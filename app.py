@@ -24,9 +24,24 @@ class Usuario(db.Model):
 def index():
     return render_template('index.html', texto='las plantillas')
 
-@app.route('/login')
+@app.route('/profile/<username>')
+def profile(username):
+    return render_template('usuario.html', usuario=username)
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        user = Usuario.query.filter_by(
+            username = request.form.get('usuario'),
+            password = request.form.get('contra')
+        ).first()
+
+        if user:
+            return redirect(url_for('profile', username=request.form.get('usuario')))
+        else:
+            return 'Usuario no existente'
+    else:
+        return render_template('login.html')
 
 @app.route('/signup')
 def register():
