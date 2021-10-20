@@ -16,10 +16,21 @@ class Usuario(db.Model):
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    tipodoc = db.Column(db.String(10), nullable=False)
+    doc = db.Column(db.String(10), nullable=False)
 
 @app.route("/")
 def index():
     return render_template("index.html", texto="las plantillas")
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/signup")
+def register():
+    return render_template("signup.html")
+
 
 if __name__ == "__main__":
     app.run()
