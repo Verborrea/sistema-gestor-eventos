@@ -11,17 +11,17 @@
         <h1>Flask funciona</h1>
         <h2>Sign Up</h2>
         <div>
-            <form method="post">
-                <label for="fname">Usuario:</label><br>
+            <form action="/create-user" method="post">
+                <label for="usuario">Usuario:</label><br>
                 <input type="text" id="usuario" name="usuario">
                 <br>
-                <label for="lname">Contraseña:</label><br>
-                <input type="text" id="contra" name="contra">
+                <label for="contra">Contraseña:</label><br>
+                <input type="password" id="contra" name="contra">
                 <br>
-                <label for="lname">Nombre y Apellido:</label><br>
+                <label for="nombre">Nombre y Apellido:</label><br>
                 <input type="text" id="nombre" name="nombre">
                 <br>
-                <label for="lname">Correo:</label><br>
+                <label for="correo">Correo:</label><br>
                 <input type="text" id="correo" name="correo">
                 <br>
                 <label for="lname">Tipo Documento:</label><br>
@@ -34,7 +34,7 @@
                 <input type="radio" id="extran" name="tipo_doc" value="ext">
                 <label for="extran">Carné de Extranjería</label>
                 <br>
-                <label for="lname">Número de Documento:</label><br>
+                <label for="doc">Número de Documento:</label><br>
                 <input type="text" id="doc" name="doc">
                 <br>
                 <br>
