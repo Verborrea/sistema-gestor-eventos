@@ -23,7 +23,7 @@ BOOSTTRAP.GenerateComplex = {
     buildTableSelection(id, headers,contenido){},//\
     buildTableOptions(id, headers,contenido, opciones=""){},//\
     buildTableModal(id, titulo, datosTabla){},//\
-    buildFormModal(id,datosForm){},//\
+    buildFormModal(id,titulo, datosForm){},//\
 }
 
 BOOSTTRAP.Buttons = {
@@ -102,12 +102,10 @@ BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
     return tabla
 }
 BOOSTTRAP.GenerateSimple.buildForm = function(id, datos){
-    let formText =String.raw`
-    <form action="" id="${id}">
-        ${()=>{for(let i in datos)
-            formText += buildRow(datos[i])}}
-    </form>
-    `
+    let formText =String.raw`<form action="" id="${id}">`
+    for(let i in datos)
+        formText += BOOSTTRAP.Forms.buildRow(datos[i])
+    formText+='</form>'
     return formText 
 }
 
@@ -174,8 +172,8 @@ BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
     return buildModal(titulo,tabla,"",id)
 }
 
-BOOSTTRAP.GenerateComplex.buildFormModal = function(id,datosForm){
-    return buildModal(titulo,buildForm(id+"-form",datosForm),"",id)
+BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm){
+    return buildModal(titulo,BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm),"",id)
 }
 
 // Buttons ==============================================

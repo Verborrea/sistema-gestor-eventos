@@ -1,0 +1,79 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+<h1>Página Principal del Evento</h1>
+
+<div id="datos-evento" class="row">
+    <div class="col-8">
+        <div class="">
+            {{descripcion}}
+        </div>
+        <br>
+        <div class="">
+            {{lugar}}
+        </div>
+        <br>
+        <div class="">
+            {{tipoEvento}}
+        </div>
+        <br>
+        {% if estado == 'Borrador' %}
+        <button type="button" class="btn btn-outline-info">Editar Datos</button>
+        {% else %}
+        <button type="button" class="btn btn-outline-info">Visualizar Datos</button>
+        {% endif %}
+    </div>
+    
+    <div class="col-4">
+        {% if estado == 'Borrador' %}
+        <button class="btn btn-primary btn-lg btn-block" type="button"> Lanzar Evento</button>
+        <button class="btn btn-success btn-lg btn-block" type="button"> Guardar Cambios</button>
+        {% endif %}
+    </div>
+</div>
+<div>
+    <br>
+    <h2>Actividades</h2>
+    <div id="modalModificar"></div>
+    <div class="row">
+        <div class="col-1"></div>
+        <div id="activities-list" class="col">
+            {%for i in range(0, lenActividad)%}
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"> {{actividad[i].nombre}}</div>
+                        <div class="col-2 text-right">
+                            {% if estado == 'Borrador' %}
+                            <a href=""><i class="fa fa-pencil"> </i></a>
+                            <a href=""><i class="fa fa-trash"> </i></a>
+                            {% else %}
+                            <a href=""><i class="fa fa-eye"> </i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            {%endfor%}
+  
+
+            {% if estado == 'Borrador' %}
+            <p class="text-center">
+                <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar actividad</button>
+            </p>
+            {% endif %}
+        </div>
+        <div class="col-1"></div>
+    </div>
+
+</div>
+
+{% endblock %}
+{% block script %}
+    <script>
+        campos = ["tipoEvento","descripcion","lugar"]
+        BOOSTTRAP.GenerateComplex.buildFormModal("modifyEvento","Editar datos del evento",campos)
+    </script>
+{% endblock %}
+</html>

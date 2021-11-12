@@ -20,6 +20,9 @@ class Usuario(db.Model):
     tipodoc = db.Column(db.String(10), nullable=False)
     doc = db.Column(db.String(10), nullable=False)
 
+loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales.
+'''
+
 @app.route('/')
 def index():
     datos = [{"id":"Evento01","nombre":"Evento1",'fechaCreacion':'05/05/21','fechaCierreInscripcion':'No definida','fechaInicioEvento':'No definida','fechaCierreEvento':'No definida','estadoEvento':'Borrador'}]
@@ -31,7 +34,19 @@ def seleccionarevento():
         id = request.form.get('selection')
         if id==None:
             return redirect(url_for('index'), code=302)
-    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido="",tipoUsuario="Admin",NombreEvento=id)
+    return redirect(url_for('evento'), code=302)
+    
+
+@app.route('/evento/', methods=['GET','POST'])
+def evento():
+    #infoEvento = {'estado':'Borrador'}
+    actividad = [
+        {"nombre":"Exposicion de materiales"},
+        {"nombre":"Exposicion de IA"},
+        {"nombre":"Exposicion de Machine Learning"},
+        {"nombre":"Exposicion de BigData"}
+    ]
+    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
 
 
 @app.route('/profile/<username>')
@@ -78,6 +93,9 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
+#MODIFY
 
+
+#
 if __name__ == '__main__':
     app.run()
