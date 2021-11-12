@@ -4,6 +4,8 @@
         <h1>Hola {{ nombreUsuario }}</h1>
         <h3>Historial de eventos:</h3>
 
+        <div id="modalNuevo"></div>
+
         <form action="{{url_for('seleccionarevento')}}" method="post">
             <div id="historialEventos"></div>
             <div class="row">
@@ -17,9 +19,13 @@
         <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
-                <button id="seleccionarEvento" class="btn btn-outline-primary btn-block" type="submit">
+                <button id="seleccionarEvento" class="btn btn-outline-primary btn-block" type="button" onclick="generarButtonsAdd()">
                     <i class="fa fa-plus"></i> Agregar Evento
                 </button>
+                <div id="BtnEventoPlantilla" class="btn-group" role="group" aria-label="Plantilla o nuevo" >
+
+                    <!--Falta eleccion a partir de plantillas-->
+                </div>
             </div>
             <div class="col-4"></div>
         </div>
@@ -33,6 +39,26 @@
             {{ contenido| tojson }}
             )
         BOOSTTRAP.Utilities.onlyChild("historialEventos",tabla)
+        function generarButtonsAdd(){
+            let idModalNuevo = "nuevoEventoModal"
+            let idModalPlantilla = "nuevoEventoPlantilla"
+            let datosForm = [{"nombre":"nombreEvento","tipo_dato":"text"},
+            {"nombre":"tipoEvento","tipo_dato":"text"},
+            {"nombre":"descripcionBreve","tipo_dato":"text"},
+            {"nombre":"lugar","tipo_dato":"text"},
+            ]
+
+            formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalNuevo,"Creacion de nuevo evento",datosForm)
+            BOOSTTRAP.Utilities.onlyChild("modalNuevo",formModal)
+            BOOSTTRAP.Utilities.addChild(idModalNuevo+"-form", BOOSTTRAP.Utilities.basicButton("Siguiente","eventoNuevo"))//Agrega el boton al form de crear
+            BOOSTTRAP.Utilities.onlyChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalNuevo,"Nuevo Evento"))
+            BOOSTTRAP.Utilities.addChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalPlantilla,"Evento Plantilla"))
+            //document.getElementById(idModalPlantilla+-"toogle").disabled = true
+        
+            document.getElementById(idModalNuevo+"-form").action = "{{url_for('crearEvento')}}"
+            document.getElementById(idModalNuevo+"-form").method = "post"
+        }
+
     </script>
 {% endblock %}
 </html>

@@ -4,7 +4,7 @@ var BOOSTTRAP = BOOSTTRAP ||{};
 
 BOOSTTRAP.Utilities = {
     iconos : {"ver":"fa-eye","eliminar":"fa-trash","modificar":"fa-pencil-square-o","agregar":"fa-plus-square-o","seleccionar":"fa-hand-pointer-o"},
-    basicButton(texto,id,classStyle){},//\
+    basicButton(texto='Enviar',id='boton-0',classStyle='btn-outline-primary'){},//\
     buildOptions(id,buttons){},//\Build extra
     buildSelection(id, name, value,extra){},//\Para poner checked or disabled
     addChild(id,raw){},//\Agrega el texto html como un hijo al padre del id
@@ -48,7 +48,7 @@ BOOSTTRAP.Tables = {
 }
 
 BOOSTTRAP.Modals = {
-    buildButtonModal(id,texto){},
+    buildButtonModal(idTarget,texto){},
     build2ButtonModal(text1,text2){},//
 }
 
@@ -67,7 +67,7 @@ function probando(){
 //==================================================
 // Utilities =======================================
 BOOSTTRAP.Utilities.basicButton = function(texto='Enviar',id='boton-0',classStyle='btn-outline-secondary'){
-    return String.raw`<button type="submit" id="${id}" class="btn ${classStyle}">${text}</button>`
+    return String.raw`<button type="submit" id="${id}" class="btn ${classStyle}">${texto}</button>`
 }
 BOOSTTRAP.Utilities.buildOptions = function(id,buttons){
     return BOOSTTRAP.buttons.getButtons(id,buttons)
@@ -117,7 +117,7 @@ BOOSTTRAP.GenerateSimple.buildModal = function(titulo,body,footer,id="modal0"){
         </button>`
     let string = String.raw`
     <div class="modal" id="${id}" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     ${header}
@@ -173,7 +173,7 @@ BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
 }
 
 BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm){
-    return buildModal(titulo,BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm),"",id)
+    return BOOSTTRAP.GenerateSimple.buildModal(titulo,BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm),"",id)
 }
 
 // Buttons ==============================================
@@ -197,10 +197,10 @@ BOOSTTRAP.Buttons.getButtons = function(id,types){
 
 // Forms ================================================
 BOOSTTRAP.Forms.buildRow = function(content){
-    if(content.tipo_dato=="multiple") return buildMultiple(content)
-    if (content.tipo_dato=="check") return buildCheck(content)
-    if (content.tipo_dato=="textarea") return buildTextarea(content)
-    return buildInput(content)
+    if(content.tipo_dato=="multiple") return BOOSTTRAP.Forms.buildMultiple(content)
+    if (content.tipo_dato=="check") return BOOSTTRAP.Forms.buildCheck(content)
+    if (content.tipo_dato=="textarea") return BOOSTTRAP.Forms.buildTextarea(content)
+    return BOOSTTRAP.Forms.buildInput(content)
 }
 
  BOOSTTRAP.Forms.buildTextarea = function(formRow){
@@ -215,15 +215,15 @@ BOOSTTRAP.Forms.buildRow = function(content){
 }
 BOOSTTRAP.Forms.buildInput = function(formRow){
     return String.raw`
-            <div class="col">
-                <div class="form-group row">
-                    <label for="id-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
-                    <div class="col-sm-10">
-                        <input type="${formRow.tipo_dato}" class="form-control" id="id-${formRow.nombre}" ${formRow.extra}>
-                    </div>
+        <div class="col">
+            <div class="form-group row">
+                <label for="id-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
+                <div class="col-sm-10">
+                    <input type="${formRow.tipo_dato}" class="form-control" id="id-${formRow.nombre}" ${formRow.extra}>
                 </div>
             </div>
-            `
+        </div>
+        `
 }
 
 BOOSTTRAP.Forms.buildCheck= function(formRow){
@@ -295,10 +295,10 @@ BOOSTTRAP.Modals.build2ButtonModal = function(text1='Cancelar',text2='Confirmar'
     <button type="button" class="btn btn-primary">${text2}</button>
     `
 }
-BOOSTTRAP.Modals.buildButtonModal = function(id,texto){
-    String.raw`
+BOOSTTRAP.Modals.buildButtonModal = function(idTarget,texto){
+    return String.raw`
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#${id}">
+    <button id="${idTarget}-'toogle'" type="button" class="btn btn-primary" data-toggle="modal" data-target="#${idTarget}" >
         ${texto}
     </button>
     `

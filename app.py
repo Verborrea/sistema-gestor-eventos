@@ -40,13 +40,21 @@ def seleccionarevento():
 @app.route('/evento/', methods=['GET','POST'])
 def evento():
     #infoEvento = {'estado':'Borrador'}
+    #modificar aqui
     actividad = [
-        {"nombre":"Exposicion de materiales"},
-        {"nombre":"Exposicion de IA"},
-        {"nombre":"Exposicion de Machine Learning"},
-        {"nombre":"Exposicion de BigData"}
+        {"nombre":"Exposicion de materiales","id":"id-actividad"},
+        {"nombre":"Exposicion de IA","id":"id-actividad"},
+        {"nombre":"Exposicion de Machine Learning","id":"id-actividad"},
+        {"nombre":"Exposicion de BigData","id":"id-actividad"}
     ]
     return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/crearEvento/', methods=['POST'])
+def crearEvento():
+    #infoEvento = {'estado':'Borrador'}
+    return "aqui crearia evento y redirecciona a la pagina de este evento"
+    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
 
 
 @app.route('/profile/<username>')
