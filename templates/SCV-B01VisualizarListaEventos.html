@@ -1,0 +1,38 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+        <h1>Hola {{ nombreUsuario }}</h1>
+        <h3>Historial de eventos:</h3>
+
+        <form action="{{url_for('seleccionarevento')}}" method="post">
+            <div id="historialEventos"></div>
+            <div class="row">
+                <div class="col-8"></div>
+                <div class="col-4">
+                    <button id="seleccionarEvento" class="btn btn-primary btn-lg btn-block" type="submit"> Seleccionar</button>                
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <button id="seleccionarEvento" class="btn btn-outline-primary btn-block" type="submit">
+                    <i class="fa fa-plus"></i> Agregar Evento
+                </button>
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+{% endblock %}
+{% block script %}
+    <script>
+        let tabla = BOOSTTRAP.GenerateComplex.buildTableSelection(
+            "tablaHistorialEventos",
+            ["nombre","fechaCreacion","fechaCierreInscripcion","fechaInicioEvento","fechaCierreEvento","estadoEvento"],
+            {{ contenido| tojson }}
+            )
+        BOOSTTRAP.Utilities.onlyChild("historialEventos",tabla)
+    </script>
+{% endblock %}
+</html>

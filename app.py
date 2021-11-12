@@ -22,7 +22,17 @@ class Usuario(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('index.html', texto='las plantillas')
+    datos = [{"id":"Evento01","nombre":"Evento1",'fechaCreacion':'05/05/21','fechaCierreInscripcion':'No definida','fechaInicioEvento':'No definida','fechaCierreEvento':'No definida','estadoEvento':'Borrador'}]
+    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
+
+@app.route('/seleccionarevento/', methods=['POST'])
+def seleccionarevento():
+    if request.method == 'POST':
+        id = request.form.get('selection')
+        if id==None:
+            return redirect(url_for('index'), code=302)
+    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido="",tipoUsuario="Admin",NombreEvento=id)
+
 
 @app.route('/profile/<username>')
 def profile(username):
