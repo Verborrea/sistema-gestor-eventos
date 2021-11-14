@@ -59,8 +59,9 @@ let None = "";
 
 //==================================================
 // Pruebando =======================================
+
 function probando(){
-    console.log(BOOSTTRAP.Utilities.buildSelection("id", "name", "value","checked"))
+    
 }
 
 //==================================================
@@ -166,19 +167,19 @@ BOOSTTRAP.GenerateComplex.buildTableOptions = function(id, headers,contenido, op
 }
 
 BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
-    let tabla = String.raw`<form id='${id}-tablaModalForm' method='post'><div class = 'marquito'>`
+    let tabla = String.raw`<form id='${id}-tablaModalForm' method='post'><div class = "marquito"><div class = "container"><br>`
     if (datosTabla.tipo_tabla == 'Simple') tabla += BOOSTTRAP.GenerateSimple.buildTable(id+'-table',datosTabla.headers, datosTabla.contenido)
     else if (datosTabla.tipo_tabla == 'Seleccion') tabla += BOOSTTRAP.GenerateComplex.buildTableSelection(id+'-table',datosTabla.headers, datosTabla.contenido)
     else if (datosTabla.tipo_tabla == 'Opciones') tabla += BOOSTTRAP.GenerateComplex.buildTableOptions(id+'-table',datosTabla.headers, datosTabla.contenido,datosTabla.opciones)
-    tabla += "</div></form>"
-    return buildModal(titulo,tabla,"",id)
+    tabla += "</div></div></form>"
+    return BOOSTTRAP.GenerateSimple.buildModal(titulo,tabla,"",id)
 }
 
 BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm){
     let form = String.raw`
-        <div class = "marquito">
+        <div class = "marquito"><div class = "container"><br>
             ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm)}
-        </div>
+        </div></div>
     `
     return BOOSTTRAP.GenerateSimple.buildModal(titulo,form,"",id)
 }

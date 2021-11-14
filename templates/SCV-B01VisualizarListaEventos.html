@@ -4,8 +4,8 @@
         <h1>Hola {{ nombreUsuario }}</h1>
         <h3>Historial de eventos:</h3>
 
-        <div id="modalNuevo"></div>
-
+        <div id="modalEventoNuevo"></div>
+        <div id="modalEventoPlantilla"></div>
         <form action="{{url_for('seleccionarevento')}}" method="post">
             <div id="historialEventos"></div>
             <div class="row">
@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
-                <button id="seleccionarEvento" class="btn btn-outline-primary btn-block" type="button" onclick="generarButtonsAdd()">
+                <button id="agregarEvento" class="btn btn-outline-primary btn-block" type="button" >
                     <i class="fa fa-plus"></i> Agregar Evento
                 </button>
                 <div id="BtnEventoPlantilla" class="btn-group  btn-block" role="group" aria-label="Plantilla o nuevo" >
@@ -43,7 +43,7 @@
         function generarButtonsAdd(){//Crea los modals y botones de crear nuevo y crear a partir de plantilla
             if(!loadedButton){
                 let idModalNuevo = "nuevoEventoModal"
-                let idModalPlantilla = "nuevoEventoPlantilla"
+                let idModalPlantilla = "plantillaEventoModal"
                 let datosForm = [
                     {"nombre":"nombreEvento","tipo_dato":"text"},
                     {"nombre":"tipoEvento","tipo_dato":"text"},
@@ -52,7 +52,7 @@
                 ]
                 //Crear evento desde 0
                 formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalNuevo,"Creación de nuevo evento",datosForm)
-                BOOSTTRAP.Utilities.onlyChild("modalNuevo",formModal)
+                BOOSTTRAP.Utilities.onlyChild("modalEventoNuevo",formModal)
                 document.getElementById(idModalNuevo+"-form").action = "{{url_for('crearEvento')}}"
                 document.getElementById(idModalNuevo+"-form").method = "post"
 
@@ -63,17 +63,19 @@
                     contenido:""}
                 tableModal = BOOSTTRAP.GenerateComplex.buildTableModal(idModalPlantilla, "Creación a partir de Plantilla", datosTabla)
                 //Hacer request magico
-                let contenido = ()=>{return ""}//Request
-                BOOSTTRAP.Tables.fillTabla(headers,contenido,true,false)
+                //let contenido = ()=>{return ""}//Request
+                //BOOSTTRAP.Tables.fillTabla(headers,contenido,true,false)
                 //document.getElementById(idModalNuevo+"'${id}-tablaModalForm' ").action = "{{url_for('crearEvento')}}"
                 
 
                 //Aniade botones de los modals
                 BOOSTTRAP.Utilities.onlyChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalNuevo,"Nuevo Evento"))
                 BOOSTTRAP.Utilities.addChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalPlantilla,"Evento Plantilla"))
+                
+                loadedButton = true;
             }
-            
         }
+        document.getElementById("agregarEvento").addEventListener("click", generarButtonsAdd, false);
 
     </script>
 {% endblock %}
