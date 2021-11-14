@@ -55,6 +55,16 @@ def crearEvento():
     return "aqui crearia evento y redirecciona a la pagina de este evento"
     return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
 
+@app.route('/eliminarActividad/', methods=['GET','POST'])
+def eliminarActividad():
+    return "aqui elimina actividad"
+    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/registrarMovimiento/', methods=['GET','POST'])
+def registrarMovimiento():
+    datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
+
+    return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
 
 
 @app.route('/profile/<username>')

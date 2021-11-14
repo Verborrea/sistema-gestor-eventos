@@ -1,21 +1,19 @@
 console.log("BOOSTTRAP Version 1.0 \n Framework developed by: Magr")
-//Estas editando aqui
+
 var BOOSTTRAP = BOOSTTRAP ||{};
 
 BOOSTTRAP.Utilities = {
     iconos : {"ver":"fa-eye","eliminar":"fa-trash","modificar":"fa-pencil-square-o","agregar":"fa-plus-square-o","seleccionar":"fa-hand-pointer-o"},
     basicButton(texto='Enviar',id='boton-0',classStyle='btn-outline-primary'){},//\
-    buildOptions(id,buttons){},//\Build extra
-    buildSelection(id, name, value,extra){},//\Para poner checked or disabled
-    addChild(id,raw){},//\Agrega el texto html como un hijo al padre del id
-    onlyChild(id,raw){},//\Agrega el texto html como unico hijo al padre del id
+    buildOptions(id,buttons){},//\
+    buildSelection(id, name, value,extra){},//\
+    addChild(id,raw){},//\
+    onlyChild(id,raw){},//\
 }
 
 BOOSTTRAP.GenerateSimple = {
     buildTable(id, headers,contenido){},//\
-    buildForm(id, datos){},//Re-do, missing form part xd
-    //var datos = [{'nombre': 'vin', 'tipo_dato': 'number', 'values': None, 'extra': None}, {'nombre': 'marca', 'tipo_dato': 'text', 'values': None, 'extra': None}, {'nombre': 'placa', 'tipo_dato': 'text', 'values': None, 'extra': None}, {'nombre': 'año', 'tipo_dato': 'number', 'values': None, 'extra': None}, {'nombre': 'modelo', 'tipo_dato': 'text', 'values': None, 'extra': None}, {'nombre': 'tipo de carro', 'tipo_dato': None, 'values': None, 'extra': None}, {'nombre': 'combustible', 'tipo_dato': None, 'values': None, 'extra': None}, {'nombre': 'nivel de combustible', 'tipo_dato': 'number', 'values': None, 'extra': None}, {'nombre': 'Nivel de refrigerante', 'tipo_dato': 'number', 'values': None, 'extra': None}, {'nombre': 'Kilometraje', 'tipo_dato': 'number', 'values': None, 'extra': None}, {'nombre': 'Observaciones', 'tipo_dato': 'textarea', 'values': None, 'extra': None}]
-
+    buildForm(id, datos){},//\
     buildModal(titulo,body,footer,id){},//\
 }
 
@@ -43,8 +41,9 @@ BOOSTTRAP.Forms = {
 BOOSTTRAP.Tables = {
     buildTableRowContent(headers,obj){},//\
     //getHeaders(row){},
+    fillTable(idTable,headers,contenido,selectionBool,optionsRight){},
     buildTableContent(headers,contenido,selectionBool,optionsRight){},//\
-    buildTableHeader(headers,left,right){},//Recibe los nombres de los headers y dos booleanos de si deja espacio a la izquierda o derecha
+    buildTableHeader(headers,left,right){},//
 }
 
 BOOSTTRAP.Modals = {
@@ -66,8 +65,8 @@ function probando(){
 
 //==================================================
 // Utilities =======================================
-BOOSTTRAP.Utilities.basicButton = function(texto='Enviar',id='boton-0',classStyle='btn-outline-secondary'){
-    return String.raw`<button type="submit" id="${id}" class="btn ${classStyle}">${texto}</button>`
+BOOSTTRAP.Utilities.basicButton = function(texto='Enviar',id='boton-0',classStyle='btn-outline-primary'){
+    return String.raw`<button type="submit" id="${id}" class="btn ${classStyle}  float-right" >${texto}</button>`
 }
 BOOSTTRAP.Utilities.buildOptions = function(id,buttons){
     return BOOSTTRAP.buttons.getButtons(id,buttons)
@@ -94,7 +93,7 @@ BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
         <thead>
             ${BOOSTTRAP.Tables.buildTableHeader(headers,false,false)}
         </thead>
-        <tbody>
+        <tbody id="${id="-tbody"}">
             ${BOOSTTRAP.Tables.buildTableContent(headers,contenido,false,false)}
         </tbody>
     </table>
@@ -105,6 +104,8 @@ BOOSTTRAP.GenerateSimple.buildForm = function(id, datos){
     let formText =String.raw`<form action="" id="${id}">`
     for(let i in datos)
         formText += BOOSTTRAP.Forms.buildRow(datos[i])
+    formText += String.raw`<div class="justify-content-end">${BOOSTTRAP.Utilities.basicButton("Continuar","id","btn-outline-primary")}</div>`
+    //formText+=
     formText+='</form>'
     return formText 
 }
@@ -165,15 +166,21 @@ BOOSTTRAP.GenerateComplex.buildTableOptions = function(id, headers,contenido, op
 }
 
 BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
-    let tabla = ""
-    if (datosTabla.tipo_tabla == 'Simple') tabla = BOOSTTRAP.GenerateSimple.buildTable(id+'-table',datosTabla.headers, datosTabla.contenido)
-    else if (datosTabla.tipo_tabla == 'Seleccion') tabla = BOOSTTRAP.GenerateComplex.buildTableSelection(id+'-table',datosTabla.headers, datosTabla.contenido)
-    else if (datosTabla.tipo_tabla == 'Opciones') tabla = BOOSTTRAP.GenerateComplex.buildTableOptions(id+'-table',datosTabla.headers, datosTabla.contenido,datosTabla.opciones)
+    let tabla = String.raw`<form id='${id}-tablaModalForm' method='post'><div class = 'marquito'>`
+    if (datosTabla.tipo_tabla == 'Simple') tabla += BOOSTTRAP.GenerateSimple.buildTable(id+'-table',datosTabla.headers, datosTabla.contenido)
+    else if (datosTabla.tipo_tabla == 'Seleccion') tabla += BOOSTTRAP.GenerateComplex.buildTableSelection(id+'-table',datosTabla.headers, datosTabla.contenido)
+    else if (datosTabla.tipo_tabla == 'Opciones') tabla += BOOSTTRAP.GenerateComplex.buildTableOptions(id+'-table',datosTabla.headers, datosTabla.contenido,datosTabla.opciones)
+    tabla += "</div></form>"
     return buildModal(titulo,tabla,"",id)
 }
 
 BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm){
-    return BOOSTTRAP.GenerateSimple.buildModal(titulo,BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm),"",id)
+    let form = String.raw`
+        <div class = "marquito">
+            ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm)}
+        </div>
+    `
+    return BOOSTTRAP.GenerateSimple.buildModal(titulo,form,"",id)
 }
 
 // Buttons ==============================================
@@ -197,18 +204,18 @@ BOOSTTRAP.Buttons.getButtons = function(id,types){
 
 // Forms ================================================
 BOOSTTRAP.Forms.buildRow = function(content){
-    if(content.tipo_dato=="multiple") return BOOSTTRAP.Forms.buildMultiple(content)
+    //if(content.tipo_dato=="multiple") return BOOSTTRAP.Forms.buildMultiple(content)
     if (content.tipo_dato=="check") return BOOSTTRAP.Forms.buildCheck(content)
     if (content.tipo_dato=="textarea") return BOOSTTRAP.Forms.buildTextarea(content)
     return BOOSTTRAP.Forms.buildInput(content)
 }
 
- BOOSTTRAP.Forms.buildTextarea = function(formRow){
+BOOSTTRAP.Forms.buildTextarea = function(formRow){
     return String.raw`
         <div class="col">
             <div class="mb-3">
                 <label for="id-${formRow.nombre}">${formRow.nombre}</label>
-                <textarea class="form-control" id="id-${formRow.nombre}" ${formRow.extra}></textarea>
+                <textarea class="form-control" id="${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}></textarea>
             </div>
         </div>    
         `
@@ -217,9 +224,9 @@ BOOSTTRAP.Forms.buildInput = function(formRow){
     return String.raw`
         <div class="col">
             <div class="form-group row">
-                <label for="id-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
+                <label for="${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
                 <div class="col-sm-10">
-                    <input type="${formRow.tipo_dato}" class="form-control" id="id-${formRow.nombre}" ${formRow.extra}>
+                    <input type="${formRow.tipo_dato}" class="form-control" id="${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}>
                 </div>
             </div>
         </div>
@@ -263,7 +270,6 @@ BOOSTTRAP.Tables.buildTableRowContent = function(headers,obj){
 
 BOOSTTRAP.Tables.buildTableContent = function(headers,contenido,selectionBool,optionsRight){
     let tabla = ""
-    
     for (let i in contenido){
         var obj = contenido[i]
         tabla+=String.raw`<tr id="${obj.id}" class="table dataTable table-hover dataTable">`;
@@ -285,6 +291,10 @@ BOOSTTRAP.Tables.buildTableHeader = function(headers,left,right){
     if(right)tabla+='<th scope="col">opciones</th>';//una fila para botones
     tabla+='</tr>'
     return tabla
+}
+BOOSTTRAP.Tables.fillTable = function(idTable,headers,contenido,selectionBool,optionsRight){
+    let fill = BOOSTTRAP.Tables.buildTableContent(headers,contenido,selectionBool,optionsRight)
+    document.getElementById(idTable+"+tbody").innerHTML = fill
 }
 
 
