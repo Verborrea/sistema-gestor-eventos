@@ -31,12 +31,12 @@ BOOSTTRAP.Buttons = {
 }
 
 BOOSTTRAP.Forms = {
-    buildRow(content){},//\
-    buildTextarea(formRow){},//\
-    buildInput(formRow){},//\
-    buildCheck(formRow){},//\
-    buildCheck(formRow){},//\
-    fillForm(datos){},//\
+    buildRow(content,idForm){},//\
+    buildTextarea(formRow,idForm){},//\
+    buildInput(formRow,idForm){},//\
+    buildCheck(formRow,idForm){},//\
+    //buildCheck(formRow,idForm){},//\
+    fillForm(datos,idForm){},//\
 }
 
 BOOSTTRAP.Tables = {
@@ -112,7 +112,7 @@ BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
 BOOSTTRAP.GenerateSimple.buildForm = function(id, datos){
     let formText =String.raw`<form action="" id="${id}">`
     for(let i in datos)
-        formText += BOOSTTRAP.Forms.buildRow(datos[i])
+        formText += BOOSTTRAP.Forms.buildRow(datos[i],id)
     formText += String.raw`<div class="justify-content-end">${BOOSTTRAP.Utilities.basicButton("Continuar","id","btn-outline-primary")}</div>`
     //formText+=
     formText+='</form>'
@@ -212,44 +212,44 @@ BOOSTTRAP.Buttons.getButtons = function(id,types){
 }
 
 // Forms ================================================
-BOOSTTRAP.Forms.buildRow = function(content){
+BOOSTTRAP.Forms.buildRow = function(content,idForm){
     //if(content.tipo_dato=="multiple") return BOOSTTRAP.Forms.buildMultiple(content)
-    if (content.tipo_dato=="check") return BOOSTTRAP.Forms.buildCheck(content)
-    if (content.tipo_dato=="textarea") return BOOSTTRAP.Forms.buildTextarea(content)
-    return BOOSTTRAP.Forms.buildInput(content)
+    if (content.tipo_dato=="check") return BOOSTTRAP.Forms.buildCheck(content,idForm)
+    if (content.tipo_dato=="textarea") return BOOSTTRAP.Forms.buildTextarea(content,idForm)
+    return BOOSTTRAP.Forms.buildInput(content,idForm)
 }
 
-BOOSTTRAP.Forms.buildTextarea = function(formRow){
+BOOSTTRAP.Forms.buildTextarea = function(formRow,idForm){
     return String.raw`
         <div class="col">
             <div class="mb-3">
-                <label for="id-${formRow.nombre}">${formRow.nombre}</label>
-                <textarea class="form-control" id="id-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}></textarea>
+                <label for="${idForm}-${formRow.nombre}">${formRow.nombre}</label>
+                <textarea class="form-control" id="${idForm}-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}></textarea>
             </div>
         </div>    
         `
 }
-BOOSTTRAP.Forms.buildInput = function(formRow){
+BOOSTTRAP.Forms.buildInput = function(formRow,idForm){
     return String.raw`
-        <div class="col">
+        <div class="col" ${formRow.extra}>
             <div class="form-group row">
-                <label for="id-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
+                <label for="${idForm}-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
                 <div class="col-sm-10">
-                    <input type="${formRow.tipo_dato}" class="form-control" id="id-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}>
+                    <input type="${formRow.tipo_dato}" class="form-control" id="${idForm}-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}>
                 </div>
             </div>
         </div>
         `
 }
 
-BOOSTTRAP.Forms.buildCheck= function(formRow){
+BOOSTTRAP.Forms.buildCheck= function(formRow,idForm){
     let text = ""
     let values = formRow.values
     values = values.split("+");
     for (i in values){
         text += String.raw`
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="${formRow.nombre}" id="id-${formRow.nombre}-op${i}" value="${values[i]}" ${formRow.extra}>
+            <input class="form-check-input" type="radio" name="${formRow.nombre}" id="${idForm}-${formRow.nombre}-op${i}" value="${values[i]}" ${formRow.extra}>
             <label class="form-check-label" for="inlineRadio1">${values[i]}</label>
         </div>
         `
@@ -258,12 +258,9 @@ BOOSTTRAP.Forms.buildCheck= function(formRow){
 }
 
 
-BOOSTTRAP.Forms.fillForm = function(datos){//datos = {"id"=10.12312}
+BOOSTTRAP.Forms.fillForm = function(datos,idForm){//datos = {"id"=10.12312}
     for (let key in datos){
-        //console.log(key," ",datos[key])
-        //document.getElementById("id-"+key).attr('value',datos[key])
-        console.log("id-"+key)
-        document.getElementById("id-"+key).setAttribute('value',datos[key])
+        document.getElementById(idForm+"-"+key).setAttribute('value',datos[key])
     }
 }
 
