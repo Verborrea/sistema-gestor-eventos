@@ -107,13 +107,6 @@ def crearEvento():
         lugar = request.form.get('lugar')
     )
 
-    actividad = [
-        {"nombre":"Exposicion de materiales","id":"id-actividad"},
-        {"nombre":"Exposicion de IA","id":"id-actividad"},
-        {"nombre":"Exposicion de Machine Learning","id":"id-actividad"},
-        {"nombre":"Exposicion de BigData","id":"id-actividad"}
-    ]
-
     db.session.add(nuevoEvento)
     db.session.commit()
     print(Evento.query.all())
