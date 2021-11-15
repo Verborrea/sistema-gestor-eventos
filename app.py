@@ -21,8 +21,7 @@ class Usuario(db.Model):
     tipodoc = db.Column(db.String(10), nullable=False)
     doc = db.Column(db.String(10), nullable=False)
 
-loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales.
-'''
+loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 @app.route('/')
 def index():
@@ -52,9 +51,16 @@ def evento():
 
 @app.route('/crearEvento/', methods=['POST'])
 def crearEvento():
-    #infoEvento = {'estado':'Borrador'}
     return "aqui crearia evento y redirecciona a la pagina de este evento"
-    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/modificarEvento/', methods=['POST'])
+def modificarEvento():
+    return "aqui modificaria evento y redirecciona a la pagina de este evento"
+
+@app.route('/lanzarEvento/', methods=['POST'])
+def lanzarEvento():
+    return "aqui lanzaria evento y redirecciona a la pagina de este evento"
+
 
 @app.route('/obtenerPlantillas/', methods=['POST','GET'])
 def obtenerPlantillas():

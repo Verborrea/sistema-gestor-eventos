@@ -18,7 +18,7 @@
         </div>
         <br>
         {% if estado == 'Borrador' %}
-        <button type="button" class="btn btn-outline-info">Editar Datos</button>
+        <button id="editarDatosBoton" type="button" class="btn btn-outline-info">Editar Datos</button>
         {% else %}
         <button type="button" class="btn btn-outline-info">Visualizar Datos</button>
         {% endif %}
@@ -26,15 +26,20 @@
     
     <div class="col-4">
         {% if estado == 'Borrador' %}
-        <button class="btn btn-primary btn-lg btn-block" type="button"> Lanzar Evento</button>
-        <button class="btn btn-success btn-lg btn-block" type="button"> Guardar Cambios</button>
+        <form action="{{url_for('lanzarEvento')}}">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Lanzar Evento</button>
+        </form>
+        
+        <!--
+            <button class="btn btn-success btn-lg btn-block" type="button"> Guardar Cambios</button>
+        -->
         {% endif %}
     </div>
 </div>
 <div>
     <br>
     <h2>Actividades</h2>
-    <div id="modalModificar"></div>
+    <div id="modalModificarContainer"></div>
     <div class="row">
         <div class="col-1"></div>
         <div id="activities-list" class="col">
@@ -72,8 +77,29 @@
 {% endblock %}
 {% block script %}
     <script>
-        campos = ["tipoEvento","descripcion","lugar"]
-        BOOSTTRAP.GenerateComplex.buildFormModal("modifyEvento","Editar datos del evento",campos)
+        let idModalModify = "modalModificar"
+        let datosForm = [
+            {"nombre":"nombreEvento","tipo_dato":"text"},
+            {"nombre":"tipoEvento","tipo_dato":"text"},
+            {"nombre":"descripcion","tipo_dato":"text"},
+            {"nombre":"lugar","tipo_dato":"text"},
+        ]
+        formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalModify,"Modificar evento",datosForm)
+        BOOSTTRAP.Utilities.onlyChild("modalModificarContainer",formModal)
+        console.log(formModal)
+        document.getElementById(idModalModify+"-form").action = "{{url_for('modificarEvento')}}"
+        document.getElementById(idModalModify+"-form").method = "post"
+        let contenido ={
+            "nombreEvento":"{{nombreEvento}}",
+            "descripcion":"{{descripcion}}",
+            "lugar":"{{lugar}}",
+            "tipoEvento":"{{tipoEvento}}",
+        }
+        BOOSTTRAP.Forms.fillForm(contenido)
+        
+        BOOSTTRAP.Utilities.convertToCallModal("editarDatosBoton",idModalModify)
+
+
     </script>
 {% endblock %}
 </html>
