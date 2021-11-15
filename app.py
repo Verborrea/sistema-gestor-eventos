@@ -4,6 +4,7 @@ from markupsafe import escape
 from flask import Flask, request, redirect, url_for
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
+from sqlalchemy.orm import defaultload
 import json
 
 app = Flask(__name__)
@@ -21,11 +22,50 @@ class Usuario(db.Model):
     tipodoc = db.Column(db.String(10), nullable=False)
     doc = db.Column(db.String(10), nullable=False)
 
+class Evento(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    tipo = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.String(100), nullable=False)
+    lugar = db.Column(db.String(100), nullable=False)
+    estado = db.Column(db.String(20), default="Borrador")
+    fechaCreacion = db.Column(db.Date, default=datetime.datetime.utcnow)
+    fechaPreInscripcion = db.Column(db.Date)
+    fechaAprtrInscripcion = db.Column(db.Date)
+    fechaLmtDscnto = db.Column(db.Date)
+    fechaCierreInscripcion = db.Column(db.Date)
+    fechaInicio = db.Column(db.Date)
+    fechaFin = db.Column(db.Date)
+    cntInscritos = db.Column(db.Integer, default=0)
+    cntPreInscritos = db.Column(db.Integer, default=0)
+    prcntjDscnto = db.Column(db.Float, default=0)
+    plantilla = db.Column(db.Boolean, default=False)
+    
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 @app.route('/')
 def index():
-    datos = [{"id":"Evento01","nombre":"Evento1",'fechaCreacion':'05/05/21','fechaCierreInscripcion':'No definida','fechaInicioEvento':'No definida','fechaCierreEvento':'No definida','estadoEvento':'Borrador'}]
+    datos = []
+    eventos = Evento.query.all()
+    for evento in eventos:
+        strFechaInicio = evento.fechaInicio
+        if strFechaInicio == None:
+            strFechaInicio = 'No definida'
+        strFechaFin = evento.fechaInicio
+        if strFechaFin == None:
+            strFechaFin = 'No definida'
+        strfechaCierreIns = evento.fechaCierreInscripcion
+        if strfechaCierreIns == None:
+            strfechaCierreIns = 'No definida'
+        datos.append({
+            "id":evento.id,
+            "nombre":evento.nombre,
+            'fechaCreacion':evento.fechaCreacion.strftime("%d/%m/%Y"),
+            'fechaCierreInscripcion':strfechaCierreIns,
+            'fechaInicioEvento':strFechaInicio,
+            'fechaCierreEvento':strFechaFin,
+            'estadoEvento':evento.estado
+        })
     return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
@@ -34,24 +74,51 @@ def seleccionarevento():
         id = request.form.get('selection')
         if id==None:
             return redirect(url_for('index'), code=302)
-    return redirect(url_for('evento'), code=302)
+    return redirect(url_for('evento',idEvento=id), code=302)
     
 
-@app.route('/evento/', methods=['GET','POST'])
-def evento():
-    #infoEvento = {'estado':'Borrador'}
-    #modificar aqui
+@app.route('/evento/<idEvento>', methods=['GET','POST'])
+def evento(idEvento):
+    miEvento = Evento.query.filter_by(
+        id = idEvento
+    ).first()
+    print(miEvento)
     actividad = [
         {"nombre":"Exposicion de materiales","id":"id-actividad"},
         {"nombre":"Exposicion de IA","id":"id-actividad"},
         {"nombre":"Exposicion de Machine Learning","id":"id-actividad"},
         {"nombre":"Exposicion de BigData","id":"id-actividad"}
     ]
-    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+    return render_template(
+        'SCV-B01MenuEvento.html',
+        estado = miEvento.estado,
+        descripcion = miEvento.descripcion,
+        lugar = miEvento.lugar,
+        tipoEvento = miEvento.tipo,
+        actividad = actividad,
+        lenActividad = len(actividad))
 
 @app.route('/crearEvento/', methods=['POST'])
 def crearEvento():
-    return "aqui crearia evento y redirecciona a la pagina de este evento"
+    nuevoEvento = Evento(
+        nombre = request.form.get('nombreEvento'),
+        tipo = request.form.get('tipoEvento'),
+        descripcion = request.form.get('descripcionBreve'),
+        lugar = request.form.get('lugar')
+    )
+
+    actividad = [
+        {"nombre":"Exposicion de materiales","id":"id-actividad"},
+        {"nombre":"Exposicion de IA","id":"id-actividad"},
+        {"nombre":"Exposicion de Machine Learning","id":"id-actividad"},
+        {"nombre":"Exposicion de BigData","id":"id-actividad"}
+    ]
+
+    db.session.add(nuevoEvento)
+    db.session.commit()
+    print(Evento.query.all())
+
+    return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
 @app.route('/modificarEvento/', methods=['POST'])
 def modificarEvento():
