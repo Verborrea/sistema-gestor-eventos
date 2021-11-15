@@ -79,6 +79,7 @@
     <script>
         let idModalModify = "modalModificar"
         let datosForm = [
+            {"nombre":"idEvento","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
             {"nombre":"nombreEvento","tipo_dato":"text"},
             {"nombre":"tipoEvento","tipo_dato":"text"},
             {"nombre":"descripcion","tipo_dato":"text"},
@@ -90,12 +91,13 @@
         document.getElementById(idModalModify+"-form").action = "{{url_for('modificarEvento')}}"
         document.getElementById(idModalModify+"-form").method = "post"
         let contenido ={
+            "idEvento":"{{idEvento}}",
             "nombreEvento":"{{nombreEvento}}",
             "descripcion":"{{descripcion}}",
             "lugar":"{{lugar}}",
             "tipoEvento":"{{tipoEvento}}",
         }
-        BOOSTTRAP.Forms.fillForm(contenido)
+        BOOSTTRAP.Forms.fillForm(contenido,idModalModify+"-form")
         
         BOOSTTRAP.Utilities.convertToCallModal("editarDatosBoton",idModalModify)
 
