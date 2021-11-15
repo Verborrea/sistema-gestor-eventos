@@ -94,7 +94,7 @@ BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
         <thead>
             ${BOOSTTRAP.Tables.buildTableHeader(headers,false,false)}
         </thead>
-        <tbody id="${id="-tbody"}">
+        <tbody id="${id}-tbody">
             ${BOOSTTRAP.Tables.buildTableContent(headers,contenido,false,false)}
         </tbody>
     </table>
@@ -144,7 +144,7 @@ BOOSTTRAP.GenerateComplex.buildTableSelection = function(id, headers,contenido){
         <thead>
             ${BOOSTTRAP.Tables.buildTableHeader(headers,true,false)}
         </thead>
-        <tbody>
+        <tbody id="${id}-tbody">
             ${BOOSTTRAP.Tables.buildTableContent(headers,contenido,true, false)}
         </tbody>
     </table>
@@ -158,7 +158,7 @@ BOOSTTRAP.GenerateComplex.buildTableOptions = function(id, headers,contenido, op
         <thead>
             ${BOOSTTRAP.Tables.buildTableHeader(headers,false,true)}
         </thead>
-        <tbody>
+        <tbody id="${id}-tbody">
             ${BOOSTTRAP.Tables.buildTableContent(headers,contenido,false,opciones)}
         </tbody>
     </table>
@@ -167,10 +167,10 @@ BOOSTTRAP.GenerateComplex.buildTableOptions = function(id, headers,contenido, op
 }
 
 BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
-    let tabla = String.raw`<form id='${id}-tablaModalForm' method='post'><div class = "marquito"><div class = "container"><br>`
-    if (datosTabla.tipo_tabla == 'Simple') tabla += BOOSTTRAP.GenerateSimple.buildTable(id+'-table',datosTabla.headers, datosTabla.contenido)
-    else if (datosTabla.tipo_tabla == 'Seleccion') tabla += BOOSTTRAP.GenerateComplex.buildTableSelection(id+'-table',datosTabla.headers, datosTabla.contenido)
-    else if (datosTabla.tipo_tabla == 'Opciones') tabla += BOOSTTRAP.GenerateComplex.buildTableOptions(id+'-table',datosTabla.headers, datosTabla.contenido,datosTabla.opciones)
+    let tabla = String.raw`<form id='${id}-tableModalForm' method='post'><div class = "marquito"><div class = "container"><br>`
+    if (datosTabla.tipo_tabla == 'Simple') tabla += BOOSTTRAP.GenerateSimple.buildTable(id+"-tableModalForm"+'-table',datosTabla.headers, datosTabla.contenido)
+    else if (datosTabla.tipo_tabla == 'Seleccion') tabla += BOOSTTRAP.GenerateComplex.buildTableSelection(id+"-tableModalForm"+'-table',datosTabla.headers, datosTabla.contenido)
+    else if (datosTabla.tipo_tabla == 'Opciones') tabla += BOOSTTRAP.GenerateComplex.buildTableOptions(id+"-tableModalForm"+'-table',datosTabla.headers, datosTabla.contenido,datosTabla.opciones)
     tabla += "</div></div></form>"
     return BOOSTTRAP.GenerateSimple.buildModal(titulo,tabla,"",id)
 }
@@ -295,7 +295,8 @@ BOOSTTRAP.Tables.buildTableHeader = function(headers,left,right){
 }
 BOOSTTRAP.Tables.fillTable = function(idTable,headers,contenido,selectionBool,optionsRight){
     let fill = BOOSTTRAP.Tables.buildTableContent(headers,contenido,selectionBool,optionsRight)
-    document.getElementById(idTable+"+tbody").innerHTML = fill
+    console.log(idTable+"-tbody")
+    document.getElementById(idTable+"-tbody").innerHTML = fill
 }
 
 

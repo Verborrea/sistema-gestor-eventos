@@ -62,10 +62,26 @@
                     headers:["Nombre","Fecha","TipoEvento"],
                     contenido:""}
                 tableModal = BOOSTTRAP.GenerateComplex.buildTableModal(idModalPlantilla, "Creación a partir de Plantilla", datosTabla)
-                //Hacer request magico
-                //let contenido = ()=>{return ""}//Request
-                //BOOSTTRAP.Tables.fillTabla(headers,contenido,true,false)
-                //document.getElementById(idModalNuevo+"'${id}-tablaModalForm' ").action = "{{url_for('crearEvento')}}"
+                
+                console.log(tableModal)
+                
+                
+                BOOSTTRAP.Utilities.onlyChild("modalEventoPlantilla",tableModal)
+                BOOSTTRAP.Utilities.addChild(idModalPlantilla+"-tableModalForm",BOOSTTRAP.Utilities.basicButton("Seleccionar"))
+
+                document.getElementById(idModalPlantilla+"-tableModalForm").action = "{{url_for('crearEventoPlantilla')}}"
+
+                //Llena la tabla
+                    //Request
+                    const request = new XMLHttpRequest();
+                    request.open('GET', "{{url_for('obtenerPlantillas')}}", false);
+                    
+                    request.onload = () => {
+                        const data = JSON.parse(request.responseText);
+                        BOOSTTRAP.Tables.fillTable(idModalPlantilla+"-tableModalForm-table",datosTabla.headers,data,true,false)
+                    };
+                    request.send(null)
+
                 
 
                 //Aniade botones de los modals

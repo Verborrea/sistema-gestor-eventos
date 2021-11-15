@@ -4,6 +4,7 @@ from markupsafe import escape
 from flask import Flask, request, redirect, url_for
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -54,6 +55,22 @@ def crearEvento():
     #infoEvento = {'estado':'Borrador'}
     return "aqui crearia evento y redirecciona a la pagina de este evento"
     return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/obtenerPlantillas/', methods=['POST','GET'])
+def obtenerPlantillas():
+    #headers=["Nombre","Fecha","TipoEvento"]
+    plantillas = [
+        {"id":"Evento01","Nombre":"Evento01","Fecha":"Ayer","TipoEvento":"tipito"}
+    ]
+    return json.dumps(plantillas)
+    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/crearEventoPlantilla/', methods=['GET','POST'])
+def crearEventoPlantilla():
+    #infoEvento = {'estado':'Borrador'}
+    return "aqui crearia evento y redirecciona a la pagina de este evento"
+    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
 
 @app.route('/eliminarActividad/', methods=['GET','POST'])
 def eliminarActividad():
