@@ -1,7 +1,7 @@
 import datetime
 from markupsafe import escape
 
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, session
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
 from sqlalchemy.orm import defaultload
@@ -67,7 +67,7 @@ def index():
             'fechaCierreEvento':strFechaFin,
             'estadoEvento':evento.estado
         })
-    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
+    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():
@@ -83,7 +83,7 @@ def evento(idEvento):
     miEvento = Evento.query.filter_by(
         id = idEvento
     ).first()
-    print(miEvento)
+    session['idEvento'] = idEvento
     actividad = [
         {"nombre":"Exposicion de materiales","id":"id-actividad"},
         {"nombre":"Exposicion de IA","id":"id-actividad"},
@@ -97,7 +97,8 @@ def evento(idEvento):
         lugar = miEvento.lugar,
         tipoEvento = miEvento.tipo,
         actividad = actividad,
-        lenActividad = len(actividad))
+        lenActividad = len(actividad),
+        nombreEvento = miEvento.nombre)
 
 @app.route('/crearEvento/', methods=['POST'])
 def crearEvento():
@@ -116,17 +117,17 @@ def crearEvento():
 
 @app.route('/modificarEvento/', methods=['POST'])
 def modificarEvento():
-    # miEvento = Evento.query.filter_by(
-    #     id = idEvento
-    # ).first()
+    miEvento = Evento.query.get_or_404(session['idEvento'])
 
-    # miEvento.nombre = request.form.get('nombreEvento'),
-    # miEvento.tipo = request.form.get('tipoEvento'),
-    # miEvento.descripcion = request.form.get('descripcionBreve'),
-    # miEvento.lugar = request.form.get('lugar')
-    # db.session.commit()
-
-    return "aqui modificaria evento y redirecciona a la pagina de este evento"
+    miEvento.nombre = request.form.get('nombreEvento')
+    miEvento.tipo = request.form.get('tipoEvento')
+    miEvento.descripcion = request.form.get('descripcion')
+    miEvento.lugar = request.form.get('lugar')
+    try:
+        db.session.commit()
+    except:
+        print("Error")
+    return redirect(url_for('evento',idEvento=miEvento.id), code=302)
 
 @app.route('/lanzarEvento/', methods=['POST'])
 def lanzarEvento():
@@ -158,7 +159,7 @@ def eliminarActividad():
 def registrarMovimiento():
     datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
 
-    return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
+    return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 # ============================== login ============================== #
 
