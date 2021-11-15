@@ -8,6 +8,7 @@ from sqlalchemy.orm import defaultload
 import json
 
 app = Flask(__name__)
+app.secret_key = b'192b9bdd22ab9ed4d12e236c77823bcbf'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
 
@@ -115,6 +116,16 @@ def crearEvento():
 
 @app.route('/modificarEvento/', methods=['POST'])
 def modificarEvento():
+    # miEvento = Evento.query.filter_by(
+    #     id = idEvento
+    # ).first()
+
+    # miEvento.nombre = request.form.get('nombreEvento'),
+    # miEvento.tipo = request.form.get('tipoEvento'),
+    # miEvento.descripcion = request.form.get('descripcionBreve'),
+    # miEvento.lugar = request.form.get('lugar')
+    # db.session.commit()
+
     return "aqui modificaria evento y redirecciona a la pagina de este evento"
 
 @app.route('/lanzarEvento/', methods=['POST'])
@@ -149,6 +160,7 @@ def registrarMovimiento():
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",NombreEvento="Our Point")
 
+# ============================== login ============================== #
 
 @app.route('/profile/<username>')
 def profile(username):
@@ -194,9 +206,5 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
-#MODIFY
-
-
-#
 if __name__ == '__main__':
     app.run()
