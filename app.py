@@ -44,27 +44,24 @@ class Evento(db.Model):
     
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
+def crearFecha(date, format):
+    str = 'No definida'
+    if date != None:
+        str = date.strftime(format)
+    return str
+
 @app.route('/')
 def index():
     datos = []
     eventos = Evento.query.all()
     for evento in eventos:
-        strFechaInicio = evento.fechaInicio
-        if strFechaInicio == None:
-            strFechaInicio = 'No definida'
-        strFechaFin = evento.fechaInicio
-        if strFechaFin == None:
-            strFechaFin = 'No definida'
-        strfechaCierreIns = evento.fechaCierreInscripcion
-        if strfechaCierreIns == None:
-            strfechaCierreIns = 'No definida'
         datos.append({
             "id":evento.id,
             "nombre":evento.nombre,
-            'fechaCreacion':evento.fechaCreacion.strftime("%d/%m/%Y"),
-            'fechaCierreInscripcion':strfechaCierreIns,
-            'fechaInicioEvento':strFechaInicio,
-            'fechaCierreEvento':strFechaFin,
+            'fechaCreacion':crearFecha(evento.fechaCreacion,"%d/%m/%Y"),
+            'fechaCierreInscripcion':crearFecha(evento.fechaCierreInscripcion,"%d/%m/%Y"),
+            'fechaInicioEvento':crearFecha(evento.fechaInicio,"%d/%m/%Y"),
+            'fechaCierreEvento':crearFecha(evento.fechaFin,"%d/%m/%Y"),
             'estadoEvento':evento.estado
         })
     return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
@@ -111,7 +108,6 @@ def crearEvento():
 
     db.session.add(nuevoEvento)
     db.session.commit()
-    print(Evento.query.all())
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
@@ -137,18 +133,39 @@ def lanzarEvento():
 @app.route('/obtenerPlantillas/', methods=['POST','GET'])
 def obtenerPlantillas():
     #headers=["Nombre","Fecha","TipoEvento"]
-    plantillas = [
-        {"id":"Evento01","Nombre":"Evento01","Fecha":"Ayer","TipoEvento":"tipito"}
-    ]
+
+    plantillas = []
+    eventos = Evento.query.all()
+    for evento in eventos:
+        plantillas.append({
+            "id":evento.id,
+            "Nombre":evento.nombre,
+            "Fecha":crearFecha(evento.fechaInicio,"%d/%m/%Y"),
+            "TipoEvento":evento.tipo
+        })
+
     return json.dumps(plantillas)
-    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
 
-@app.route('/crearEventoPlantilla/', methods=['GET','POST'])
+@app.route('/crearEventoPlantilla/', methods=['POST'])
 def crearEventoPlantilla():
-    #infoEvento = {'estado':'Borrador'}
-    return "aqui crearia evento y redirecciona a la pagina de este evento"
-    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+    id = request.form.get('selection')
+    if id == None:
+        return redirect(url_for('index'), code=302)
+    
+    baseEvento = Evento.query.get_or_404(id)
 
+    nuevoEvento = Evento(
+        nombre = baseEvento.nombre,
+        tipo = baseEvento.tipo,
+        descripcion = baseEvento.descripcion,
+        lugar = baseEvento.lugar,
+        plantilla = True
+    )
+
+    db.session.add(nuevoEvento)
+    db.session.commit()
+
+    return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
 @app.route('/eliminarActividad/', methods=['GET','POST'])
 def eliminarActividad():
