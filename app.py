@@ -262,10 +262,10 @@ def actividad(id):
         "horaInicio":"05:00",#HH:mm:ss
         "horaFin":"05:30",
     }
-    ambientes = {}
-    materiales = {}
+    ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
+    materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
     estadoEvento="Borrador"
-    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento)
+    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
 
 
 #
