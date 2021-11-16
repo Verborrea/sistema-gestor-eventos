@@ -95,20 +95,23 @@ def evento(idEvento):
         id = idEvento
     ).first()
     session['idEvento'] = idEvento
-    actividad = [
-        {"nombre":"Exposicion de materiales","id":"id-actividad"},
-        {"nombre":"Exposicion de IA","id":"id-actividad"},
-        {"nombre":"Exposicion de Machine Learning","id":"id-actividad"},
-        {"nombre":"Exposicion de BigData","id":"id-actividad"}
-    ]
+    
+    listaAct = []
+    actividades = Actividad.query.filter_by(idEvento = session['idEvento'])
+    for actividad in actividades:
+        listaAct.append({
+            "id":actividad.id,
+            "nombre":actividad.nombre
+        })
+
     return render_template(
         'SCV-B01MenuEvento.html',
         estado = miEvento.estado,
         descripcion = miEvento.descripcion,
         lugar = miEvento.lugar,
         tipoEvento = miEvento.tipo,
-        actividad = actividad,
-        lenActividad = len(actividad),
+        actividad = listaAct,
+        lenActividad = len(listaAct),
         nombreEvento = miEvento.nombre)
 
 @app.route('/crearEvento/', methods=['POST'])
