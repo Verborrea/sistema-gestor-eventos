@@ -26,7 +26,7 @@
     
     <div class="col-4">
         {% if estado == 'Borrador' %}
-        <form action="{{url_for('lanzarEvento')}}">
+        <form action="{{url_for('lanzarEvento')}}" method="post">
             <button class="btn btn-primary btn-lg btn-block" type="submit">Lanzar Evento</button>
         </form>
         
@@ -64,9 +64,11 @@
   
 
             {% if estado == 'Borrador' %}
-            <p class="text-center">
-                <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar actividad</button>
-            </p>
+            <form action="{{url_for('crearActividad')}}" method="post">
+                <p class="text-center">
+                    <button type="submit" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar actividad</button>
+                </p>
+            </form>
             {% endif %}
         </div>
         <div class="col-1"></div>

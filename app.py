@@ -194,7 +194,35 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
-#MODIFY
+#ACTIVITY
+@app.route('/crearActividad/', methods=['POST'])
+def crearActividad():
+    #crea actividad
+    return "crea actividad y redirecciona a pagina Menu Actividad"
+
+@app.route('/modificarActividad/<id>', methods=['POST'])
+def modificarActividad(id):
+    #modifica actividad
+    return "recibe datos nuevos de actividad y redirecciona a pagina Menu Actividad"+id
+
+@app.route('/actividad/<id>', methods=['GET','POST'])
+def actividad(id):
+    datos ={
+        "id":"A03",
+        "nombreActividad":"Documental bailando bajo la lluvia",
+        "descripcion":"El Director vendrá acompañado de Haley, un artista muy famoso y su grupo, que mostrará el documental bailando bajo la luvia",
+        "consideraciones":"En caso de que llueva de verdad, hay que ir al comedor usando cascos de seguridad",
+        "tipoActividad":"Concierto",
+        "expositor":"Haley",
+        "fechaInicio":"2000-09-30",#yyyy-MM-dd
+        "fechaFin":"2000-09-30",
+        "horaInicio":"05:00",#HH:mm:ss
+        "horaFin":"05:30",
+    }
+    ambientes = {}
+    materiales = {}
+    estadoEvento="Borrador"
+    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento)
 
 
 #

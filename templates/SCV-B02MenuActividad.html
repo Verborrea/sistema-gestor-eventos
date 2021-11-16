@@ -1,0 +1,204 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+<h1>Datos de la actividad</h1>
+<br>
+<div class="container marquito">
+    <br>
+    <form action="{{url_for('modificarActividad',id = actividad.id)}}" method="post">
+        <div class="form-row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="nombreActividad">Nombre de la actividad</label>
+                    <input type="text" class="form-control" id="nombreActividad" value="{{actividad.nombreActividad}}">
+                </div>
+                <div class="form-group">
+                    <label for="descripcionActividad">Breve descripcion</label>
+                    <input type="text" class="form-control" id="descripcionActividad" value="{{actividad.descripcion}}">
+                </div>
+                <div class="form-group">
+                    <label for="consideracionesAsistentes">Consideraciones para asistentes</label>
+                    <input type="text" class="form-control" id="consideracionesAsistentes"  value="{{actividad.consideraciones}}">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="tipoActividad">Tipo de actividad</label>
+                    <input type="text" class="form-control" id="tipoActividad" value="{{actividad.tipoActividad}}">
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaInicio">Fecha inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" value="{{actividad.fechaInicio}}">
+                        </div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaFin">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fechaFin" value="{{actividad.fechaFin}}">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class=" col-4">
+                <div class="form-group">
+                    <label for="expositor">Expositor</label>
+                    <input type="text" class="form-control" id="expositor" value="{{actividad.expositor}}">
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="horaInicio">Hora inicio</label>
+                            <input type="time" class="form-control" id="horaInicio"  value="{{actividad.horaInicio}}">
+                        </div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="horaFin">Hora Fin</label>
+                        <input type="time" class="form-control" id="horaFin" value="{{actividad.horaFin}}">
+                        </div>
+                    </div>
+
+                </div>
+                {% if estado == 'Borrador' or estado == 'Inscripciones' %}
+                <div class="form-group">
+                    <br>
+                    <button class="btn btn-success btn-lg btn-block" type="submit">Guardar Cambios</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+    
+</div>
+<div class="row">
+    <div class="col">
+        <div id="ambientes" class="container marquito">
+            <br>
+            <h3>Ambientes</h3>
+            <div class="row">
+                <div class="col-1"></div>
+                <div id="activities-list" class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> Ambiente 1</div>
+                                <div class="col-2 text-right">
+                                    {% if estado == 'Borrador' %}
+                                    <a href=""><i class="fa fa-pencil"> </i></a>
+                                    <a href=""><i class="fa fa-trash"> </i></a>
+                                    {% else %}
+                                    <a href=""><i class="fa fa-eye"> </i></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> Ambiente 2</div>
+                                <div class="col-2 text-right">
+                                    {% if estado == 'Borrador' %}
+                                    <a href=""><i class="fa fa-pencil"> </i></a>
+                                    <a href=""><i class="fa fa-trash"> </i></a>
+                                    {% else %}
+                                    <a href=""><i class="fa fa-eye"> </i></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+
+                    <p class="text-center">
+                        <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar ambiente</button>
+                    </p>
+
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col">
+        <div id="materiales" class="container marquito">
+            <br>
+            <h3>Materiales</h3>
+            <div class="row">
+                <div class="col-1"></div>
+                <div id="materials-list" class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> Material 1</div>
+                                <div class="col-2 text-right">
+                                    <a href=""><i class="fa fa-pencil"> </i></a>
+                                    <a href=""><i class="fa fa-trash"> </i></a> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> Material 2</div>
+                                <div class="col-2 text-right">
+                                    <a href=""><i class="fa fa-pencil"> </i></a>
+                                    <a href=""><i class="fa fa-trash"> </i></a> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+
+                    <p class="text-center">
+                        <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar material</button>
+                    </p>
+
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+{% block script %}
+    <script>
+        /*let idModalModify = "modalModificar"
+        let datosForm = [
+            {"nombre":"idEvento","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
+            {"nombre":"nombreEvento","tipo_dato":"text"},
+            {"nombre":"tipoEvento","tipo_dato":"text"},
+            {"nombre":"descripcion","tipo_dato":"text"},
+            {"nombre":"lugar","tipo_dato":"text"},
+        ]
+        formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalModify,"Modificar evento",datosForm)
+        BOOSTTRAP.Utilities.onlyChild("modalModificarContainer",formModal)
+        console.log(formModal)
+        document.getElementById(idModalModify+"-form").action = "{{url_for('modificarEvento')}}"
+        document.getElementById(idModalModify+"-form").method = "post"
+        let contenido ={
+            "idEvento":"{{idEvento}}",
+            "nombreEvento":"{{nombreEvento}}",
+            "descripcion":"{{descripcion}}",
+            "lugar":"{{lugar}}",
+            "tipoEvento":"{{tipoEvento}}",
+        }
+        BOOSTTRAP.Forms.fillForm(contenido,idModalModify+"-form")
+        
+        BOOSTTRAP.Utilities.convertToCallModal("editarDatosBoton",idModalModify)*/
+
+
+    </script>
+{% endblock %}
+</html>
