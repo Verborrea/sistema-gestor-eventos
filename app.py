@@ -180,8 +180,8 @@ def crearEventoPlantilla():
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
-@app.route('/eliminarActividad/', methods=['GET','POST'])
-def eliminarActividad():
+@app.route('/eliminarActividad/<id>', methods=['GET','POST'])
+def eliminarActividad(id):
     return "aqui elimina actividad"
     return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
 
@@ -267,6 +267,35 @@ def actividad(id):
     estadoEvento="Borrador"
     return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
 
+@app.route('/verActividad/<id>', methods=['GET','POST'])
+def verActividad(id):
+    #lo mismo pero el estado de evento es Ver
+    datos ={
+        "id":"A03",
+        "nombreActividad":"Documental bailando bajo la lluvia",
+        "descripcion":"El Director vendrá acompañado de Haley, un artista muy famoso y su grupo, que mostrará el documental bailando bajo la luvia",
+        "consideraciones":"En caso de que llueva de verdad, hay que ir al comedor usando cascos de seguridad",
+        "tipoActividad":"Concierto",
+        "expositor":"Haley",
+        "fechaInicio":"2000-09-30",#yyyy-MM-dd
+        "fechaFin":"2000-09-30",
+        "horaInicio":"05:00",#HH:mm:ss
+        "horaFin":"05:30",
+    }
+    ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
+    materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
+    estadoEvento="Ver"
+    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
+
+#ambiente
+@app.route('/eliminarAmbiente/<id>', methods=['GET','POST'])
+def eliminarAmbiente(id):
+    return "elimino ambiente"
+
+#material
+@app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
+def eliminarMaterial(id):
+    return "elimino material"
 
 #
 if __name__ == '__main__':

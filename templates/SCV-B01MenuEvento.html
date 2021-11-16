@@ -50,10 +50,10 @@
                         <div class="col"> {{actividad[i].nombre}}</div>
                         <div class="col-2 text-right">
                             {% if estado == 'Borrador' %}
-                            <a href=""><i class="fa fa-pencil"> </i></a>
-                            <a href="{{ url_for('eliminarActividad') }}"><i class="fa fa-trash"> </i></a>
+                            <a href="{{ url_for('actividad',id = actividad[i].id) }}"><i class="fa fa-pencil"> </i></a>
+                            <a href="{{ url_for('eliminarActividad',id = actividad[i].id) }}"><i class="fa fa-trash"> </i></a>
                             {% else %}
-                            <a href=""><i class="fa fa-eye"> </i></a>
+                            <a href="{{ url_for('verActividad',id = actividad[i].id) }}"><i class="fa fa-eye"> </i></a>
                             {% endif %}
                         </div>
                     </div>
