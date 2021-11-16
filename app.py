@@ -47,11 +47,12 @@ class Evento(db.Model):
 class Actividad(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
+    tipo = db.Column(db.String(30))
     descripcion = db.Column(db.String(100))
+    consideraciones = db.Column(db.String(100))
     fechaInicio = db.Column(db.Date)
     fechaFin = db.Column(db.Date)
-    ponente = db.Column(db.String(50), nullable = False)
+    ponente = db.Column(db.String(50))
 
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     
@@ -62,6 +63,10 @@ def crearFecha(date, format):
     if date != None:
         str = date.strftime(format)
     return str
+
+def crearFechaHora(date, hour):
+    datehour = date + ' ' + hour
+    date_time_obj = datetime.strptime(datehour, '%d/%m/%Y %H:%M:%S')
 
 # ============================== eventos ============================== #
 
@@ -79,6 +84,7 @@ def index():
             'fechaCierreEvento':crearFecha(evento.fechaFin,"%d/%m/%Y"),
             'estadoEvento':evento.estado
         })
+    session.pop('idEvento', None)
     return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
@@ -183,14 +189,8 @@ def crearEventoPlantilla():
 def lanzarEvento():
     return "aqui lanzaria evento y redirecciona a la pagina de este evento"
 
-@app.route('/eliminarActividad/<id>', methods=['GET','POST'])
-def eliminarActividad(id):
-    return "aqui elimina actividad"
-    return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
-
 @app.route('/cargarEjemplos', methods=['GET'])
 def cargarEjemplos():
-    session.pop('idEvento', None)
     aEvnt = Evento(
         nombre = "Primer Ejemplo",
         tipo = "Congreso",
@@ -237,30 +237,84 @@ def registrarMovimiento():
 
 # ============================== actividades ============================== #
 
-@app.route('/crearActividad/', methods=['POST'])
+@app.route('/crearActividad', methods=['POST'])
 def crearActividad():
-    #crea actividad
-    return "crea actividad y redirecciona a pagina Menu Actividad"
+    nuevaActividad = Actividad(
+        nombre = 'Nombre de la Actividad',
+        tipo = 'Tipo de actividad',
+        descripcion = 'Breve descripcion',
+        consideraciones = 'Consideraciones para asistentes',
+        ponente = 'Expositor',
+        fechaInicio = datetime.datetime.utcnow(),
+        fechaFin = datetime.datetime.utcnow(),
+        idEvento = session['idEvento']
+    )
+
+    db.session.add(nuevaActividad)
+    db.session.commit()
+        
+    nuevaActividadDict = {
+        "id": nuevaActividad.id,
+        "nombreActividad": "Nombre de la Actividad",
+        "descripcion": "Breve descripcion",
+        "consideraciones": "Consideraciones para asistentes",
+        "tipoActividad": "Tipo de actividad",
+        "expositor": "Expositor",
+        "fechaInicio": crearFecha(nuevaActividad.fechaInicio,"%Y-%m-%d"),
+        "fechaFin": crearFecha(nuevaActividad.fechaFin,"%Y-%m-%d"),
+        "horaInicio": "00:00",
+        "horaFin": "23:59"
+    }
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        actividad = nuevaActividadDict,
+        estado = "Borrador",
+        ambientes=[], lenAmbientes = 0,
+        materiales=[], lenMateriales = 0)
+
+@app.route('/eliminarActividad/<id>', methods=['GET','POST'])
+def eliminarActividad(id):
+    miActividad = Actividad.query.get_or_404(id)
+    db.session.delete(miActividad)
+    db.session.commit()
+    return redirect(url_for('evento',idEvento=session['idEvento']), code=302)
+
 
 @app.route('/modificarActividad/<id>', methods=['POST'])
 def modificarActividad(id):
-    #modifica actividad
-    return "recibe datos nuevos de actividad y redirecciona a pagina Menu Actividad"+id
+    print(request.form.get('Nombre de la Actividad'))
+
+    # miActividad = Actividad.query.get_or_404(id)
+
+    # miActividad.nombre = request.form.get('Nombre de la Actividad')
+    # miActividad.tipo = request.form.get('Tipo de actividad')
+    # miActividad.descripcion = request.form.get('Breve descripcion')
+    # miActividad.consideraciones = request.form.get('Consideraciones para asistentes')
+    # miActividad.ponente = request.form.get('Expositor')
+    # miActividad.fechaInicio = crearFechaHora(1,2)
+    # miActividad.fechaFin = crearFechaHora(1,2)
+
+    # db.session.commit()
+    
+    return redirect(url_for('actividad',id=id), code=302)
 
 @app.route('/actividad/<id>', methods=['GET','POST'])
 def actividad(id):
+    miActividad = Actividad.query.get_or_404(id)
     datos ={
-        "id":"A03",
-        "nombreActividad":"Documental bailando bajo la lluvia",
-        "descripcion":"El Director vendrá acompañado de Haley, un artista muy famoso y su grupo, que mostrará el documental bailando bajo la luvia",
-        "consideraciones":"En caso de que llueva de verdad, hay que ir al comedor usando cascos de seguridad",
-        "tipoActividad":"Concierto",
-        "expositor":"Haley",
-        "fechaInicio":"2000-09-30",#yyyy-MM-dd
-        "fechaFin":"2000-09-30",
-        "horaInicio":"05:00",#HH:mm:ss
-        "horaFin":"05:30",
+        "id":miActividad.id,
+        "nombreActividad":miActividad.nombre,
+        "descripcion":miActividad.descripcion,
+        "consideraciones":miActividad.consideraciones,
+        "tipoActividad":miActividad.tipo,
+        "expositor":miActividad.ponente,
+        "fechaInicio":crearFecha(miActividad.fechaInicio,"%Y-%m-%d"),
+        "fechaFin":crearFecha(miActividad.fechaFin,"%Y-%m-%d"),
+        "horaInicio":crearFecha(miActividad.fechaInicio,"%H:%M"),
+        "horaFin":crearFecha(miActividad.fechaFin,"%H:%M")
     }
+
     ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
     materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
     estadoEvento="Borrador"
@@ -286,12 +340,12 @@ def verActividad(id):
     estadoEvento="Ver"
     return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
 
-#ambiente
+# ============================== ambiente ============================== #
 @app.route('/eliminarAmbiente/<id>', methods=['GET','POST'])
 def eliminarAmbiente(id):
     return "elimino ambiente"
 
-#material
+# ============================== material ============================== #
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
 def eliminarMaterial(id):
     return "elimino material"
