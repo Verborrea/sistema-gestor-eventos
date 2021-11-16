@@ -63,6 +63,8 @@ def crearFecha(date, format):
         str = date.strftime(format)
     return str
 
+# ============================== eventos ============================== #
+
 @app.route('/')
 def index():
     datos = []
@@ -87,7 +89,6 @@ def seleccionarevento():
             return redirect(url_for('index'), code=302)
     return redirect(url_for('evento',idEvento=id), code=302)
     
-
 @app.route('/evento/<idEvento>', methods=['GET','POST'])
 def evento(idEvento):
     miEvento = Evento.query.filter_by(
@@ -138,11 +139,6 @@ def modificarEvento():
         print("Error")
     return redirect(url_for('evento',idEvento=miEvento.id), code=302)
 
-@app.route('/lanzarEvento/', methods=['POST'])
-def lanzarEvento():
-    return "aqui lanzaria evento y redirecciona a la pagina de este evento"
-
-
 @app.route('/obtenerPlantillas/', methods=['POST','GET'])
 def obtenerPlantillas():
     #headers=["Nombre","Fecha","TipoEvento"]
@@ -180,10 +176,55 @@ def crearEventoPlantilla():
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
+@app.route('/lanzarEvento/', methods=['POST'])
+def lanzarEvento():
+    return "aqui lanzaria evento y redirecciona a la pagina de este evento"
+
 @app.route('/eliminarActividad/<id>', methods=['GET','POST'])
 def eliminarActividad(id):
     return "aqui elimina actividad"
     return render_template('SCV-B01MenuEvento.html',estado='Borrador',descripcion=loremLipsum,lugar="/lugar/",tipoEvento="/tipoEvento/",actividad = actividad,lenActividad = len(actividad))
+
+@app.route('/cargarEjemplos', methods=['GET'])
+def cargarEjemplos():
+    session.pop('idEvento', None)
+    aEvnt = Evento(
+        nombre = "Primer Ejemplo",
+        tipo = "Congreso",
+        descripcion = "Super Descripcion",
+        lugar = "Arequipa",
+    )
+    bEvnt = Evento(
+        nombre = "Segundo Ejemplo",
+        tipo = "Danza",
+        descripcion = "Nueva Descripcion",
+        lugar = "Cusco",
+    )
+    cEvnt = Evento(
+        nombre = "Tercer Ejemplo",
+        tipo = "Charla",
+        descripcion = "Otra Descripcion",
+        lugar = "Lima",
+    )
+    dEvnt = Evento(
+        nombre = "Cuarto Ejemplo",
+        tipo = "Congreso",
+        descripcion = "Mas Descripcion",
+        lugar = "Lima",
+    )
+    eEvnt = Evento(
+        nombre = "Quinto Ejemplo",
+        tipo = "Simposio",
+        descripcion = "ZZZZZZZZZZZZZZZZZZ",
+        lugar = "Arequipa",
+    )
+    db.session.add(aEvnt)
+    db.session.add(bEvnt)
+    db.session.add(cEvnt)
+    db.session.add(dEvnt)
+    db.session.add(eEvnt)
+    db.session.commit()
+    return redirect(url_for('index'), code=302)
 
 @app.route('/registrarMovimiento/', methods=['GET','POST'])
 def registrarMovimiento():
@@ -191,53 +232,8 @@ def registrarMovimiento():
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
-# ============================== login ============================== #
+# ============================== actividades ============================== #
 
-@app.route('/profile/<username>')
-def profile(username):
-    return render_template('usuario.html', usuario=username)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        user = Usuario.query.filter_by(
-            username = request.form.get('usuario'),
-            password = request.form.get('contra')
-        ).first()
-
-        if user:
-            return redirect(url_for('profile', username=request.form.get('usuario')))
-        else:
-            return 'Usuario no existente'
-    else:
-        return render_template('login.html')
-
-@app.route('/signup')
-def register():
-    return render_template('signup.html')
-
-@app.route('/create-user', methods=['POST'])
-def create_user():
-    user = Usuario.query.filter_by(username = request.form.get('usuario')).first()
-    mail = Usuario.query.filter_by(email = request.form.get('correo')).first()
-    if user:
-        return 'Usuario ya existente'
-    if mail:
-        return 'El correo ingresado ya tiene una cuenta asociada'
-    nuevo_usuario = Usuario(
-        username = request.form.get('usuario'),
-        password = request.form.get('contra'),
-        nombre = request.form.get('nombre'),
-        email = request.form.get('correo'),
-        tipodoc = request.form.get('tipo_doc'),
-        doc = request.form.get('doc')
-    )
-    db.session.add(nuevo_usuario)
-    db.session.commit()
-    print(Usuario.query.all())
-    return redirect(url_for('login'))
-
-#ACTIVITY
 @app.route('/crearActividad/', methods=['POST'])
 def crearActividad():
     #crea actividad
@@ -296,6 +292,54 @@ def eliminarAmbiente(id):
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
 def eliminarMaterial(id):
     return "elimino material"
+
+
+# ============================== login ============================== #
+
+@app.route('/profile/<username>')
+def profile(username):
+    return render_template('usuario.html', usuario=username)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = Usuario.query.filter_by(
+            username = request.form.get('usuario'),
+            password = request.form.get('contra')
+        ).first()
+
+        if user:
+            return redirect(url_for('profile', username=request.form.get('usuario')))
+        else:
+            return 'Usuario no existente'
+    else:
+        return render_template('login.html')
+
+@app.route('/signup')
+def register():
+    return render_template('signup.html')
+
+@app.route('/create-user', methods=['POST'])
+def create_user():
+    user = Usuario.query.filter_by(username = request.form.get('usuario')).first()
+    mail = Usuario.query.filter_by(email = request.form.get('correo')).first()
+    if user:
+        return 'Usuario ya existente'
+    if mail:
+        return 'El correo ingresado ya tiene una cuenta asociada'
+    nuevo_usuario = Usuario(
+        username = request.form.get('usuario'),
+        password = request.form.get('contra'),
+        nombre = request.form.get('nombre'),
+        email = request.form.get('correo'),
+        tipodoc = request.form.get('tipo_doc'),
+        doc = request.form.get('doc')
+    )
+    db.session.add(nuevo_usuario)
+    db.session.commit()
+    print(Usuario.query.all())
+    return redirect(url_for('login'))
+
 
 #
 if __name__ == '__main__':
