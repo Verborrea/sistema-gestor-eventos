@@ -41,6 +41,19 @@ class Evento(db.Model):
     cntPreInscritos = db.Column(db.Integer, default=0)
     prcntjDscnto = db.Column(db.Float, default=0)
     plantilla = db.Column(db.Boolean, default=False)
+
+    activities = db.relationship('Actividad', backref='evento', lazy=True)
+
+class Actividad(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(30), nullable=False)
+    tipo = db.Column(db.String(30), nullable=False)
+    descripcion = db.Column(db.String(100))
+    fechaInicio = db.Column(db.Date)
+    fechaFin = db.Column(db.Date)
+    ponente = db.Column(db.String(50), nullable = False)
+
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
