@@ -345,6 +345,10 @@ def verActividad(id):
 def eliminarAmbiente(id):
     return "elimino ambiente"
 
+@app.route('/crearAmbiente', methods=['GET','POST'])
+def crearAmbiente():
+    return "<html>Crear ambiente aqui</html>"
+
 # ============================== material ============================== #
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
 def eliminarMaterial(id):
@@ -397,6 +401,11 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
+#ambientes
+@app.route('/modificarAmbiente', methods=['POST'])
+def modificarAmbiente():
+    #recibe id a travez del form
+    return "modificar ambiente"
 
 #
 if __name__ == '__main__':

@@ -5,6 +5,7 @@
 <h1>Datos de la actividad</h1>
 <a href="{{url_for('evento',idEvento = idEvento)}}"> << Regresar a evento </a>
 <br>
+<div id="modalAmbienteContainer"></div>
 <div class="container marquito">
     <br>
     <form action="{{url_for('modificarActividad',id = actividad.id)}}" method="post">
@@ -109,7 +110,7 @@
                     {%endfor%}
 
                     <p class="text-center">
-                        <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar ambiente</button>
+                        <button id="crearAmbienteButton" type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar ambiente</button>
                     </p>
 
                 </div>
@@ -156,29 +157,46 @@
 {% endblock %}
 {% block script %}
     <script>
-        /*let idModalModify = "modalModificar"
-        let datosForm = [
-            {"nombre":"idEvento","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
-            {"nombre":"nombreEvento","tipo_dato":"text"},
-            {"nombre":"tipoEvento","tipo_dato":"text"},
-            {"nombre":"descripcion","tipo_dato":"text"},
-            {"nombre":"lugar","tipo_dato":"text"},
-        ]
-        formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalModify,"Modificar evento",datosForm)
-        BOOSTTRAP.Utilities.onlyChild("modalModificarContainer",formModal)
-        console.log(formModal)
-        document.getElementById(idModalModify+"-form").action = "{{url_for('modificarEvento')}}"
-        document.getElementById(idModalModify+"-form").method = "post"
-        let contenido ={
-            "idEvento":"{{idEvento}}",
-            "nombreEvento":"{{nombreEvento}}",
-            "descripcion":"{{descripcion}}",
-            "lugar":"{{lugar}}",
-            "tipoEvento":"{{tipoEvento}}",
+        function generarModalAmbiente(){
+            //id,titulo, datosForm
+            let id = "ambienteModal"
+            let titulo = "Ambiente"
+            let datosForm = [
+                {"nombre":"idAmbiente","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
+                {"nombre":"nombreAmbiente","tipo_dato":"text"},
+                {"nombre":"tipoAmbiente","tipo_dato":"text"},
+                {"nombre":"descripcionBreve","tipo_dato":"text"},
+                {"nombre":"aforo","tipo_dato":"number"},
+            ]
+            let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
+            BOOSTTRAP.Utilities.onlyChild("modalAmbienteContainer",formModal)//Agrega el modal al doc
+            BOOSTTRAP.Utilities.convertToCallModal("crearAmbienteButton",id)
         }
-        BOOSTTRAP.Forms.fillForm(contenido,idModalModify+"-form")
         
-        BOOSTTRAP.Utilities.convertToCallModal("editarDatosBoton",idModalModify)*/
+        function setModalAmbienteModificar(){
+            let idModalAmbiente = "ambienteModal-form"
+            BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente')}}")
+            BOOSTTRAP.Forms.resetForm(idModalAmbiente)
+            //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
+            //BOOSTTRAP.Forms.fillForm()//To-do
+        }
+        function setModalAmbienteCrear(){
+            console.log("llamo")
+            let idModalAmbiente = "ambienteModal-form"
+            BOOSTTRAP.Utilities.setTitle("ambienteModal","Crear nuevo Ambiente")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}",'get')
+            BOOSTTRAP.Forms.resetForm(idModalAmbiente)
+            $(idModalAmbiente).modal('show')
+            
+            //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
+        }
+        window.onload = ()=>{
+            //Generar modal para ambiente
+           
+            generarModalAmbiente()
+            document.getElementById("crearAmbienteButton").addEventListener('click',setModalAmbienteCrear)
+        }
 
 
     </script>

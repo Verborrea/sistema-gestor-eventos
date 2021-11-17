@@ -10,6 +10,8 @@ BOOSTTRAP.Utilities = {
     addChild(id,raw){},//\
     onlyChild(id,raw){},//\
     convertToCallModal(idbutton,idModal){},
+    switchToogle(id1,id2,on1){},
+    setTitle(id,title){},//\
 }
 
 BOOSTTRAP.GenerateSimple = {
@@ -22,7 +24,7 @@ BOOSTTRAP.GenerateComplex = {
     buildTableSelection(id, headers,contenido){},//\
     buildTableOptions(id, headers,contenido, opciones=""){},//\
     buildTableModal(id, titulo, datosTabla){},//\
-    buildFormModal(id,titulo, datosForm){},//\
+    buildFormModal(id,titulo, datosForm){},//\Form con id-form
 }
 
 BOOSTTRAP.Buttons = {
@@ -37,6 +39,9 @@ BOOSTTRAP.Forms = {
     buildCheck(formRow,idForm){},//\
     //buildCheck(formRow,idForm){},//\
     fillForm(datos,idForm){},//\
+    resetForm(idForm){},//\
+    setActionMethod(idForm,action,method='post'){},//\
+    setButtonText(idForm,text){},//\
 }
 
 BOOSTTRAP.Tables = {
@@ -93,8 +98,19 @@ BOOSTTRAP.Utilities.convertToCallModal = function(idbutton,idModal){
     element.setAttribute('data-target', "#"+idModal)
 }
 
-
-
+BOOSTTRAP.Utilities.switchToogle= function(id1,id2,on1){
+    display1= "none"
+    display2= "block"
+    if(on1){
+        display1= "block"
+        display2= "none"
+    }
+    document.getElementById(id1).style.display = display1
+    document.getElementById(id2).style.display = display2
+}
+BOOSTTRAP.Utilities.setTitle= function(id,title){
+    document.getElementById(id+"-title").innerHTML = title
+}
 // GenerateSimple =======================================
 BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
     let tabla = String.raw`
@@ -113,15 +129,14 @@ BOOSTTRAP.GenerateSimple.buildForm = function(id, datos){
     let formText =String.raw`<form action="" id="${id}">`
     for(let i in datos)
         formText += BOOSTTRAP.Forms.buildRow(datos[i],id)
-    formText += String.raw`<div class="justify-content-end">${BOOSTTRAP.Utilities.basicButton("Continuar","id","btn-outline-primary")}</div>`
-    //formText+=
+    formText += String.raw`<div class="justify-content-end">${BOOSTTRAP.Utilities.basicButton("Continuar",id+"-button","btn-outline-primary")}</div>`
     formText+='</form>'
     return formText 
 }
 
 BOOSTTRAP.GenerateSimple.buildModal = function(titulo,body,footer,id="modal0"){
     let header = String.raw`
-        <h5 class="modal-title">${titulo}</h5>
+        <h5 class="modal-title" id="${id}-title">${titulo}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         </button>`
@@ -257,14 +272,24 @@ BOOSTTRAP.Forms.buildCheck= function(formRow,idForm){
     return text
 }
 
-
 BOOSTTRAP.Forms.fillForm = function(datos,idForm){//datos = {"id"=10.12312}
     for (let key in datos){
         document.getElementById(idForm+"-"+key).setAttribute('value',datos[key])
     }
 }
 
+BOOSTTRAP.Forms.resetForm = function(idForm){
+    document.getElementById(idForm).reset();
+}
 
+BOOSTTRAP.Forms.setActionMethod = function(idForm,action,method='post'){
+    document.getElementById(idForm).action = action
+    document.getElementById(idForm).method = method
+}
+
+BOOSTTRAP.Forms.setButtonText= function(idForm,text){
+    document.getElementById(idForm+"-button").innerHTML = text
+}
 // Tables =======================================
 BOOSTTRAP.Tables.buildTableRowContent = function(headers,obj){
     row = ""
