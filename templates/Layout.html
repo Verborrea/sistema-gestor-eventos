@@ -33,7 +33,7 @@
         <a class="btn btn-outline-primary" href="#">Log in</a>
         <a class="btn btn-outline-primary" href="#">Sign Up</a>
         {% else %}
-        <h5 class="my-0 mr-md-auto font-weight-normal">{{nombreEvento}}</h5>
+        <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">{{nombreEvento}}</h5>
         <nav class="my-2 my-md-0 mr-md-3">
             <a class="p-2 text-dark" href="#">Evento</a>
             <a class="p-2 text-dark" href="#">Inscripciones</a>
