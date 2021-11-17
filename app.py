@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from markupsafe import escape
 
 from flask import Flask, request, redirect, url_for, session
@@ -30,7 +30,7 @@ class Evento(db.Model):
     descripcion = db.Column(db.String(100), nullable=False)
     lugar = db.Column(db.String(100), nullable=False)
     estado = db.Column(db.String(20), default="Borrador")
-    fechaCreacion = db.Column(db.Date, default=datetime.datetime.utcnow)
+    fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
     fechaPreInscripcion = db.Column(db.Date)
     fechaAprtrInscripcion = db.Column(db.Date)
     fechaLmtDscnto = db.Column(db.Date)
@@ -50,8 +50,8 @@ class Actividad(db.Model):
     tipo = db.Column(db.String(30))
     descripcion = db.Column(db.String(100))
     consideraciones = db.Column(db.String(100))
-    fechaInicio = db.Column(db.Date)
-    fechaFin = db.Column(db.Date)
+    fechaInicio = db.Column(db.DateTime)
+    fechaFin = db.Column(db.DateTime)
     ponente = db.Column(db.String(50))
 
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
@@ -65,8 +65,9 @@ def crearFecha(date, format):
     return str
 
 def crearFechaHora(date, hour):
-    datehour = date + ' ' + hour
-    date_time_obj = datetime.strptime(datehour, '%d/%m/%Y %H:%M:%S')
+    datehour = date + ' ' + hour + ':00'
+    date_time_obj = datetime.strptime(datehour, '%Y-%m-%d %H:%M:%S')
+    return date_time_obj
 
 # ============================== eventos ============================== #
 
@@ -245,8 +246,8 @@ def crearActividad():
         descripcion = 'Breve descripcion',
         consideraciones = 'Consideraciones para asistentes',
         ponente = 'Expositor',
-        fechaInicio = datetime.datetime.utcnow(),
-        fechaFin = datetime.datetime.utcnow(),
+        fechaInicio = datetime.utcnow(),
+        fechaFin = datetime.utcnow(),
         idEvento = session['idEvento']
     )
 
@@ -283,25 +284,25 @@ def eliminarActividad(id):
 
 @app.route('/modificarActividad/<id>', methods=['POST'])
 def modificarActividad(id):
-    print(request.form.get('Nombre de la Actividad'))
 
-    # miActividad = Actividad.query.get_or_404(id)
+    miActividad = Actividad.query.get_or_404(id)
 
-    # miActividad.nombre = request.form.get('Nombre de la Actividad')
-    # miActividad.tipo = request.form.get('Tipo de actividad')
-    # miActividad.descripcion = request.form.get('Breve descripcion')
-    # miActividad.consideraciones = request.form.get('Consideraciones para asistentes')
-    # miActividad.ponente = request.form.get('Expositor')
-    # miActividad.fechaInicio = crearFechaHora(1,2)
-    # miActividad.fechaFin = crearFechaHora(1,2)
+    miActividad.nombre = request.form.get('nombreActividad')
+    miActividad.tipo = request.form.get('tipoActividad')
+    miActividad.descripcion = request.form.get('descripcionActividad')
+    miActividad.consideraciones = request.form.get('consideracionesAsistentes')
+    miActividad.ponente = request.form.get('expositor')
+    miActividad.fechaInicio = crearFechaHora(request.form.get('fechaInicio'),request.form.get('horaInicio'))
+    miActividad.fechaFin = crearFechaHora(request.form.get('fechaFin'),request.form.get('horaFin'))
 
-    # db.session.commit()
+    db.session.commit()
     
     return redirect(url_for('actividad',id=id), code=302)
 
 @app.route('/actividad/<id>', methods=['GET','POST'])
 def actividad(id):
     miActividad = Actividad.query.get_or_404(id)
+
     datos ={
         "id":miActividad.id,
         "nombreActividad":miActividad.nombre,
@@ -318,23 +319,26 @@ def actividad(id):
     ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
     materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
     estadoEvento="Borrador"
-    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales),idEvento=1)
+    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales),idEvento=session['idEvento'])
 
 @app.route('/verActividad/<id>', methods=['GET','POST'])
 def verActividad(id):
     #lo mismo pero el estado de evento es Ver
+    miActividad = Actividad.query.get_or_404(id)
+
     datos ={
-        "id":"A03",
-        "nombreActividad":"Documental bailando bajo la lluvia",
-        "descripcion":"El Director vendrá acompañado de Haley, un artista muy famoso y su grupo, que mostrará el documental bailando bajo la luvia",
-        "consideraciones":"En caso de que llueva de verdad, hay que ir al comedor usando cascos de seguridad",
-        "tipoActividad":"Concierto",
-        "expositor":"Haley",
-        "fechaInicio":"2000-09-30",#yyyy-MM-dd
-        "fechaFin":"2000-09-30",
-        "horaInicio":"05:00",#HH:mm:ss
-        "horaFin":"05:30",
+        "id":miActividad.id,
+        "nombreActividad":miActividad.nombre,
+        "descripcion":miActividad.descripcion,
+        "consideraciones":miActividad.consideraciones,
+        "tipoActividad":miActividad.tipo,
+        "expositor":miActividad.ponente,
+        "fechaInicio":crearFecha(miActividad.fechaInicio,"%Y-%m-%d"),
+        "fechaFin":crearFecha(miActividad.fechaFin,"%Y-%m-%d"),
+        "horaInicio":crearFecha(miActividad.fechaInicio,"%H:%M"),
+        "horaFin":crearFecha(miActividad.fechaFin,"%H:%M")
     }
+
     ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
     materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
     estadoEvento="Ver"
