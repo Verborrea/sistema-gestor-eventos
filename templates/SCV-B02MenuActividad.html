@@ -185,7 +185,7 @@
         function setModalAmbienteCrear(){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Crear nuevo Ambiente")
-            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}",'get')
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
         }
