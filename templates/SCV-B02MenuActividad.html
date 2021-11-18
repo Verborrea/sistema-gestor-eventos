@@ -6,6 +6,7 @@
 <a href="{{url_for('evento',idEvento = idEvento)}}"> << Regresar a evento </a>
 <br>
 <div id="modalAmbienteContainer"></div>
+<div id="modalMaterialContainer"></div>
 <div class="container marquito">
     <br>
     <form action="{{url_for('modificarActividad',id = actividad.id)}}" method="post">
@@ -133,7 +134,7 @@
                             <div class="row">
                                 <div class="col"> {{materiales[i].nombre}}</div>
                                 <div class="col-2 text-right">
-                                    <a href="" onclick=""><i class="fa fa-pencil"> </i></a>
+                                    <a href="" onclick="setModalMaterialModificar('{{ambientes[i].id}}')" data-toggle="modal" data-target="#materialModal"><i class="fa fa-pencil"> </i></a>
                                     <a href="{{url_for('eliminarMaterial',id = materiales[i].id)}}"><i class="fa fa-trash"> </i></a> 
                                 </div>
                             </div>
@@ -143,7 +144,7 @@
                     {%endfor%}
 
                     <p class="text-center">
-                        <button type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar material</button>
+                        <button id="crearMaterialButton" type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar material</button>
                     </p>
 
                 </div>
@@ -157,6 +158,7 @@
 {% endblock %}
 {% block script %}
     <script>
+        //Ambientes
         function generarModalAmbiente(){
             //id,titulo, datosForm
             let id = "ambienteModal"
@@ -183,8 +185,7 @@
             };
             request.send({id:id})
         }
-         
-
+        
         function setModalAmbienteModificar(id){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
@@ -200,8 +201,55 @@
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
         }
+
+        //Materiales
+        function generarModalMaterial(){
+            //id,titulo, datosForm
+            let id = "materialModal"
+            let titulo = "Material"
+            let datosForm = [
+                {"nombre":"idMaterial","tipo_dato":"text","extra":String.raw`style="display: none;"`},
+                {"nombre":"nombreMaterial","tipo_dato":"text"},
+                {"nombre":"tipoMaterial","tipo_dato":"text"},
+                {"nombre":"descripcionBreve","tipo_dato":"text"},
+                {"nombre":"stockInicial","tipo_dato":"number"},
+                {"nombre":"costoUnitario","tipo_dato":"number"}
+            ]
+            let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
+            BOOSTTRAP.Utilities.onlyChild("modalMaterialContainer",formModal)//Agrega el modal al doc
+            BOOSTTRAP.Utilities.convertToCallModal("crearMaterialButton",id)
+        }
+        
+        function getInfoMaterial(id,idModalMaterial){
+            const request = new XMLHttpRequest();
+            request.open('GET', "{{url_for('obtenerMaterial')}}", false);
+            
+            request.onload = () => {
+                const data = JSON.parse(request.responseText);
+                BOOSTTRAP.Forms.fillForm(data,idModalMaterial)
+            };
+            request.send({id:id})
+        }
+        
+        function setModalMaterialModificar(id){
+            let idModalMaterial = "materialModal-form"
+            BOOSTTRAP.Utilities.setTitle("materialModal","Modificar Material")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('modificarMaterial')}}")
+            BOOSTTRAP.Forms.resetForm(idModalMaterial)
+            getInfoMaterial(id,idModalMaterial)
+        }
+        function setModalMaterialCrear(){
+            let idModalMaterial= "materialModal-form"
+            BOOSTTRAP.Utilities.setTitle("materialModal","Crear nuevo Material")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('crearMaterial')}}")
+            BOOSTTRAP.Forms.resetForm(idModalMaterial)
+        }
+
         window.onload = ()=>{
-            //Generar modal para ambiente
+            //Material
+            generarModalMaterial()
+            document.getElementById("crearMaterialButton").addEventListener('click',setModalMaterialCrear)
+            //Ambiente
             generarModalAmbiente()
             document.getElementById("crearAmbienteButton").addEventListener('click',setModalAmbienteCrear)
         }

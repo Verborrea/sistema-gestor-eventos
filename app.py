@@ -434,7 +434,34 @@ def obtenerAmbiente():
 # ============================== material ============================== #
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
 def eliminarMaterial(id):
-    return "elimino material"
+    #aqui deberia eliminar el material
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
+@app.route('/modificarMaterial', methods=['POST'])
+def modificarMaterial():
+    #aqui deberia modifica datos de los materiales
+    id = request.form.get('idMaterial')
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
+
+@app.route('/crearMaterial', methods=['GET','POST'])
+def crearMaterial():
+    #aqui deberia crear Nuevo material
+    #no olvidar el db.session.add(nuevoAmbiente) y commit()
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
+@app.route('/obtenerMaterial', methods=['GET','POST'])
+def obtenerMaterial():
+    #aqui deberia retornar los datos del material
+    materialDict = {
+        "idMaterial" : 4,#id que manda el request
+        "nombreMaterial" : 'Nombre',
+        "tipoMaterial" : 'Tipo',
+        "descripcionBreve" : 'Breve descripcion',
+        "stockInicial" : 10,
+        "costoUnitario" : 10,
+    }
+    return json.dumps(materialDict)
 
 
 # ============================== login ============================== #
