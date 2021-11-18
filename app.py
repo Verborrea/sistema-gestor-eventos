@@ -385,6 +385,7 @@ def eliminarAmbiente(id):
 
 @app.route('/modificarAmbiente', methods=['POST'])
 def modificarAmbiente():
+    id = request.form.get('idAmbiente')
     miAmbiente = Ambiente.query.get_or_404(id)
 
     miAmbiente.nombre = request.form.get('nombreAmbiente')
@@ -417,6 +418,18 @@ def crearAmbiente():
     }
 
     return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
+@app.route('/obtenerAmbiente', methods=['GET','POST'])
+def obtenerAmbiente():
+    ambienteDict = {
+        "idAmbiente" : 4,#id que manda el request
+        "nombreAmbiente" : 'Nombre del Ambiente',
+        "tipoAmbiente" : 'Tipo de Ambiente',
+        "descripcionBreve" : 'Breve descripcion',
+        "aforo" : 10,
+    }
+    return json.dumps(ambienteDict)
+
 
 # ============================== material ============================== #
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])

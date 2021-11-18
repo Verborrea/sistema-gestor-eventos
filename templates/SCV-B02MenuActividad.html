@@ -162,7 +162,7 @@
             let id = "ambienteModal"
             let titulo = "Ambiente"
             let datosForm = [
-                {"nombre":"idAmbiente","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
+                {"nombre":"idAmbiente","tipo_dato":"text","extra":String.raw`style="display: none;"`},
                 {"nombre":"nombreAmbiente","tipo_dato":"text"},
                 {"nombre":"tipoAmbiente","tipo_dato":"text"},
                 {"nombre":"descripcionBreve","tipo_dato":"text"},
@@ -173,14 +173,25 @@
             BOOSTTRAP.Utilities.convertToCallModal("crearAmbienteButton",id)
         }
         
+        function getInfoAmbiente(id,idModalAmbiente){
+            const request = new XMLHttpRequest();
+            request.open('GET', "{{url_for('obtenerAmbiente')}}", false);
+            
+            request.onload = () => {
+                const data = JSON.parse(request.responseText);
+                BOOSTTRAP.Forms.fillForm(data,idModalAmbiente)
+            };
+            request.send({id:id})
+        }
+         
+
         function setModalAmbienteModificar(id){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
             BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente')}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
-            console.log("el id del ambiente a modificar es: ",id)
+            getInfoAmbiente(id,idModalAmbiente)
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
-            //BOOSTTRAP.Forms.fillForm()//To-do
         }
         function setModalAmbienteCrear(){
             let idModalAmbiente = "ambienteModal-form"
@@ -191,7 +202,6 @@
         }
         window.onload = ()=>{
             //Generar modal para ambiente
-           
             generarModalAmbiente()
             document.getElementById("crearAmbienteButton").addEventListener('click',setModalAmbienteCrear)
         }

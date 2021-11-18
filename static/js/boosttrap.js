@@ -12,6 +12,7 @@ BOOSTTRAP.Utilities = {
     convertToCallModal(idbutton,idModal){},
     switchToogle(id1,id2,on1){},
     setTitle(id,title){},//\
+    disable(id,disable =1){},//\
 }
 
 BOOSTTRAP.GenerateSimple = {
@@ -110,6 +111,10 @@ BOOSTTRAP.Utilities.switchToogle= function(id1,id2,on1){
 }
 BOOSTTRAP.Utilities.setTitle= function(id,title){
     document.getElementById(id+"-title").innerHTML = title
+}
+
+BOOSTTRAP.Utilities.disable = function(id,disable=1){
+    document.getElementById(id).disabled = disable;
 }
 // GenerateSimple =======================================
 BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
