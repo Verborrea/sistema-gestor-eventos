@@ -185,7 +185,7 @@
             console.log("llamo")
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Crear nuevo Ambiente")
-            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}",'get')
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             $(idModalAmbiente).modal('show')
             

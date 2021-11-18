@@ -55,7 +55,19 @@ class Actividad(db.Model):
     ponente = db.Column(db.String(50))
 
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-    
+    ambientes = db.relationship('Ambiente', backref='actividad', lazy = True)
+
+class Ambiente(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(30), nullable=False)
+    tipo = db.Column(db.String(30), nullable=False)
+    descripcion = db.Column(db.String(90))
+    aforo = db.Column(db.Integer, nullable = False)
+
+    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
+
+
+
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 def crearFecha(date, format):
@@ -316,10 +328,29 @@ def actividad(id):
         "horaFin":crearFecha(miActividad.fechaFin,"%H:%M")
     }
 
-    ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
+    #ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
     materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
+
+    session['idActividad'] = id
+    listaAmbientes = []
+    ambientes = Ambiente.query.filter_by(idActividad = session['idActividad'])
+    for ambiente in ambientes:
+        listaAmbientes.append({
+            "nombre":ambiente.nombre,
+            "id":ambiente.id
+        })
+
     estadoEvento="Borrador"
-    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales),idEvento=session['idEvento'])
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        actividad=datos,
+        estado = estadoEvento,
+        ambientes=listaAmbientes,
+        lenAmbientes = len(listaAmbientes),
+        materiales=materiales,
+        lenMateriales = len(materiales),
+        idEvento=session['idEvento'])
 
 @app.route('/verActividad/<id>', methods=['GET','POST'])
 def verActividad(id):
@@ -344,14 +375,48 @@ def verActividad(id):
     estadoEvento="Ver"
     return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
 
-# ============================== ambiente ============================== #
+# ============================== AMBIENTE ============================== #
 @app.route('/eliminarAmbiente/<id>', methods=['GET','POST'])
 def eliminarAmbiente(id):
-    return "elimino ambiente"
+    miAmbiente = Ambiente.query.get_or_404(id)
+    db.session.delete(miAmbiente)
+    db.session.commit()
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
+@app.route('/modificarAmbiente', methods=['POST'])
+def modificarAmbiente():
+    miAmbiente = Ambiente.query.get_or_404(id)
+
+    miAmbiente.nombre = request.form.get('nombreAmbiente')
+    miAmbiente.tipo = request.form.get('tipoAmbiente')
+    miAmbiente.descripcion = request.form.get('descripcionBreve')
+    miAmbiente.aforo = request.form.get('aforo')
+
+    db.session.commit()
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+
 
 @app.route('/crearAmbiente', methods=['GET','POST'])
 def crearAmbiente():
-    return "<html>Crear ambiente aqui</html>"
+    nuevoAmbiente = Ambiente(
+        nombre = request.form.get('nombreAmbiente'),
+        tipo = request.form.get('tipoAmbiente'),
+        descripcion = request.form.get('descripcionBreve'),
+        aforo = request.form.get('aforo'),
+        idActividad = session['idActividad']
+    )
+    db.session.add(nuevoAmbiente)
+    db.session.commit()
+
+    nuevoAmbienteDict = {
+        "idAmbiente" : nuevoAmbiente.id,
+        "nombreAmbiente" : 'Nombre del Ambiente',
+        "tipoAmbiente" : 'Tipo de Ambiente',
+        "descripcionBreve" : 'Breve descripcion',
+        "aforo" : 'Cantidad de personas',
+    }
+
+    return redirect(url_for('actividad',id=session['idActividad']), code=302)
 
 # ============================== material ============================== #
 @app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
@@ -405,12 +470,6 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
-#ambientes
-@app.route('/modificarAmbiente', methods=['POST'])
-def modificarAmbiente():
-    #recibe id a travez del form
-    return "modificar ambiente"
 
-#
 if __name__ == '__main__':
     app.run()
