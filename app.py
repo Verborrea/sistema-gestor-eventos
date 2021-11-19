@@ -569,13 +569,58 @@ def visitante():
     #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
     return render_template('SCV-B03SeleccionarEvento.html',tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
 
-@app.route('/inscribete/<id>')
-def inscribete(id):
-    return "te estas inscribiento en: "+id
+@app.route('/registrarse/<id>')
+def registrarse(id):
+    return "te estas registrando en: "+id
 
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
-    return render_template('SCV-B03SeleccionarEvento.html')
+    evento = {
+        "id":id,
+        "title":"Evento1",
+        "descripcion":"descripcion",
+        "lugar":"lugar",
+        "fechas":"01/01/01 - 02/02/02"
+    }
+    actividad =[
+        {
+            "nombre":"Actividad1",
+            "duracion":"1 anio",
+            "ponente":"FulanoPerez"
+        },
+        {
+            "nombre":"Actividad2",
+            "duracion":"1/2 anio",
+            "ponente":"FulanoJuarez"
+        }
+    ]
+    paquete=["Paquete 1","Paquete 2","Paquete 3"]
+    categoria=["Categoria 1","Categoria 2"]
+    categoria_paquete = {
+        "Categoria 1":{
+            "Paquete 1":5,
+            "Paquete 2":10,
+            "Paquete 3":7,
+        },
+        "Categoria 2":{
+            "Paquete 1":6,
+            "Paquete 2":11,
+            "Paquete 3":6,
+        }
+    }
+    categorias = 2
+    paquetes = 3
+    lenActividad = len(actividad)
+    return render_template('SCV-B01VisualizarEvento.html',
+        evento=evento,
+        actividad=actividad,
+        lenActividad=lenActividad,
+        categoria_paquete=categoria_paquete,
+        categorias=categorias,
+        paquetes=paquetes,
+        paquete=paquete,
+        categoria=categoria
+        )
 
 if __name__ == '__main__':
     app.run()

@@ -1,9 +1,76 @@
 {% extends "Layout.html" %}
 <html>
 {% block body %}
-    
+<br>
+<h2>{{evento.title}}</h2>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <img src="{{ url_for('static', filename='img/visualizarEvento.jpg') }}">
+            <a href="{{url_for('registrarse',id=id)}}" class="btn btn-primary">Registrarse</a>
+        </div>
+        <div class="col">
+            <div class="detallesEvento">
+                <h5>DATOS DEL EVENTO</h5>
+                {{evento.descripcion}}<br>
+                {{evento.lugar}}<br>
+                {{evento.fechas}}<br>
+            </div>
+            <br>
+            <div id="actividades">
+                <h5>ACTIVIDADES</h5>
+                <table class="table table-borderless">
+                    <tbody>
+                        {% for i in range(lenActividad) %}
+                        <tr>
+                            <td>{{actividad[i].nombre}}</td>
+                            <td>{{actividad[i].duracion}}</td>
+                            <td>{{actividad[i].ponente}}</td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <div id="paquetes">
+                <h5>DATOS DE INSCRIPCIONES</h5>
+                <table class="table marquito">
+                    <thead>
+                        <tr>
+                            <th scope="col">Categoria</th>
+                            {%for i in range(paquetes)%}
+                            <th scope="col">{{paquete[i]}}</th>
+                            {%endfor%}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(categorias) %}
+                        <tr>
+                            <td scope="row">{{categoria[i]}}</td>
+                            {% for j in range(paquetes)%}
+                                <td>{{categoria_paquete[categoria[i]][paquete[j]]}}</td>
+                            {%endfor%}
+                            
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block script %}
+<script>
+    /*loadedButton = false
+    let tabla = BOOSTTRAP.GenerateComplex.buildTableDetalle(//Genera la table
+        "tablaDetalleEvento",
+        ["elEvento","Actividades","DatosInscripciones"],
+        
+        )
+    BOOSTTRAP.Utilities.onlyChild("historialEventos",tabla)//Coloca la tabla*/
 
+</script>
 {% endblock %}
 </html>
