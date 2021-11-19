@@ -91,15 +91,15 @@
             <div class="row">
                 <div class="col-1"></div>
                 <div id="activities-list" class="col">
-                    {%for i in range(0, lenAmbientes)%}
+                    {%for ambiente in ambientes%}
                     <div class="card">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col"> {{ambientes[i].nombre}}</div>
+                                <div class="col"> {{ambiente.nombre}}</div>
                                 <div class="col-2 text-right">
                                     {% if estado == 'Borrador' %}
-                                    <a href="" onclick="setModalAmbienteModificar('{{ambientes[i].id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fa fa-pencil"> </i></a>
-                                    <a href="{{url_for('eliminarAmbiente',id = ambientes[i].id)}}"><i class="fa fa-trash"> </i></a>
+                                    <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fa fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarAmbiente',idActividad = actividad.id,idAmbiente = ambiente.id)}}"><i class="fa fa-trash"> </i></a>
                                     {% else %}
                                     <a href=""><i class="fa fa-eye"> </i></a>
                                     {% endif %}
@@ -128,14 +128,14 @@
             <div class="row">
                 <div class="col-1"></div>
                 <div id="materials-list" class="col">
-                    {% for i in range(0, lenMateriales) %}
+                    {% for material in materiales %}
                     <div class="card">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col"> {{materiales[i].nombre}}</div>
+                                <div class="col"> {{material.nombre}}</div>
                                 <div class="col-2 text-right">
-                                    <a href="" onclick="setModalMaterialModificar('{{ambientes[i].id}}')" data-toggle="modal" data-target="#materialModal"><i class="fa fa-pencil"> </i></a>
-                                    <a href="{{url_for('eliminarMaterial',id = materiales[i].id)}}"><i class="fa fa-trash"> </i></a> 
+                                    <a href="" onclick="setModalMaterialModificar('{{material.id}}')" data-toggle="modal" data-target="#materialModal"><i class="fa fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarMaterial',idActividad = actividad.id,idMaterial = material.id)}}"><i class="fa fa-trash"> </i></a> 
                                 </div>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
         
         function getInfoAmbiente(id,idModalAmbiente){
             const request = new XMLHttpRequest();
-            request.open('GET', "{{url_for('obtenerAmbiente')}}", false);
+            request.open('GET', "/obtenerAmbiente/"+id, false);
             
             request.onload = () => {
                 const data = JSON.parse(request.responseText);
@@ -189,7 +189,7 @@
         function setModalAmbienteModificar(id){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
-            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente')}}")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             getInfoAmbiente(id,idModalAmbiente)
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
@@ -197,7 +197,7 @@
         function setModalAmbienteCrear(){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Crear nuevo Ambiente")
-            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente')}}")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
         }
@@ -213,7 +213,7 @@
                 {"nombre":"tipoMaterial","tipo_dato":"text"},
                 {"nombre":"descripcionBreve","tipo_dato":"text"},
                 {"nombre":"stockInicial","tipo_dato":"number"},
-                {"nombre":"costoUnitario","tipo_dato":"number","extra":"step='.01'"}
+                {"nombre":"costoUnitario","tipo_dato":"number"}
             ]
             let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
             BOOSTTRAP.Utilities.onlyChild("modalMaterialContainer",formModal)//Agrega el modal al doc
@@ -222,7 +222,7 @@
         
         function getInfoMaterial(id,idModalMaterial){
             const request = new XMLHttpRequest();
-            request.open('GET', "{{url_for('obtenerMaterial')}}", false);
+            request.open('GET',  "/obtenerMaterial/"+id, false);
             
             request.onload = () => {
                 const data = JSON.parse(request.responseText);
@@ -234,14 +234,14 @@
         function setModalMaterialModificar(id){
             let idModalMaterial = "materialModal-form"
             BOOSTTRAP.Utilities.setTitle("materialModal","Modificar Material")
-            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('modificarMaterial')}}")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('modificarMaterial',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalMaterial)
             getInfoMaterial(id,idModalMaterial)
         }
         function setModalMaterialCrear(){
             let idModalMaterial= "materialModal-form"
             BOOSTTRAP.Utilities.setTitle("materialModal","Crear nuevo Material")
-            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('crearMaterial')}}")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('crearMaterial',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalMaterial)
         }
 
