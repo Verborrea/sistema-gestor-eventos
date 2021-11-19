@@ -27,7 +27,7 @@ class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     tipo = db.Column(db.String(100), nullable=False)
-    descripcion = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.String(130), nullable=False)
     lugar = db.Column(db.String(100), nullable=False)
     estado = db.Column(db.String(20), default="Borrador")
     fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
@@ -48,7 +48,7 @@ class Actividad(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
     tipo = db.Column(db.String(30))
-    descripcion = db.Column(db.String(100))
+    descripcion = db.Column(db.String(130))
     consideraciones = db.Column(db.String(100))
     fechaInicio = db.Column(db.DateTime)
     fechaFin = db.Column(db.DateTime)
@@ -56,18 +56,28 @@ class Actividad(db.Model):
 
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     ambientes = db.relationship('Ambiente', backref='actividad', lazy = True)
+    materiales = db.relationship('Material', backref='actividad', lazy = True)
 
 class Ambiente(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
     tipo = db.Column(db.String(30), nullable=False)
-    descripcion = db.Column(db.String(90))
+    descripcion = db.Column(db.String(100))
     aforo = db.Column(db.Integer, nullable = False)
 
     idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
 
+class Material(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(30), nullable=False)
+    tipo = db.Column(db.String(30), nullable=False)
+    descripcion = db.Column(db.String(100))
+    stockInicial = db.Column(db.Integer, nullable = False)
+    costoUnitario = db.Column(db.Float, nullable = False)
 
+    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
 
+    
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 @app.context_processor
@@ -320,6 +330,9 @@ def modificarActividad(id):
 
 @app.route('/actividad/<id>', methods=['GET','POST'])
 def actividad(id):
+    miEvento = Evento.query.get_or_404(session['idEvento'])
+    estadoEvento = miEvento.estado
+
     miActividad = Actividad.query.get_or_404(id)
 
     datos ={
@@ -335,19 +348,21 @@ def actividad(id):
         "horaFin":crearFecha(miActividad.fechaFin,"%H:%M")
     }
 
-    #ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
-    materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
-
-    session['idActividad'] = id
     listaAmbientes = []
-    ambientes = Ambiente.query.filter_by(idActividad = session['idActividad'])
+    ambientes = Ambiente.query.filter_by(idActividad = id)
     for ambiente in ambientes:
         listaAmbientes.append({
             "nombre":ambiente.nombre,
             "id":ambiente.id
         })
-
-    estadoEvento="Borrador"
+    
+    listaMateriales = []
+    materiales = Material.query.filter_by(idActividad = id)
+    for material in materiales:
+        listaMateriales.append({
+            "nombre":material.nombre,
+            "id":material.id
+        })
 
     return render_template(
         'SCV-B02MenuActividad.html',
@@ -355,43 +370,20 @@ def actividad(id):
         estado = estadoEvento,
         ambientes=listaAmbientes,
         lenAmbientes = len(listaAmbientes),
-        materiales=materiales,
-        lenMateriales = len(materiales),
+        materiales=listaMateriales,
+        lenMateriales = len(listaMateriales),
         idEvento=session['idEvento'])
 
-@app.route('/verActividad/<id>', methods=['GET','POST'])
-def verActividad(id):
-    #lo mismo pero el estado de evento es Ver
-    miActividad = Actividad.query.get_or_404(id)
-
-    datos ={
-        "id":miActividad.id,
-        "nombreActividad":miActividad.nombre,
-        "descripcion":miActividad.descripcion,
-        "consideraciones":miActividad.consideraciones,
-        "tipoActividad":miActividad.tipo,
-        "expositor":miActividad.ponente,
-        "fechaInicio":crearFecha(miActividad.fechaInicio,"%Y-%m-%d"),
-        "fechaFin":crearFecha(miActividad.fechaFin,"%Y-%m-%d"),
-        "horaInicio":crearFecha(miActividad.fechaInicio,"%H:%M"),
-        "horaFin":crearFecha(miActividad.fechaFin,"%H:%M")
-    }
-
-    ambientes = [{"nombre":"Amb1","id":"Amb1"},{"nombre":"Amb2","id":"Amb2"}]
-    materiales = [{"nombre":"Mat1","id":"Mat1"},{"nombre":"Mat2","id":"Mat2"}]
-    estadoEvento="Ver"
-    return render_template('SCV-B02MenuActividad.html',actividad=datos,estado = estadoEvento,ambientes=ambientes,lenAmbientes = len(ambientes),materiales=materiales,lenMateriales = len(materiales))
-
 # ============================== AMBIENTE ============================== #
-@app.route('/eliminarAmbiente/<id>', methods=['GET','POST'])
-def eliminarAmbiente(id):
-    miAmbiente = Ambiente.query.get_or_404(id)
+@app.route('/<idActividad>/eliminarAmbiente/<idAmbiente>', methods=['GET','POST'])
+def eliminarAmbiente(idActividad,idAmbiente):
+    miAmbiente = Ambiente.query.get_or_404(idAmbiente)
     db.session.delete(miAmbiente)
     db.session.commit()
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+    return redirect(url_for('actividad',id=idActividad), code=302)
 
-@app.route('/modificarAmbiente', methods=['POST'])
-def modificarAmbiente():
+@app.route('/<idActividad>/modificarAmbiente', methods=['GET','POST'])
+def modificarAmbiente(idActividad):
     id = request.form.get('idAmbiente')
     miAmbiente = Ambiente.query.get_or_404(id)
 
@@ -401,75 +393,84 @@ def modificarAmbiente():
     miAmbiente.aforo = request.form.get('aforo')
 
     db.session.commit()
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+    return redirect(url_for('actividad',id=idActividad), code=302)
 
-
-@app.route('/crearAmbiente', methods=['GET','POST'])
-def crearAmbiente():
+@app.route('/<idActividad>/crearAmbiente', methods=['GET','POST'])
+def crearAmbiente(idActividad):
     nuevoAmbiente = Ambiente(
         nombre = request.form.get('nombreAmbiente'),
         tipo = request.form.get('tipoAmbiente'),
         descripcion = request.form.get('descripcionBreve'),
         aforo = request.form.get('aforo'),
-        idActividad = session['idActividad']
+        idActividad = idActividad
     )
     db.session.add(nuevoAmbiente)
     db.session.commit()
 
-    nuevoAmbienteDict = {
-        "idAmbiente" : nuevoAmbiente.id,
-        "nombreAmbiente" : 'Nombre del Ambiente',
-        "tipoAmbiente" : 'Tipo de Ambiente',
-        "descripcionBreve" : 'Breve descripcion',
-        "aforo" : 'Cantidad de personas',
-    }
+    return redirect(url_for('actividad',id=idActividad), code=302)
 
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
-
-@app.route('/obtenerAmbiente', methods=['GET','POST'])
-def obtenerAmbiente():
+@app.route('/obtenerAmbiente/<idAmb>', methods=['GET','POST'])
+def obtenerAmbiente(idAmb):
+    miAmbiente = Ambiente.query.get_or_404(idAmb)
     ambienteDict = {
-        "idAmbiente" : 4,#id que manda el request
-        "nombreAmbiente" : 'Nombre del Ambiente',
-        "tipoAmbiente" : 'Tipo de Ambiente',
-        "descripcionBreve" : 'Breve descripcion',
-        "aforo" : 10,
+        "idAmbiente" : idAmb,
+        "nombreAmbiente" : miAmbiente.nombre,
+        "tipoAmbiente" : miAmbiente.tipo,
+        "descripcionBreve" : miAmbiente.descripcion,
+        "aforo" : miAmbiente.aforo
     }
     return json.dumps(ambienteDict)
 
 
 # ============================== material ============================== #
-@app.route('/eliminarMaterial/<id>', methods=['GET','POST'])
-def eliminarMaterial(id):
-    #aqui deberia eliminar el material
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+@app.route('/<idActividad>/eliminarMaterial/<idMaterial>', methods=['GET','POST'])
+def eliminarMaterial(idActividad,idMaterial):
+    miMaterial = Material.query.get_or_404(idMaterial)
+    db.session.delete(miMaterial)
+    db.session.commit()
+    return redirect(url_for('actividad',id=idActividad), code=302)
 
-@app.route('/modificarMaterial', methods=['POST'])
-def modificarMaterial():
-    #aqui deberia modifica datos de los materiales
+@app.route('/<idActividad>/modificarMaterial', methods=['POST'])
+def modificarMaterial(idActividad):
     id = request.form.get('idMaterial')
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+    miMaterial = Material.query.get_or_404(id)
 
+    miMaterial.nombre = request.form.get('nombreMaterial')
+    miMaterial.tipo = request.form.get('tipoMaterial')
+    miMaterial.descripcion = request.form.get('descripcionBreve')
+    miMaterial.stockInicial = request.form.get('stockInicial')
+    miMaterial.costoUnitario = request.form.get('costoUnitario')
 
-@app.route('/crearMaterial', methods=['GET','POST'])
-def crearMaterial():
-    #aqui deberia crear Nuevo material
-    #no olvidar el db.session.add(nuevoAmbiente) y commit()
-    return redirect(url_for('actividad',id=session['idActividad']), code=302)
+    db.session.commit()
+    return redirect(url_for('actividad',id=idActividad), code=302)
 
-@app.route('/obtenerMaterial', methods=['GET','POST'])
-def obtenerMaterial():
-    #aqui deberia retornar los datos del material
+@app.route('/<idActividad>/crearMaterial', methods=['GET','POST'])
+def crearMaterial(idActividad):
+    nuevoMaterial = Material(
+        nombre = request.form.get('nombreMaterial'),
+        tipo = request.form.get('tipoMaterial'),
+        descripcion = request.form.get('descripcionBreve'),
+        stockInicial = request.form.get('stockInicial'),
+        costoUnitario = request.form.get('costoUnitario'),
+        idActividad = idActividad
+    )
+    db.session.add(nuevoMaterial)
+    db.session.commit()
+
+    return redirect(url_for('actividad',id=idActividad), code=302)
+
+@app.route('/obtenerMaterial/<idMat>', methods=['GET','POST'])
+def obtenerMaterial(idMat):
+    miMaterial = Material.query.get_or_404(idMat)
     materialDict = {
-        "idMaterial" : 4,#id que manda el request
-        "nombreMaterial" : 'Nombre',
-        "tipoMaterial" : 'Tipo',
-        "descripcionBreve" : 'Breve descripcion',
-        "stockInicial" : 10,
-        "costoUnitario" : 10,
+        "idMaterial" : idMat,
+        "nombreMaterial" : miMaterial.nombre,
+        "tipoMaterial" : miMaterial.tipo,
+        "descripcionBreve" : miMaterial.descripcion,
+        "stockInicial" : miMaterial.stockInicial,
+        "costoUnitario" : miMaterial.costoUnitario
     }
     return json.dumps(materialDict)
-
 
 # ============================== login ============================== #
 
