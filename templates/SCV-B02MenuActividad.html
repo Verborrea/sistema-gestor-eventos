@@ -213,7 +213,7 @@
                 {"nombre":"tipoMaterial","tipo_dato":"text"},
                 {"nombre":"descripcionBreve","tipo_dato":"text"},
                 {"nombre":"stockInicial","tipo_dato":"number"},
-                {"nombre":"costoUnitario","tipo_dato":"number"}
+                {"nombre":"costoUnitario","tipo_dato":"number","extra":String.raw`step='.01'`}
             ]
             let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
             BOOSTTRAP.Utilities.onlyChild("modalMaterialContainer",formModal)//Agrega el modal al doc
