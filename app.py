@@ -70,6 +70,13 @@ class Ambiente(db.Model):
 
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
+@app.context_processor
+def utility_processor():
+    def modulo(a,b):
+        return a%b
+    return dict(modulo=modulo)
+
+
 def crearFecha(date, format):
     str = 'No definida'
     if date != None:
@@ -510,6 +517,63 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
+def breakArr(array,division):
+    arr =[]
+    sizes = []
+    for i in range(0,len(array),division):
+        arr.append([])
+        sizes.append(0)
+        for j in range(i,i+division):
+            if j<len(array):
+                arr[i//division].append(array[j])
+                sizes[i//division]=sizes[i//division]+1
+    return arr,sizes, len(sizes)
+
+@app.route('/visitante')#para probar la vista de participante
+def visitante():
+    evento =[
+        {
+            "title":"Evento1",
+            "summary":"Este evento es un evento de prueba",
+            "id":"EV1",
+        },
+        {
+            "title":"Evento2",
+            "summary":"Este evento es otro evento de prueba",
+            "id":"EV2",
+        },
+        {
+            "title":"Evento3",
+            "summary":"Mini descripcion de otro eventito de prueba"+loremLipsum,
+            "id":"EV2",
+        },
+        {
+            "title":"Funciona la vista"+loremLipsum,
+            "summary":"Mini descripcion de otro eventito de prueba"+loremLipsum,
+            "id":"EV2",
+        },
+        {
+            "title":"Evento1",
+            "summary":"Este evento es un evento de prueba",
+            "id":"EV1",
+        },
+        {
+            "title":"Evento2",
+            "summary":"Este evento es otro evento de prueba",
+            "id":"EV2",
+        }
+
+    ]
+    renderEventos, arrSizes, size = breakArr(evento,3)
+    #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
+    return render_template('SCV-B03SeleccionarEvento.html',tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
+
+@app.route('/inscribete/<id>')
+def inscribete(id):
+    return "te estas inscribiento en: "+id
+@app.route('/verEvento/<id>')
+def verEvento(id):
+    return "estas viendo el evento: "+id
 
 if __name__ == '__main__':
     app.run()
