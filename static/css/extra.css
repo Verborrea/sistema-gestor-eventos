@@ -7,6 +7,7 @@ label::first-letter th::first-letter{
     border: 2.25px solid skyblue;
     border-style: dashed;
     border-radius: 5px;
+    background-color: white;
 }
 .breveDescripcion{
     overflow: hidden;
@@ -29,6 +30,22 @@ label::first-letter th::first-letter{
     width: 350px;
     background-color: rgb(214, 242, 246);
     border-radius: 50%;
+    display: inline-block;
+    z-index: -2;
+}
+
+.datosEventos{
+    margin-bottom: -2.5vh;
+    padding: 3% 5% 2% 5%;
+}
+
+.gray {
+    top: 14%;
+    left: 0px;
+    position: absolute;
+    height: 350px;
+    width: 100%;
+    background-color: #F0F0F0;
     display: inline-block;
     z-index: -2;
 }
