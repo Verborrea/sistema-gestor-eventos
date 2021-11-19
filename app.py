@@ -571,9 +571,10 @@ def visitante():
 @app.route('/inscribete/<id>')
 def inscribete(id):
     return "te estas inscribiento en: "+id
-@app.route('/verEvento/<id>')
+
+@app.route('/visualizarEvento/<id>')
 def verEvento(id):
-    return "estas viendo el evento: "+id
+    return render_template('SCV-B03SeleccionarEvento.html')
 
 if __name__ == '__main__':
     app.run()
