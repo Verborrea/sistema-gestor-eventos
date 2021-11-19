@@ -217,7 +217,13 @@ def crearEventoPlantilla():
 
 @app.route('/lanzarEvento/', methods=['POST'])
 def lanzarEvento():
-    return "aqui lanzaria evento y redirecciona a la pagina de este evento"
+    miEvento = Evento.query.get_or_404(session['idEvento'])
+    miEvento.estado = 'Inscripciones'
+    try:
+        db.session.commit()
+    except:
+        print("ERROR al lanzar Evento " + miEvento.nombre)
+    return redirect(url_for('evento',idEvento=miEvento.id), code=302)
 
 @app.route('/cargarEjemplos', methods=['GET'])
 def cargarEjemplos():
