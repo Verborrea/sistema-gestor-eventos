@@ -115,7 +115,7 @@ def index():
             'estadoEvento':evento.estado
         })
     session.pop('idEvento', None)
-    return render_template('SCV-B01VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():
@@ -141,7 +141,7 @@ def evento(idEvento):
         })
 
     return render_template(
-        'SCV-B01MenuEvento.html',
+        'SCV-B10MenuEvento.html',
         estado = miEvento.estado,
         descripcion = miEvento.descripcion,
         lugar = miEvento.lugar,
