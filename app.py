@@ -538,40 +538,16 @@ def breakArr(array,division):
 
 @app.route('/visitante')#para probar la vista de participante
 def visitante():
-    evento =[
-        {
-            "title":"Evento1",
-            "summary":"Este evento es un evento de prueba",
-            "id":"EV1",
-        },
-        {
-            "title":"Evento2",
-            "summary":"Este evento es otro evento de prueba",
-            "id":"EV2",
-        },
-        {
-            "title":"Evento3",
-            "summary":"Mini descripcion de otro eventito de prueba"+loremLipsum,
-            "id":"EV2",
-        },
-        {
-            "title":"Funciona la vista"+loremLipsum,
-            "summary":"Mini descripcion de otro eventito de prueba"+loremLipsum,
-            "id":"EV2",
-        },
-        {
-            "title":"Evento1",
-            "summary":"Este evento es un evento de prueba",
-            "id":"EV1",
-        },
-        {
-            "title":"Evento2",
-            "summary":"Este evento es otro evento de prueba",
-            "id":"EV2",
-        }
-
-    ]
-    renderEventos, arrSizes, size = breakArr(evento,3)
+    eventos = []
+    info = Evento.query.all()
+    for evento in info:
+        if evento.estado == 'Inscripciones':
+            eventos.append({
+                "id" : evento.id,
+                "title" : evento.nombre,
+                "summary" : evento.descripcion
+            })
+    renderEventos, arrSizes, size = breakArr(eventos,3)
     #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
     return render_template('SCV-B03SeleccionarEvento.html',tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
 
