@@ -87,6 +87,19 @@ class Material(db.Model):
     costoUnitario = db.Column(db.Float, nullable = False)
 
     idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
+    
+class Movimiento(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    tipo = db.Column(db.String(30), nullable=False)
+    nombre = db.Column(db.String(30), nullable=False)
+    factura = db.Column(db.String(30), nullable=False)
+    detalle = db.Column(db.String(90))
+    cantidad = db.Column(db.Integer)
+    monto = db.Column(db.Float, nullable = False)
+    
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
+
+   
 
     
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
@@ -281,11 +294,51 @@ def cargarEjemplos():
     db.session.commit()
     return redirect(url_for('index'), code=302)
 
+# ============================== movimiento ============================== #
+
 @app.route('/registrarMovimiento/', methods=['GET','POST'])
 def registrarMovimiento():
     datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+
+
+
+@app.route('/movimiento/')
+def movimiento():
+    miEvento = Evento.query.get_or_404(session['idEvento'])
+    estadoEvento = miEvento.estado
+
+    id = db.Column(db.Integer, primary_key = True)
+    tipo = db.Column(db.String(30), nullable=False)
+    nombre = db.Column(db.String(30), nullable=False)
+    factura = db.Column(db.String(30), nullable=False)
+    detalle = db.Column(db.String(90))
+    cantidad = db.Column(db.Integer)
+    monto = db.Column(db.Float, nullable = False)
+
+    listaMovimientos = []
+    movimientos = Movimiento.query.filter_by(idActividad = miEvento)
+    for movimiento in movimientos:
+        listaMovimientos.append({
+            "id":movimiento.id,
+            "nombre":movimiento.nombre,
+            "factura":movimiento.factura,
+            "detalle":movimiento.detalle,
+            "cantidad":movimiento.cantidad,
+            "monto":movimiento.monto,
+            "tipo":movimiento.tipo
+        })
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        actividad=datos,
+        estado = estadoEvento,
+        ambientes=listaAmbientes,
+        lenAmbientes = len(listaAmbientes),
+        materiales=listaMateriales,
+        lenMateriales = len(listaMateriales),
+        idEvento=session['idEvento'])
 
 # ============================== actividades ============================== #
 
