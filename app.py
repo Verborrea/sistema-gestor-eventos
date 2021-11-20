@@ -604,5 +604,47 @@ def verEvento(id):
         categoria=categoria
         )
 
+@app.route('/movimiento/')
+def movimiento():
+    general =[
+        {"numero":1,"concepto":"Inscripcion","tipo":"Ingreso","monto":150},
+        {"numero":2,"concepto":"Compra","tipo":"Egreso","monto":62}
+    ]
+    ingresos =[#lo mismo pero filtran en la consulta que sean solo ingresos
+        {"numero":1,"concepto":"Inscripcion","monto":150}
+    ]
+    egresos=[
+        {"numero":2,"numeroRecibo":"N-123154649","concepto":"Compra","monto":62}
+    ]
+    balance={
+        "general":88,
+        "ingreso":150,
+        "egreso":62
+    }
+    len={
+        "general":88,
+        "ingreso":150,
+        "egreso":62
+    }
+    return render_template('SCV-B04-B05RegistrarMovimiento.html',
+        general=general,
+        ingresos=ingresos,
+        egresos=egresos,
+        balance=balance,
+        len=len
+        )
+
+@app.route('/nuevoEgreso/', methods=['POST'])
+def nuevoEgreso():
+    return "creado"
+
+@app.route('/nuevoIngreso/', methods=['POST'])
+def nuevoIngreso():
+    return "creado"
+
+@app.route('/logout/')
+def logout():
+    return "Cierra sesion y manda a lista eventos de visitante"
+
 if __name__ == '__main__':
     app.run()

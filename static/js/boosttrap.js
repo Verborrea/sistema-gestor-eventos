@@ -4,7 +4,7 @@ var BOOSTTRAP = BOOSTTRAP ||{};
 
 BOOSTTRAP.Utilities = {
     iconos : {"ver":"fa-eye","eliminar":"fa-trash","modificar":"fa-pencil-square-o","agregar":"fa-plus-square-o","seleccionar":"fa-hand-pointer-o"},
-    basicButton(texto='Enviar',id='boton-0',classStyle='btn-outline-primary'){},//\
+    basicButton(texto='Enviar',id='boton-0',classStyle='btn-outline-primary',type='submit'){},//\
     buildOptions(id,buttons){},//\
     buildSelection(id, name, value,extra){},//\
     addChild(id,raw){},//\
@@ -18,14 +18,14 @@ BOOSTTRAP.Utilities = {
 BOOSTTRAP.GenerateSimple = {
     buildTable(id, headers,contenido){},//\
     buildForm(id, datos){},//\
-    buildModal(titulo,body,footer,id){},//\
+    buildModal(titulo,body,footer,id,size){},//\
 }
 
 BOOSTTRAP.GenerateComplex = {
     buildTableSelection(id, headers,contenido){},//\
     buildTableOptions(id, headers,contenido, opciones=""){},//\
     buildTableModal(id, titulo, datosTabla){},//\
-    buildFormModal(id,titulo, datosForm){},//\Form con id-form
+    buildFormModal(id,titulo, datosForm,button=false){},//\Form con id-form
 }
 
 BOOSTTRAP.Buttons = {
@@ -73,8 +73,8 @@ function probando(){
 
 //==================================================
 // Utilities =======================================
-BOOSTTRAP.Utilities.basicButton = function(texto='Enviar',id='boton-0',classStyle='btn-outline-primary'){
-    return String.raw`<button type="submit" id="${id}" class="btn ${classStyle}  float-right" >${texto}</button>`
+BOOSTTRAP.Utilities.basicButton = function(texto='Enviar',id='boton-0',classStyle='btn-outline-primary',type='submit'){
+    return String.raw`<button type="${type}" id="${id}" class="btn ${classStyle}  float-right" >${texto}</button>`
 }
 BOOSTTRAP.Utilities.buildOptions = function(id,buttons){
     return BOOSTTRAP.buttons.getButtons(id,buttons)
@@ -130,16 +130,19 @@ BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
     `
     return tabla
 }
-BOOSTTRAP.GenerateSimple.buildForm = function(id, datos){
+BOOSTTRAP.GenerateSimple.buildForm = function(id, datos,button=false){
+    if(button==false){
+        button=BOOSTTRAP.Utilities.basicButton("Continuar",id+"-button","btn-outline-primary")
+    }
     let formText =String.raw`<form action="" id="${id}">`
     for(let i in datos)
         formText += BOOSTTRAP.Forms.buildRow(datos[i],id)
-    formText += String.raw`<div class="justify-content-end">${BOOSTTRAP.Utilities.basicButton("Continuar",id+"-button","btn-outline-primary")}</div>`
+    formText += String.raw`<div class="justify-content-end">${button}</div>`
     formText+='</form>'
     return formText 
 }
 
-BOOSTTRAP.GenerateSimple.buildModal = function(titulo,body,footer,id="modal0"){
+BOOSTTRAP.GenerateSimple.buildModal = function(titulo,body,footer,id="modal0",size="modal-lg"){
     let header = String.raw`
         <h5 class="modal-title" id="${id}-title">${titulo}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -147,7 +150,7 @@ BOOSTTRAP.GenerateSimple.buildModal = function(titulo,body,footer,id="modal0"){
         </button>`
     let string = String.raw`
     <div class="modal" id="${id}" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog ${size}">
             <div class="modal-content">
                 <div class="modal-header">
                     ${header}
@@ -203,10 +206,10 @@ BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
     return BOOSTTRAP.GenerateSimple.buildModal(titulo,tabla,"",id)
 }
 
-BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm){
+BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm,button=false){
     let form = String.raw`
         <div class = "marquito"><div class = "container"><br>
-            ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm)}
+            ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm,button)}
         </div></div>
     `
     return BOOSTTRAP.GenerateSimple.buildModal(titulo,form,"",id)
