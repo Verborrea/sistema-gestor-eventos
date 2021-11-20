@@ -32,7 +32,6 @@ class Usuario_Evento(db.Model):
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
-
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
@@ -111,7 +110,6 @@ def utility_processor():
         return a%b
     return dict(modulo=modulo)
 
-
 def crearFecha(date, format):
     str = 'No definida'
     if date != None:
@@ -137,8 +135,8 @@ def breakArr(array,division):
 
 # ============================== eventos ============================== #
 
-@app.route('/')
-def index():
+@app.route('/listaEventos')
+def listaEventos():
     datos = []
     eventos = Evento.query.all()
     for evento in eventos:
@@ -597,20 +595,23 @@ def profile(username):
 def login():
     if request.method == 'POST':
         user = Usuario.query.filter_by(
-            username = request.form.get('usuario'),
+            email = request.form.get('usuario'),
             password = request.form.get('contra')
         ).first()
 
         if user:
-            return redirect(url_for('profile', username=request.form.get('usuario')))
+            session['tipoUsuario'] = user.tipoUsuario
+            if session['tipoUsuario'] == 'Admin':
+                return redirect(url_for('listaEventos'))
+            return redirect(url_for('index'))
         else:
             return 'Usuario no existente'
     else:
-        return render_template('login.html')
+        return render_template('login.html',tipoUsuario='Visitante')
 
 @app.route('/signup')
 def register():
-    return render_template('signup.html')
+    return render_template('signup.html',tipoUsuario='Visitante')
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
@@ -622,19 +623,22 @@ def create_user():
         return 'El correo ingresado ya tiene una cuenta asociada'
     nuevo_usuario = Usuario(
         username = request.form.get('usuario'),
+        tipoUsuario = 'Admin',
         password = request.form.get('contra'),
         nombre = request.form.get('nombre'),
         email = request.form.get('correo'),
         tipodoc = request.form.get('tipo_doc'),
-        doc = request.form.get('doc')
+        doc = request.form.get('doc'),
+        profesion = request.form.get('profesion')
     )
     db.session.add(nuevo_usuario)
     db.session.commit()
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
-@app.route('/visitante')#para probar la vista de participante
-def visitante():
+@app.route('/')#para probar la vista de participante
+def index():
+    session['tipoUsuario'] = 'Visitante'
     eventos = []
     info = Evento.query.all()
     for evento in info:
@@ -665,16 +669,7 @@ def verEvento(id):
     }
 
     actividades = []
-    '''
-    datos = Actividad.query.all()
-    for actividad in datos:
-        if actividad.idEvento == id:
-            actividades.append({
-                "nombre": actividad.nombre,
-                "duracion": "por definir",
-                "ponente": actividad.ponente
-            })
-    '''
+
     datos = Actividad.query.filter_by(
             idEvento = id
         )
@@ -713,7 +708,7 @@ def verEvento(id):
     }
     categorias = 2
     paquetes = 3
-    lenActividad = len(actividad)
+    lenActividad = len(actividades)
     return render_template('SCV-B01VisualizarEvento.html',
         evento=evento,
         actividad=actividades,
