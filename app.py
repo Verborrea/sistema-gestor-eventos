@@ -137,9 +137,14 @@ def breakArr(array,division):
 
 @app.route('/listaEventos')
 def listaEventos():
+    usuario_evento = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
+    listaIdEventos = []
+    for usr_evt in usuario_evento:
+        listaIdEventos.append(usr_evt.idEvento)
     datos = []
-    eventos = Evento.query.all()
-    for evento in eventos:
+    # eventos = Evento.query.all()
+    for idEvt in listaIdEventos:
+        evento = Evento.query.get_or_404(idEvt)
         datos.append({
             "id":evento.id,
             "nombre":evento.nombre,
@@ -195,6 +200,14 @@ def crearEvento():
     )
 
     db.session.add(nuevoEvento)
+    db.session.commit()
+
+    nuevoEventoUsuario = Usuario_Evento(
+        idEvento = nuevoEvento.id,
+        idUsuario = session['idUsuario']
+    )
+
+    db.session.add(nuevoEventoUsuario)
     db.session.commit()
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
@@ -602,6 +615,7 @@ def login():
         if user:
             session['tipoUsuario'] = user.tipoUsuario
             if session['tipoUsuario'] == 'Admin':
+                session['idUsuario'] = user.id
                 return redirect(url_for('listaEventos'))
             return redirect(url_for('index'))
         else:
