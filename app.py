@@ -368,9 +368,9 @@ def movimiento():
         balanceGeneral += movimiento.monto
 
     balance={
-        "general":balanceIngreso,
-        "ingresos":balanceEgreso,
-        "egresos":balanceGeneral
+        "general":balanceGeneral,
+        "ingresos":balanceIngreso,
+        "egresos":balanceEgreso
     }
     lens={
         "general" : len(general),
@@ -385,14 +385,38 @@ def movimiento():
         len=lens
     )
 
-@app.route('/nuevoEgreso/', methods=['POST'])
-def nuevoEgreso():
-    return "creado"
-
 @app.route('/nuevoIngreso/', methods=['POST'])
 def nuevoIngreso():
-    return "creado"
+    miNuevoIngreso = Movimiento(
+        nombre = request.form.get('nombre'),
+        tipo = 'Ingreso',
+        factura = request.form.get('factura'),
+        detalle = request.form.get('detalle'),
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
 
+    db.session.add(miNuevoIngreso)
+    db.session.commit()
+      
+    return redirect(url_for('movimiento'), code=302)
+
+
+@app.route('/nuevoEgreso/', methods=['POST'])
+def nuevoEgreso():
+    miNuevoEgreso = Movimiento(
+        nombre = request.form.get('concepto'),
+        tipo = 'Egreso',
+        factura = 'F12345',
+        detalle = request.form.get('detalle'),
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
+
+    db.session.add(miNuevoEgreso)
+    db.session.commit()
+      
+    return redirect(url_for('movimiento'), code=302)
 # ============================== actividades ============================== #
 
 @app.route('/crearActividad', methods=['POST'])
