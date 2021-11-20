@@ -755,7 +755,8 @@ def verEvento(id):
         categorias=categorias,
         paquetes=paquetes,
         paquete=paquete,
-        categoria=categoria
+        categoria=categoria,
+        tipoUsuario = "Visitante"
         )
 
 @app.route('/logout/')
