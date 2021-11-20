@@ -266,7 +266,7 @@ def cargarEjemplos():
         tipo = "Congreso",
         descripcion = "Mas Descripcion",
         lugar = "Lima",
-        estado = "Culminado",
+        estado = "Finalizado",
     )
     eEvnt = Evento(
         nombre = "Liderazgo",
