@@ -52,8 +52,9 @@ class Evento(db.Model):
     prcntjDscnto = db.Column(db.Float, default=0)
     plantilla = db.Column(db.Boolean, default=False)
 
-    activities = db.relationship('Actividad', backref='evento', lazy=True)
+    actividades = db.relationship('Actividad', backref='evento', lazy=True)
     usuarios_eventos = db.relationship('Usuario_Evento', backref='evento', lazy=True)
+    movimientos = db.relationship('Movimiento', backref='evento', lazy=True)
 
 class Actividad(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -121,6 +122,18 @@ def crearFechaHora(date, hour):
     datehour = date + ' ' + hour + ':00'
     date_time_obj = datetime.strptime(datehour, '%Y-%m-%d %H:%M:%S')
     return date_time_obj
+
+def breakArr(array,division):
+    arr =[]
+    sizes = []
+    for i in range(0,len(array),division):
+        arr.append([])
+        sizes.append(0)
+        for j in range(i,i+division):
+            if j<len(array):
+                arr[i//division].append(array[j])
+                sizes[i//division]=sizes[i//division]+1
+    return arr,sizes, len(sizes)
 
 # ============================== eventos ============================== #
 
@@ -302,43 +315,72 @@ def registrarMovimiento():
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
-
-
-@app.route('/movimiento/')
+#genera problemas al compilar (comentar route movimiento hasta que no este culminado)
+@app.route('/movimiento/', methods=['GET','POST'])
 def movimiento():
-    miEvento = Evento.query.get_or_404(session['idEvento'])
-    estadoEvento = miEvento.estado
-
-    id = db.Column(db.Integer, primary_key = True)
-    tipo = db.Column(db.String(30), nullable=False)
-    nombre = db.Column(db.String(30), nullable=False)
-    factura = db.Column(db.String(30), nullable=False)
-    detalle = db.Column(db.String(90))
-    cantidad = db.Column(db.Integer)
-    monto = db.Column(db.Float, nullable = False)
-
-    listaMovimientos = []
-    movimientos = Movimiento.query.filter_by(idActividad = miEvento)
+    general = []
+    ingresos = []
+    egresos = []
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento'])
+    numeroIngreso = 0
+    numeroEgreso = 0
+    numeroGeneral = 0
+    balanceIngreso = 0
+    balanceEgreso = 0
+    balanceGeneral = 0
     for movimiento in movimientos:
-        listaMovimientos.append({
-            "id":movimiento.id,
-            "nombre":movimiento.nombre,
-            "factura":movimiento.factura,
-            "detalle":movimiento.detalle,
-            "cantidad":movimiento.cantidad,
+        numeroGeneral += 1
+        if movimiento.tipo == 'Ingreso':
+            numeroIngreso += 1
+            ingresos.append({
+                "numero":numeroIngreso,
+                "concepto":movimiento.nombre,
+                "monto":movimiento.monto
+            })
+            balanceIngreso += movimiento.monto
+        else:
+            numeroEgreso += 1
+            egresos.append({
+                "numero":numeroEgreso,
+                "numeroRecibo":movimiento.factura,
+                "concepto":movimiento.nombre,
+                "monto":movimiento.monto,
+                "cantidad":movimiento.cantidad
+            })
+            balanceEgreso += movimiento.monto
+        general.append({
+            "numero":numeroGeneral,
+            "concepto":movimiento.nombre,
+            "tipo":movimiento.tipo,
             "monto":movimiento.monto,
-            "tipo":movimiento.tipo
         })
+        balanceGeneral += movimiento.monto
 
-    return render_template(
-        'SCV-B02MenuActividad.html',
-        actividad=datos,
-        estado = estadoEvento,
-        ambientes=listaAmbientes,
-        lenAmbientes = len(listaAmbientes),
-        materiales=listaMateriales,
-        lenMateriales = len(listaMateriales),
-        idEvento=session['idEvento'])
+    balance={
+        "general":balanceIngreso,
+        "ingresos":balanceEgreso,
+        "egresos":balanceGeneral
+    }
+    lens={
+        "general" : len(general),
+        "ingresos" : len(ingresos),
+        "egresos" : len(egresos)
+    }
+    return render_template('SCV-B04-B05RegistrarMovimiento.html',
+        general=general,
+        ingresos=ingresos,
+        egresos=egresos,
+        balance=balance,
+        len=lens
+    )
+
+@app.route('/nuevoEgreso/', methods=['POST'])
+def nuevoEgreso():
+    return "creado"
+
+@app.route('/nuevoIngreso/', methods=['POST'])
+def nuevoIngreso():
+    return "creado"
 
 # ============================== actividades ============================== #
 
@@ -384,7 +426,6 @@ def eliminarActividad(id):
     db.session.delete(miActividad)
     db.session.commit()
     return redirect(url_for('evento',idEvento=session['idEvento']), code=302)
-
 
 @app.route('/modificarActividad/<id>', methods=['POST'])
 def modificarActividad(id):
@@ -496,7 +537,6 @@ def obtenerAmbiente(idAmb):
     }
     return json.dumps(ambienteDict)
 
-
 # ============================== material ============================== #
 @app.route('/<idActividad>/eliminarMaterial/<idMaterial>', methods=['GET','POST'])
 def eliminarMaterial(idActividad,idMaterial):
@@ -593,18 +633,6 @@ def create_user():
     print(Usuario.query.all())
     return redirect(url_for('login'))
 
-def breakArr(array,division):
-    arr =[]
-    sizes = []
-    for i in range(0,len(array),division):
-        arr.append([])
-        sizes.append(0)
-        for j in range(i,i+division):
-            if j<len(array):
-                arr[i//division].append(array[j])
-                sizes[i//division]=sizes[i//division]+1
-    return arr,sizes, len(sizes)
-
 @app.route('/visitante')#para probar la vista de participante
 def visitante():
     eventos = []
@@ -696,44 +724,6 @@ def verEvento(id):
         paquete=paquete,
         categoria=categoria
         )
-#genera problemas al compilar (comentar route movimiento hasta que no este culminado)
-@app.route('/movimiento/')
-def movimiento():
-    general =[
-        {"numero":1,"concepto":"Inscripcion","tipo":"Ingreso","monto":150},
-        {"numero":2,"concepto":"Compra","tipo":"Egreso","monto":62}
-    ]
-    ingresos =[#lo mismo pero filtran en la consulta que sean solo ingresos
-        {"numero":1,"concepto":"Inscripcion","monto":150}
-    ]
-    egresos=[
-        {"numero":2,"numeroRecibo":"N-123154649","concepto":"Compra","monto":62,"cantidad":5}
-    ]
-    balance={
-        "general":88,
-        "ingresos":150,
-        "egresos":62
-    }
-    len={
-        "general":2,
-        "ingresos":1,
-        "egresos":1
-    }
-    return render_template('SCV-B04-B05RegistrarMovimiento.html',
-        general=general,
-        ingresos=ingresos,
-        egresos=egresos,
-        balance=balance,
-        len=len
-        )
-
-@app.route('/nuevoEgreso/', methods=['POST'])
-def nuevoEgreso():
-    return "creado"
-
-@app.route('/nuevoIngreso/', methods=['POST'])
-def nuevoIngreso():
-    return "creado"
 
 @app.route('/logout/')
 def logout():
