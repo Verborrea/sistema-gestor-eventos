@@ -127,11 +127,12 @@
             let idModalIngreso = "RegistrarMovimientoIngresoModal"
             let datosForm1 = [{"nombre":"concepto","tipo_dato":"text"},
                 {"nombre":"detalle","tipo_dato":"text"},
-                {"nombre":"monto","tipo_dato":"number"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`},
             ]
             let datosForm2 = [{"nombre":"nombre","tipo_dato":"text"},
                 {"nombre":"factura","tipo_dato":"text"},
                 {"nombre":"detalle","tipo_dato":"text"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`},
             ]
             formModal1 = BOOSTTRAP.GenerateComplex.buildFormModal(
                 idModalEgreso,
@@ -155,27 +156,7 @@
 
         cargarBotonesModal()
         formularioMovimiento()
-        /*
-        let tabla = BOOSTTRAP.GenerateComplex.buildTableSelection(
-            "tablaListaMovimientos",
-            ["numero","concepto","tipo","monto"],
-            {{ general| tojson }}
-            )
-        BOOSTTRAP.Utilities.onlyChild("historialMovimientos",tabla)
-
-        document.getElementById("RegistrarMovimientoBtn").addEventListener("click", function() {
-            //Genera modals de ingreso / egreso
         
-
-
-
-            //BOOSTTRAP.Utilities.addChild(idModNuevoIngresom, BOOSTTRAP.Modals.basicButton("eventoNuevo","SigIngreso"))//
-            //BOOSTTRAP.Utilities.onlyChild("BtNuevoEgresoa", BOOSTTRAP.Modals.buildButtonModal(idModalNuevo,"NueEgreso"))//
-            //document.getElementById(idModalPlantilla+"-toogle").disabled = true
-
-
-
-        });*/
     </script>
 {% endblock %}
 </html>
