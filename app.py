@@ -646,5 +646,10 @@ def nuevoIngreso():
 def logout():
     return "Cierra sesion y manda a lista eventos de visitante"
 
+@app.route('/navbar/<tipoUsuario>')
+def navbar(tipoUsuario):
+    #Visitante, Colaborador, Caja, Admin
+    return render_template("Layout.html",tipoUsuario=tipoUsuario)
+
 if __name__ == '__main__':
     app.run()

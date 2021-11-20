@@ -22,15 +22,31 @@
         <a class="btn btn-outline-primary" href="{{ url_for('login') }}">Log in</a>
         <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Sign Up</a>
         {% else %}
-        <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">{{nombreEvento}}</h5>
-        <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('index') }}">Evento</a>
-            <a class="p-2 text-dark" href="#">Inscripciones</a>
-            <a class="p-2 text-dark" href="#">Caja</a>
-            <a class="p-2 text-dark" href="#">Gestión</a>
-            <a class="p-2 text-dark" href="#">Reporte</a>
-        </nav>
-        <a class="btn btn-outline-primary" href="{{ url_for('logout') }}">Log out</a>
+            {% if tipoUsuario == 'Caja' %}
+            <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">{{nombreEvento}}</h5>
+            <nav class="my-2 my-md-0 mr-md-3">
+                <a class="p-2 text-dark" href="#">Registrar Movimimento</a>
+                <a class="p-2 text-dark" href="#">Registrar Inscripcion</a>
+            </nav>
+            {% else %}
+                {% if tipoUsuario == 'Colaborador' %}
+                <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">{{nombreEvento}}</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                    <a class="p-2 text-dark" href="#">Asistencia</a>
+                    <a class="p-2 text-dark" href="#">Materiales</a>
+                </nav>
+                {% else %}
+                <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">{{nombreEvento}}</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                    <a class="p-2 text-dark" href="{{ url_for('index') }}">Evento</a>
+                    <a class="p-2 text-dark" href="#">Inscripciones</a>
+                    <a class="p-2 text-dark" href="#">Caja</a>
+                    <a class="p-2 text-dark" href="#">Gestión</a>
+                    <a class="p-2 text-dark" href="#">Reporte</a>
+                </nav>
+                {% endif %}
+            {% endif %}
+            <a class="btn btn-outline-primary" href="{{ url_for('logout') }}">Log out</a>
         {% endif %}
 
     </div>
