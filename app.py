@@ -14,27 +14,24 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
 
 db = SQLAlchemy(app)
 
-class Miembro(db.Model):
-    __abstract__ = True
+class Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tipoUsuario = db.Column(db.String(10), nullable=False)
+    tipodoc = db.Column(db.String(10), nullable=True)
+    doc = db.Column(db.String(10), nullable=True)
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
     nombre = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    profesion = db.Column(db.String(30), nullable=True)
 
-class Participante(Miembro):
-    __tablename__ = 'participante'
+    usuarios_eventos = db.relationship('Usuario_Evento', backref='usuario', lazy=True)
+
+class Usuario_Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    tipoDocumento = db.Column(db.String(30), nullable=False)
-    documento = db.Column(db.String(30), nullable=False)
-    profesion = db.Column(db.String(30), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
-
-class Usuario(Miembro):
-    __tablename__ = 'usuario'
-    id = db.Column(db.Integer, primary_key=True)
-    tipoUsuario = db.Column(db.String(10), nullable=False)
-    tipodoc = db.Column(db.String(10), nullable=False)
-    doc = db.Column(db.String(10), nullable=False)
 
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,6 +53,7 @@ class Evento(db.Model):
     plantilla = db.Column(db.Boolean, default=False)
 
     activities = db.relationship('Actividad', backref='evento', lazy=True)
+    usuarios_eventos = db.relationship('Usuario_Evento', backref='evento', lazy=True)
 
 class Actividad(db.Model):
     id = db.Column(db.Integer, primary_key = True)
