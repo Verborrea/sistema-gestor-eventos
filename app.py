@@ -626,13 +626,37 @@ def registrarse(id):
 
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
+    miEvento = Evento.query.get_or_404(id)
+
     evento = {
-        "id":id,
-        "title":"Evento1",
-        "descripcion":"descripcion",
-        "lugar":"lugar",
-        "fechas":"01/01/01 - 02/02/02"
+        "id": id,
+        "title": miEvento.nombre,
+        "descripcion": miEvento.descripcion,
+        "lugar": miEvento.lugar,
+        "fechas": miEvento.fechaCierreInscripcion
     }
+
+    actividades = []
+    '''
+    datos = Actividad.query.all()
+    for actividad in datos:
+        if actividad.idEvento == id:
+            actividades.append({
+                "nombre": actividad.nombre,
+                "duracion": "por definir",
+                "ponente": actividad.ponente
+            })
+    '''
+    datos = Actividad.query.filter_by(
+            idEvento = id
+        )
+    for actividad in datos:
+        actividades.append({
+            "nombre": actividad.nombre,
+            "duracion": actividad.tipo,
+            "ponente": actividad.ponente
+        })
+
     actividad =[
         {
             "nombre":"Actividad1",
@@ -664,15 +688,15 @@ def verEvento(id):
     lenActividad = len(actividad)
     return render_template('SCV-B01VisualizarEvento.html',
         evento=evento,
-        actividad=actividad,
-        lenActividad=lenActividad,
+        actividad=actividades,
+        lenActividad=len(actividades),
         categoria_paquete=categoria_paquete,
         categorias=categorias,
         paquetes=paquetes,
         paquete=paquete,
         categoria=categoria
         )
-
+#genera problemas al compilar (comentar route movimiento hasta que no este culminado)
 @app.route('/movimiento/')
 def movimiento():
     general =[
