@@ -6,6 +6,7 @@
         <div id="modalIngresoContainer"></div>
         <div id="modalEgresoContainer"></div>
 
+        <br>
         <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
@@ -13,15 +14,10 @@
                     <i class="fa fa-plus"></i> Registrar Movimiento
                 </button>
                 
-
-
-                <div id="BtnEventoPlantilla" class="btn-group" role="group" aria-label="Plantilla o nuevo" style="display: none;">
-                    <button id="nuevoEventoBtn" type="button" class="btn btn-secondary" onclick="">Left</button>
-                    <!--Falta eleccion a partir de plantillas-->
-                </div>
             </div>
             <div class="col-4"></div>
         </div>
+        <br>
         <div>
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -31,9 +27,80 @@
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">...</div>
-                <div class="tab-pane fade" id="nav-ingresos" role="tabpanel" aria-labelledby="nav-ingresos-tab">...</div>
-                <div class="tab-pane fade" id="nav-egresos" role="tabpanel" aria-labelledby="nav-egresos-tab">...</div>
+                <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.general) %}
+                            <tr>
+                                <th scope="row">{{general[i].numero}}</th>
+                                <td>{{general[i].concepto}}</td>
+                                <td>{{general[i].tipo}}</td>
+                                <td>{{general[i].monto}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.general}}</h5>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane fade" id="nav-ingresos" role="tabpanel" aria-labelledby="nav-ingresos-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.ingresos) %}
+                            <tr>
+                                <th scope="row">{{ingresos[i].numero}}</th>
+                                <td>{{ingresos[i].concepto}}</td>
+                                <td>{{ingresos[i].monto}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.ingresos}}</h5>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-egresos" role="tabpanel" aria-labelledby="nav-egresos-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Número de recibo</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.egresos) %}
+                            <tr>
+                                <th scope="row">{{egresos[i].numero}}</th>
+                                <td>{{egresos[i].numeroRecibo}}</td>
+                                <td>{{egresos[i].concepto}}</td>
+                                <td>{{egresos[i].cantidad}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.egresos}}</h5>
+                    </div>
+                </div>
             </div>
         </div>
 

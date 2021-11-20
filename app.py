@@ -614,17 +614,17 @@ def movimiento():
         {"numero":1,"concepto":"Inscripcion","monto":150}
     ]
     egresos=[
-        {"numero":2,"numeroRecibo":"N-123154649","concepto":"Compra","monto":62}
+        {"numero":2,"numeroRecibo":"N-123154649","concepto":"Compra","monto":62,"cantidad":5}
     ]
     balance={
         "general":88,
-        "ingreso":150,
-        "egreso":62
+        "ingresos":150,
+        "egresos":62
     }
     len={
-        "general":88,
-        "ingreso":150,
-        "egreso":62
+        "general":2,
+        "ingresos":1,
+        "egresos":1
     }
     return render_template('SCV-B04-B05RegistrarMovimiento.html',
         general=general,
