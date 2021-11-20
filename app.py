@@ -14,12 +14,25 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
 
 db = SQLAlchemy(app)
 
-class Usuario(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+class Miembro(db.Model):
+    __abstract__ = True
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
     nombre = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+
+class Participante(Miembro):
+    __tablename__ = 'participante'
+    id = db.Column(db.Integer, primary_key=True)
+    tipoDocumento = db.Column(db.String(30), nullable=False)
+    documento = db.Column(db.String(30), nullable=False)
+    profesion = db.Column(db.String(30), nullable=False)
+
+
+class Usuario(Miembro):
+    __tablename__ = 'usuario'
+    id = db.Column(db.Integer, primary_key=True)
+    tipoUsuario = db.Column(db.String(10), nullable=False)
     tipodoc = db.Column(db.String(10), nullable=False)
     doc = db.Column(db.String(10), nullable=False)
 
@@ -228,34 +241,39 @@ def lanzarEvento():
 @app.route('/cargarEjemplos', methods=['GET'])
 def cargarEjemplos():
     aEvnt = Evento(
-        nombre = "Primer Ejemplo",
+        nombre = "IntArtificial",
         tipo = "Congreso",
         descripcion = "Super Descripcion",
         lugar = "Arequipa",
+        estado = "Inscripciones",
     )
     bEvnt = Evento(
-        nombre = "Segundo Ejemplo",
+        nombre = "Festidanza",
         tipo = "Danza",
         descripcion = "Nueva Descripcion",
         lugar = "Cusco",
+        estado = "Borrador",
     )
     cEvnt = Evento(
-        nombre = "Tercer Ejemplo",
+        nombre = "IoT",
         tipo = "Charla",
         descripcion = "Otra Descripcion",
         lugar = "Lima",
+        estado = "En Curso",
     )
     dEvnt = Evento(
-        nombre = "Cuarto Ejemplo",
+        nombre = "Porcesamiento de lenguaje",
         tipo = "Congreso",
         descripcion = "Mas Descripcion",
         lugar = "Lima",
+        estado = "Culminado",
     )
     eEvnt = Evento(
-        nombre = "Quinto Ejemplo",
+        nombre = "Liderazgo",
         tipo = "Simposio",
-        descripcion = "ZZZZZZZZZZZZZZZZZZ",
+        descripcion = "Aprendizaje continuo",
         lugar = "Arequipa",
+        estado = "Borrador",
     )
     db.session.add(aEvnt)
     db.session.add(bEvnt)
