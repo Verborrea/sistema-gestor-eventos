@@ -14,12 +14,25 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
 
 db = SQLAlchemy(app)
 
-class Usuario(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+class Miembro(db.Model):
+    __abstract__ = True
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
     nombre = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+
+class Participante(Miembro):
+    __tablename__ = 'participante'
+    id = db.Column(db.Integer, primary_key=True)
+    tipoDocumento = db.Column(db.String(30), nullable=False)
+    documento = db.Column(db.String(30), nullable=False)
+    profesion = db.Column(db.String(30), nullable=False)
+
+
+class Usuario(Miembro):
+    __tablename__ = 'usuario'
+    id = db.Column(db.Integer, primary_key=True)
+    tipoUsuario = db.Column(db.String(10), nullable=False)
     tipodoc = db.Column(db.String(10), nullable=False)
     doc = db.Column(db.String(10), nullable=False)
 
@@ -241,34 +254,39 @@ def lanzarEvento():
 @app.route('/cargarEjemplos', methods=['GET'])
 def cargarEjemplos():
     aEvnt = Evento(
-        nombre = "Primer Ejemplo",
+        nombre = "IntArtificial",
         tipo = "Congreso",
         descripcion = "Super Descripcion",
         lugar = "Arequipa",
+        estado = "Inscripciones",
     )
     bEvnt = Evento(
-        nombre = "Segundo Ejemplo",
+        nombre = "Festidanza",
         tipo = "Danza",
         descripcion = "Nueva Descripcion",
         lugar = "Cusco",
+        estado = "Borrador",
     )
     cEvnt = Evento(
-        nombre = "Tercer Ejemplo",
+        nombre = "IoT",
         tipo = "Charla",
         descripcion = "Otra Descripcion",
         lugar = "Lima",
+        estado = "En Curso",
     )
     dEvnt = Evento(
-        nombre = "Cuarto Ejemplo",
+        nombre = "Porcesamiento de lenguaje",
         tipo = "Congreso",
         descripcion = "Mas Descripcion",
         lugar = "Lima",
+        estado = "Finalizado",
     )
     eEvnt = Evento(
-        nombre = "Quinto Ejemplo",
+        nombre = "Liderazgo",
         tipo = "Simposio",
-        descripcion = "ZZZZZZZZZZZZZZZZZZ",
+        descripcion = "Aprendizaje continuo",
         lugar = "Arequipa",
+        estado = "Borrador",
     )
     db.session.add(aEvnt)
     db.session.add(bEvnt)
@@ -656,6 +674,53 @@ def verEvento(id):
         paquete=paquete,
         categoria=categoria
         )
+
+@app.route('/movimiento/')
+def movimiento():
+    general =[
+        {"numero":1,"concepto":"Inscripcion","tipo":"Ingreso","monto":150},
+        {"numero":2,"concepto":"Compra","tipo":"Egreso","monto":62}
+    ]
+    ingresos =[#lo mismo pero filtran en la consulta que sean solo ingresos
+        {"numero":1,"concepto":"Inscripcion","monto":150}
+    ]
+    egresos=[
+        {"numero":2,"numeroRecibo":"N-123154649","concepto":"Compra","monto":62,"cantidad":5}
+    ]
+    balance={
+        "general":88,
+        "ingresos":150,
+        "egresos":62
+    }
+    len={
+        "general":2,
+        "ingresos":1,
+        "egresos":1
+    }
+    return render_template('SCV-B04-B05RegistrarMovimiento.html',
+        general=general,
+        ingresos=ingresos,
+        egresos=egresos,
+        balance=balance,
+        len=len
+        )
+
+@app.route('/nuevoEgreso/', methods=['POST'])
+def nuevoEgreso():
+    return "creado"
+
+@app.route('/nuevoIngreso/', methods=['POST'])
+def nuevoIngreso():
+    return "creado"
+
+@app.route('/logout/')
+def logout():
+    return "Cierra sesion y manda a lista eventos de visitante"
+
+@app.route('/navbar/<tipoUsuario>')
+def navbar(tipoUsuario):
+    #Visitante, Colaborador, Caja, Admin
+    return render_template("Layout.html",tipoUsuario=tipoUsuario)
 
 if __name__ == '__main__':
     app.run()
