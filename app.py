@@ -696,6 +696,7 @@ def register():
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
+# registro en la pagina
     user = Usuario.query.filter_by(username = request.form.get('usuario')).first()
     mail = Usuario.query.filter_by(email = request.form.get('correo')).first()
     if user:
@@ -714,7 +715,14 @@ def create_user():
     )
     db.session.add(nuevo_usuario)
     db.session.commit()
+# registro en el evento
     print(Usuario.query.all())
+    nuevoInscrito = Usuario_Evento(
+        idEvento = session['eventoReg'],
+        idUsuario = nuevo_usuario.id,
+        estaInscrito = False
+    )
+    session.pop('eventoReg', None)
     return redirect(url_for('login'))
 
 @app.route('/')#para probar la vista de participante
@@ -735,7 +743,10 @@ def index():
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
-    return "te estas registrando en: "+id
+    if session['idUsuario'] and session['tipoUsuario'] == 'Visitante':
+        return 'xd'
+    session['eventoReg'] = id
+    return redirect(url_for('register'))
 
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
@@ -755,24 +766,13 @@ def verEvento(id):
             idEvento = id
         )
     for actividad in datos:
+        delta = actividad.fechaFin - actividad.fechaInicio
         actividades.append({
             "nombre": actividad.nombre,
-            "duracion": actividad.tipo,
+            "duracion": str(delta.days) + 'dias',
             "ponente": actividad.ponente
         })
 
-    actividad =[
-        {
-            "nombre":"Actividad1",
-            "duracion":"1 anio",
-            "ponente":"FulanoPerez"
-        },
-        {
-            "nombre":"Actividad2",
-            "duracion":"1/2 anio",
-            "ponente":"FulanoJuarez"
-        }
-    ]
     paquete=["Paquete 1","Paquete 2","Paquete 3"]
     categoria=["Categoria 1","Categoria 2"]
     categoria_paquete = {
@@ -789,7 +789,6 @@ def verEvento(id):
     }
     categorias = 2
     paquetes = 3
-    lenActividad = len(actividades)
     return render_template('SCV-B01VisualizarEvento.html',
         evento=evento,
         actividad=actividades,
@@ -800,7 +799,7 @@ def verEvento(id):
         paquete=paquete,
         categoria=categoria,
         tipoUsuario = "Visitante"
-        )
+    )
 
 @app.route('/logout/')
 def logout():
