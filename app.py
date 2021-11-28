@@ -99,9 +99,23 @@ class Movimiento(db.Model):
     
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
-   
+class Categoria(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(30), nullable=False)
+    cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
 
-    
+class Paquete(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(30), nullable=False)
+    monto = db.Column(db.Float, nullable = False)
+    cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
+
+class Categoria_Paquete(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+    idPaquete = db.Column(db.Integer, db.ForeignKey('paquete.id'), nullable=False)
+    descripcion = db.Column(db.String(150))
+
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 @app.context_processor
