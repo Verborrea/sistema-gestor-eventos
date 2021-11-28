@@ -27,11 +27,6 @@ class Usuario(db.Model):
 
     usuarios_eventos = db.relationship('Usuario_Evento', backref='usuario', lazy=True)
 
-class Usuario_Evento(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
@@ -102,19 +97,30 @@ class Movimiento(db.Model):
 class Categoria(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
+
     cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
 
 class Paquete(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
     monto = db.Column(db.Float, nullable = False)
-    cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
+
+    cat_pqt = db.relationship('Categoria_Paquete', backref='paquete', lazy = True)
 
 class Categoria_Paquete(db.Model):
+    __tablename__ = 'categoria_paquete'
     id = db.Column(db.Integer, primary_key=True)
     idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     idPaquete = db.Column(db.Integer, db.ForeignKey('paquete.id'), nullable=False)
     descripcion = db.Column(db.String(150))
+    usuarios_eventos = db.relationship('Usuario_Evento', backref='categoria_paquete', lazy = True)
+
+class Usuario_Evento(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
+    idCategoria_Paquete = db.Column(db.Integer, db.ForeignKey('categoria_paquete.id'))
+    estaInscrito = db.Column(db.Boolean, nullable=False)
 
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
@@ -146,6 +152,29 @@ def breakArr(array,division):
                 arr[i//division].append(array[j])
                 sizes[i//division]=sizes[i//division]+1
     return arr,sizes, len(sizes)
+
+# =============== creacion de un administrador primigenio =============== #
+
+# usuario_admin = Usuario.query.filter_by(
+#     username = 'admin',
+#     tipoUsuario = 'Admin',
+#     password = 'admin',
+#     nombre = 'Administrador',
+#     email = 'admin@sge.com'
+# ).first()
+
+# if usuario_admin:
+#     print("Admin")
+# else:
+#     nuevo_usuario = Usuario(
+#         username = 'admin',
+#         tipoUsuario = 'Admin',
+#         password = 'admin',
+#         nombre = 'Administrador',
+#         email = 'admin@sge.com'
+#     )
+#     db.session.add(nuevo_usuario)
+#     db.session.commit()
 
 # ============================== eventos ============================== #
 
@@ -218,7 +247,8 @@ def crearEvento():
 
     nuevoEventoUsuario = Usuario_Evento(
         idEvento = nuevoEvento.id,
-        idUsuario = session['idUsuario']
+        idUsuario = session['idUsuario'],
+        estaInscrito = False
     )
 
     db.session.add(nuevoEventoUsuario)
@@ -242,7 +272,6 @@ def modificarEvento():
 
 @app.route('/obtenerPlantillas/', methods=['POST','GET'])
 def obtenerPlantillas():
-    #headers=["Nombre","Fecha","TipoEvento"]
 
     plantillas = []
     eventos = Evento.query.all()
@@ -675,7 +704,7 @@ def create_user():
         return 'El correo ingresado ya tiene una cuenta asociada'
     nuevo_usuario = Usuario(
         username = request.form.get('usuario'),
-        tipoUsuario = 'Admin',
+        tipoUsuario = 'Visitante',
         password = request.form.get('contra'),
         nombre = request.form.get('nombre'),
         email = request.form.get('correo'),
@@ -775,7 +804,10 @@ def verEvento(id):
 
 @app.route('/logout/')
 def logout():
-    return "Cierra sesion y manda a lista eventos de visitante"
+    session.pop('idUsuario', None)
+    session.pop('tipoUsuario', None)
+    session.pop('idEvento', None)
+    return redirect(url_for('index'))
 
 @app.route('/navbar/<tipoUsuario>')
 def navbar(tipoUsuario):
