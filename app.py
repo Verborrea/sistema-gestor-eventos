@@ -772,7 +772,7 @@ def verEvento(id):
             "duracion": str(delta.days) + 'dias',
             "ponente": actividad.ponente
         })
-
+    #.
     paquete=["Paquete 1","Paquete 2","Paquete 3"]
     categoria=["Categoria 1","Categoria 2"]
     categoria_paquete = {
@@ -812,6 +812,124 @@ def logout():
 def navbar(tipoUsuario):
     #Visitante, Colaborador, Caja, Admin
     return render_template("Layout.html",tipoUsuario=tipoUsuario)
+
+#Para inscripciones
+@app.route('/obtenerNombreActividades/', methods=['GET','POST'])
+def obtenerNombreActividades():
+    actividades =[
+        {"id":"A01","nombre":"Conferencia"},
+        {"id":"A01","nombre":"Conferencia2"},
+        {"id":"A01","nombre":"Conferencia3"},
+        {"id":"A01","nombre":"Conferencia4"},
+        {"id":"A01","nombre":"Conferencia5"}
+    ]
+    return json.dumps(actividades)
+
+@app.route('/crearCategoria/', methods=['POST'])
+def crearCategoria(id):
+    return "creo"
+@app.route('/crearPaquete/', methods=['POST'])
+def crearPaquete(id):
+    return "creo"
+
+@app.route('/gestionar_inscripcion/<id>', methods=['GET','POST'])
+def gestionar_inscripcion(id):
+    descuento = 10#numero del 1 al 100
+    #fechas del evento
+    fecha = {
+        "Preinscripción":"010101",
+        "Inscripciones":"010101",
+        "Descuento":"010101",
+    }
+
+    #categoriaPaquete
+    paquete=["Paquete 1","Paquete 2","Paquete 3"]
+    categoria=["Categoria 1","Categoria 2"]
+    categoria_paquete = {
+        "Categoria 1":{
+            "Paquete 1":5,
+            "Paquete 2":10,
+            "Paquete 3":7,
+        },
+        "Categoria 2":{
+            "Paquete 1":6,
+            "Paquete 2":11,
+            "Paquete 3":6,
+        }
+    }
+    categorias = 2
+    paquetes = 3
+    #Datos provisionales para probar, no llenar, reusaremos la tabla con otros datos
+    general = []
+    ingresos = []
+    egresos = []
+    movimientos = []#Movimiento.query.filter_by(idEvento = session['idEvento'])
+    numeroIngreso = 0
+    numeroEgreso = 0
+    numeroGeneral = 0
+    balanceIngreso = 0
+    balanceEgreso = 0
+    balanceGeneral = 0
+    for movimiento in movimientos:
+        numeroGeneral += 1
+        if movimiento.tipo == 'Ingreso':
+            numeroIngreso += 1
+            ingresos.append({
+                "numero":numeroIngreso,
+                "concepto":movimiento.nombre,
+                "monto":movimiento.monto
+            })
+            balanceIngreso += movimiento.monto
+        else:
+            numeroEgreso += 1
+            egresos.append({
+                "numero":numeroEgreso,
+                "numeroRecibo":movimiento.factura,
+                "concepto":movimiento.nombre,
+                "monto":movimiento.monto,
+                "cantidad":movimiento.cantidad
+            })
+            balanceEgreso += movimiento.monto
+        general.append({
+            "numero":numeroGeneral,
+            "concepto":movimiento.nombre,
+            "tipo":movimiento.tipo,
+            "monto":movimiento.monto,
+        })
+        balanceGeneral += movimiento.monto
+    balance={
+        "general":balanceGeneral,
+        "ingresos":balanceIngreso,
+        "egresos":balanceEgreso
+    }
+    lens={
+        "general" : len(general),
+        "ingresos" : len(ingresos),
+        "egresos" : len(egresos)
+    }
+    #fin de datos provisionales
+    return render_template(
+        "SCV-B09GestionarConfiguracionInscripcion.html",
+        #datos no usados    
+        general=general,
+        ingresos=ingresos,
+        egresos=egresos,
+        balance=balance,
+        len=lens,
+        #fin de datos no usados
+
+        nombreEvento="nombreEvento",
+        idEvento=id,
+        estadoEvento = "",
+        categoria_paquete=categoria_paquete,
+        categorias=categorias,
+        paquetes=paquetes,
+        paquete=paquete,
+        categoria=categoria,
+        tipoUsuario = "",
+        fecha = fecha,
+        descuento = descuento
+    )
 
 if __name__ == '__main__':
     app.run()

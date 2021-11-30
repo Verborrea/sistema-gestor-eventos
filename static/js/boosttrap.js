@@ -13,6 +13,7 @@ BOOSTTRAP.Utilities = {
     switchToogle(id1,id2,on1){},
     setTitle(id,title){},//\
     disable(id,disable =1){},//\
+    buildCheckBox(name,texto){}
 }
 
 BOOSTTRAP.GenerateSimple = {
@@ -116,6 +117,19 @@ BOOSTTRAP.Utilities.setTitle= function(id,title){
 BOOSTTRAP.Utilities.disable = function(id,disable=1){
     document.getElementById(id).disabled = disable;
 }
+
+BOOSTTRAP.Utilities.buildCheckBox = function(name,texto){
+    return String.raw`
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="${name}" value="" id="">
+            <label class="form-check-label" for="">
+                ${texto}
+            </label>
+        </div>
+        
+    `
+}
+
 // GenerateSimple =======================================
 BOOSTTRAP.GenerateSimple.buildTable = function(id, headers, contenido){
     let tabla = String.raw`
