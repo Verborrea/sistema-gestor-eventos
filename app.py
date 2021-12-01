@@ -874,68 +874,34 @@ def gestionar_inscripcion(id):
     }
     categorias = 2
     paquetes = 3
+    
     #Datos provisionales para probar, no llenar, reusaremos la tabla con otros datos
-    general = []
-    ingresos = []
-    egresos = []
-    movimientos = []#Movimiento.query.filter_by(idEvento = session['idEvento'])
-    numeroIngreso = 0
-    numeroEgreso = 0
-    numeroGeneral = 0
-    balanceIngreso = 0
-    balanceEgreso = 0
-    balanceGeneral = 0
-    for movimiento in movimientos:
-        numeroGeneral += 1
-        if movimiento.tipo == 'Ingreso':
-            numeroIngreso += 1
-            ingresos.append({
-                "numero":numeroIngreso,
-                "concepto":movimiento.nombre,
-                "monto":movimiento.monto
-            })
-            balanceIngreso += movimiento.monto
-        else:
-            numeroEgreso += 1
-            egresos.append({
-                "numero":numeroEgreso,
-                "numeroRecibo":movimiento.factura,
-                "concepto":movimiento.nombre,
-                "monto":movimiento.monto,
-                "cantidad":movimiento.cantidad
-            })
-            balanceEgreso += movimiento.monto
-        general.append({
-            "numero":numeroGeneral,
-            "concepto":movimiento.nombre,
-            "tipo":movimiento.tipo,
-            "monto":movimiento.monto,
-        })
-        balanceGeneral += movimiento.monto
-    balance={
-        "general":balanceGeneral,
-        "ingresos":balanceIngreso,
-        "egresos":balanceEgreso
-    }
+    general = [#la numeracion de 1 a n
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+    preinscritos = [#numeracion igual a la de general
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+    inscritos = [
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+
+
     lens={
         "general" : len(general),
-        "ingresos" : len(ingresos),
-        "egresos" : len(egresos)
+        "preinscritos" : len(preinscritos),
+        "inscritos" : len(inscritos)
     }
-    #fin de datos provisionales
+
     return render_template(
         "SCV-B09GestionarConfiguracionInscripcion.html",
-        #datos no usados    
-        general=general,
-        ingresos=ingresos,
-        egresos=egresos,
-        balance=balance,
-        len=lens,
-        #fin de datos no usados
-
-        nombreEvento="nombreEvento",
         idEvento=id,
-        estadoEvento = "",
+        estado="Finalizado",
+        general=general,
+        preinscritos=preinscritos,
+        inscritos=inscritos,
+        len=lens,
+        nombreEvento="nombreEvento",
         categoria_paquete=categoria_paquete,
         categorias=categorias,
         paquetes=paquetes,
