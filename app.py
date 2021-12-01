@@ -692,7 +692,14 @@ def login():
 
 @app.route('/signup')
 def register():
-    return render_template('signup.html',tipoUsuario='Visitante')
+    
+    profesion = [
+        {"value":"ING","texto":"Ingeniero"},
+        {"value":"ARQ","texto":"Arquitecto"},
+        {"value":"SIS","texto":"Sistemas"},
+        {"value":"ALA","texto":"Alan"}
+        ]
+    return render_template('signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion))
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
@@ -745,7 +752,7 @@ def index():
         "texto":"Este es el texto",
         "masTexto":"mastexto",#opcional
     }
-    #alerta=False
+    alerta=False
     #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
     return render_template('SCV-B03SeleccionarEvento.html',alerta=alerta,tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
 

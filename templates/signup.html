@@ -46,8 +46,10 @@
                         <div class="form-group">
                             <label for="inputState">Profesión</label>
                             <select id="inputState" class="form-control" name="profesion" required>
-                                <option selected>Profesion </option>
-                                <option>...</option>
+                                <option value="none" selected>None</option>
+                                {% for i in range(lenProfesion)%}
+                                <option value="{{ profesion[i].value }}">{{ profesion[i].texto }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="row">
