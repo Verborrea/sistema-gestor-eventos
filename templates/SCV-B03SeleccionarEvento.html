@@ -3,6 +3,9 @@
 {% block body %}
 <span class="dot"></span>
     <br>
+    {% if nombreUsuario != 'no existe'%}
+    <h3>Hola {{ nombreUsuario }}</h3>
+    {% endif %}
     <h1>Lista de eventos proximos</h1>
     <br>
     {%for i in range(0, size)%}

@@ -1,126 +1,6 @@
-from datetime import datetime
 from markupsafe import escape
-
-from flask import Flask, request, redirect, url_for, session
-from flask.templating import render_template
-from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
-from sqlalchemy.orm import defaultload
+from models import *
 import json
-
-app = Flask(__name__)
-app.secret_key = b'192b9bdd22ab9ed4d12e236c77823bcbf'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
-
-db = SQLAlchemy(app)
-
-class Usuario(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    tipoUsuario = db.Column(db.String(10), nullable=False)
-    tipodoc = db.Column(db.String(10), nullable=True)
-    doc = db.Column(db.String(10), nullable=True)
-    username = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.String(30), nullable=False)
-    nombre = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    profesion = db.Column(db.String(30), nullable=True)
-
-    usuarios_eventos = db.relationship('Usuario_Evento', backref='usuario', lazy=True)
-
-class Evento(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    tipo = db.Column(db.String(100), nullable=False)
-    descripcion = db.Column(db.String(130), nullable=False)
-    lugar = db.Column(db.String(100), nullable=False)
-    estado = db.Column(db.String(20), default="Borrador")
-    fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
-    fechaPreInscripcion = db.Column(db.Date)
-    fechaAprtrInscripcion = db.Column(db.Date)
-    fechaLmtDscnto = db.Column(db.Date)
-    fechaCierreInscripcion = db.Column(db.Date)
-    fechaInicio = db.Column(db.Date)
-    fechaFin = db.Column(db.Date)
-    cntInscritos = db.Column(db.Integer, default=0)
-    cntPreInscritos = db.Column(db.Integer, default=0)
-    prcntjDscnto = db.Column(db.Float, default=0)
-    plantilla = db.Column(db.Boolean, default=False)
-
-    actividades = db.relationship('Actividad', backref='evento', lazy=True)
-    usuarios_eventos = db.relationship('Usuario_Evento', backref='evento', lazy=True)
-    movimientos = db.relationship('Movimiento', backref='evento', lazy=True)
-
-class Actividad(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30))
-    descripcion = db.Column(db.String(130))
-    consideraciones = db.Column(db.String(100))
-    fechaInicio = db.Column(db.DateTime)
-    fechaFin = db.Column(db.DateTime)
-    ponente = db.Column(db.String(50))
-
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-    ambientes = db.relationship('Ambiente', backref='actividad', lazy = True)
-    materiales = db.relationship('Material', backref='actividad', lazy = True)
-
-class Ambiente(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
-    descripcion = db.Column(db.String(100))
-    aforo = db.Column(db.Integer, nullable = False)
-
-    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
-
-class Material(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
-    descripcion = db.Column(db.String(100))
-    stockInicial = db.Column(db.Integer, nullable = False)
-    costoUnitario = db.Column(db.Float, nullable = False)
-
-    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
-    
-class Movimiento(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    tipo = db.Column(db.String(30), nullable=False)
-    nombre = db.Column(db.String(30), nullable=False)
-    factura = db.Column(db.String(30), nullable=False)
-    detalle = db.Column(db.String(90))
-    cantidad = db.Column(db.Integer)
-    monto = db.Column(db.Float, nullable = False)
-    
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-
-class Categoria(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-
-    cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
-
-class Paquete(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    monto = db.Column(db.Float, nullable = False)
-
-    cat_pqt = db.relationship('Categoria_Paquete', backref='paquete', lazy = True)
-
-class Categoria_Paquete(db.Model):
-    __tablename__ = 'categoria_paquete'
-    id = db.Column(db.Integer, primary_key=True)
-    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
-    idPaquete = db.Column(db.Integer, db.ForeignKey('paquete.id'), nullable=False)
-    descripcion = db.Column(db.String(150))
-    usuarios_eventos = db.relationship('Usuario_Evento', backref='categoria_paquete', lazy = True)
-
-class Usuario_Evento(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-    idCategoria_Paquete = db.Column(db.Integer, db.ForeignKey('categoria_paquete.id'))
-    estaInscrito = db.Column(db.Boolean, nullable=False)
 
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
@@ -164,7 +44,7 @@ def breakArr(array,division):
 # ).first()
 
 # if usuario_admin:
-#     print("Admin")
+#     print("Admin exists")
 # else:
 #     nuevo_usuario = Usuario(
 #         username = 'admin',
@@ -181,6 +61,7 @@ def breakArr(array,division):
 @app.route('/listaEventos')
 def listaEventos():
     usuario_evento = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
+    usuario = Usuario.query.get_or_404(session['idUsuario'])
     listaIdEventos = []
     for usr_evt in usuario_evento:
         listaIdEventos.append(usr_evt.idEvento)
@@ -198,7 +79,7 @@ def listaEventos():
             'estadoEvento':evento.estado
         })
     session.pop('idEvento', None)
-    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():
@@ -667,10 +548,6 @@ def obtenerMaterial(idMat):
 
 # ============================== login ============================== #
 
-@app.route('/profile/<username>')
-def profile(username):
-    return render_template('usuario.html', usuario=username)
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -681,38 +558,69 @@ def login():
 
         if user:
             session['tipoUsuario'] = user.tipoUsuario
+            session['idUsuario'] = user.id
+            if 'eventoReg' in session:
+                registrarUsuario(user.id)
+                return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
             if session['tipoUsuario'] == 'Admin':
-                session['idUsuario'] = user.id
                 return redirect(url_for('listaEventos'))
             return redirect(url_for('index'))
         else:
-            return 'Usuario no existente'
+            miAlerta ={
+                "tipo":"failiure",
+                "title":"Error",
+                "texto":"Usuario no encontrado",
+                "masTexto":"Por favor, ingrese un correo o contraseña válidos.",#opcional
+            }
+            return render_template('login.html',alerta=miAlerta,tipoUsuario='Visitante')
     else:
         return render_template('login.html',tipoUsuario='Visitante')
 
+def registrarUsuario(id):
+    nuevo_inscrito = Usuario_Evento(
+        idEvento = session['eventoReg'],
+        idUsuario = id,
+        estaInscrito = False
+    )
+    session.pop('eventoReg', None)
+    session['idUsuario'] = id # login automatico
+    session['tipoUsuario'] = 'Participante'
+    db.session.add(nuevo_inscrito)
+    db.session.commit()
+
 @app.route('/signup')
 def register():
-    
     profesion = [
         {"value":"ING","texto":"Ingeniero"},
         {"value":"ARQ","texto":"Arquitecto"},
-        {"value":"SIS","texto":"Sistemas"},
-        {"value":"ALA","texto":"Alan"}
-        ]
-    return render_template('signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion))
+        {"value":"SIS","texto":"Sistemas"}
+    ]
+    alert = {
+        'existe':False,
+        'mensaje':''
+    }
+    return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
-# registro en la pagina
+    alert = {
+        'existe':False,
+        'mensaje':''
+    }
+    # registro en la pagina
     user = Usuario.query.filter_by(username = request.form.get('usuario')).first()
     mail = Usuario.query.filter_by(email = request.form.get('correo')).first()
     if user:
-        return 'Usuario ya existente'
+        alert['existe'] = True
+        alert['mensaje'] = 'Nombre de Usuario ya existente'
+        return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
     if mail:
-        return 'El correo ingresado ya tiene una cuenta asociada'
+        alert['existe'] = True
+        alert['mensaje'] = 'El correo ingresado ya tiene una cuenta asociada'
+        return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
     nuevo_usuario = Usuario(
         username = request.form.get('usuario'),
-        tipoUsuario = 'Visitante',
+        tipoUsuario = 'Participante',
         password = request.form.get('contra'),
         nombre = request.form.get('nombre'),
         email = request.form.get('correo'),
@@ -722,21 +630,22 @@ def create_user():
     )
     db.session.add(nuevo_usuario)
     db.session.commit()
-# registro en el evento
-    print(Usuario.query.all())
-    nuevoInscrito = Usuario_Evento(
-        idEvento = session['eventoReg'],
-        idUsuario = nuevo_usuario.id,
-        estaInscrito = False
-    )
-    session.pop('eventoReg', None)
+    # registro en el evento
+    if 'eventoReg' in session:
+        registrarUsuario(nuevo_usuario.id)
+        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
     return redirect(url_for('login'))
 
 @app.route('/')#para probar la vista de participante
 def index():
-    session['tipoUsuario'] = 'Visitante'
+    if 'tipoUsuario' not in session:
+        session['tipoUsuario'] = 'Visitante'
     eventos = []
     info = Evento.query.all()
+    nom_usuario = 'no existe'
+    if 'idUsuario' in session:
+        usuario = Usuario.query.get_or_404(session['idUsuario'])
+        nom_usuario = usuario.nombre
     for evento in info:
         if evento.estado == 'Inscripciones':
             eventos.append({
@@ -745,23 +654,23 @@ def index():
                 "summary" : evento.descripcion
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
-    
-    alerta={
-        "tipo":"success",
-        "title":"Este es el titulo",
-        "texto":"Este es el texto",
-        "masTexto":"mastexto",#opcional
-    }
-    alerta=False
-    #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
-    return render_template('SCV-B03SeleccionarEvento.html',alerta=alerta,tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
+    return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size)
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
-    if session['idUsuario'] and session['tipoUsuario'] == 'Visitante':
-        return 'xd'
+    # si ya esta logeado
+    if 'idUsuario' in session and session['tipoUsuario'] == 'Participante':
+        # buscar si ya esta inscrito en el evento
+        usuario_evento = Usuario_Evento.query.filter_by(
+            idUsuario = session['idUsuario'],
+            idEvento = session['eventoReg']
+        ).first()
+        if usuario_evento == None:
+            session['eventoReg'] = id
+            registrarUsuario(session['idUsuario'])
+        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
     session['eventoReg'] = id
-    return redirect(url_for('register'))
+    return redirect(url_for('login'))
 
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
@@ -782,9 +691,12 @@ def verEvento(id):
         )
     for actividad in datos:
         delta = actividad.fechaFin - actividad.fechaInicio
+        duracion = str(delta.seconds//3600) + ' hora'
+        if duracion != '1 hora':
+            duracion += 's'
         actividades.append({
             "nombre": actividad.nombre,
-            "duracion": str(delta.days) + 'dias',
+            "duracion": duracion,
             "ponente": actividad.ponente
         })
     #.
@@ -813,7 +725,7 @@ def verEvento(id):
         paquetes=paquetes,
         paquete=paquete,
         categoria=categoria,
-        tipoUsuario = "Visitante"
+        tipoUsuario = session['tipoUsuario']
     )
 
 @app.route('/logout/')
@@ -828,7 +740,7 @@ def navbar(tipoUsuario):
     #Visitante, Colaborador, Caja, Admin
     return render_template("Layout.html",tipoUsuario=tipoUsuario)
 
-#Para inscripciones
+# ================== gestionar inscripciones ==================
 @app.route('/obtenerNombreActividades/', methods=['GET','POST'])
 def obtenerNombreActividades():
     actividades =[

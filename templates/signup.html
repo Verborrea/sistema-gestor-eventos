@@ -46,10 +46,8 @@
                         <div class="form-group">
                             <label for="inputState">Profesión</label>
                             <select id="inputState" class="form-control" name="profesion" required>
-                                <option value="none" selected>None</option>
-                                {% for i in range(lenProfesion)%}
-                                <option value="{{ profesion[i].value }}">{{ profesion[i].texto }}</option>
-                                {% endfor %}
+                                <option selected>Profesion </option>
+                                <option>...</option>
                             </select>
                         </div>
                         <div class="row">
@@ -67,6 +65,11 @@
 </body>
 {% endblock %}
 {% block script %}
-
+<script type="text/javascript">
+    let alerta = {{msg_alerta|tojson}}
+    if (alerta.existe){
+        alert(alerta.mensaje);
+    }
+ </script>
 {% endblock %}
 </html>
