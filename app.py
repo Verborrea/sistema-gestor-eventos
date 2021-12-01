@@ -738,8 +738,16 @@ def index():
                 "summary" : evento.descripcion
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
+    
+    alerta={
+        "tipo":"success",
+        "title":"Este es el titulo",
+        "texto":"Este es el texto",
+        "masTexto":"mastexto",#opcional
+    }
+    #alerta=False
     #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
-    return render_template('SCV-B03SeleccionarEvento.html',tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
+    return render_template('SCV-B03SeleccionarEvento.html',alerta=alerta,tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
