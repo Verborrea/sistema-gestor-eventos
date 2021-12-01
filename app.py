@@ -663,7 +663,7 @@ def registrarse(id):
         # buscar si ya esta inscrito en el evento
         usuario_evento = Usuario_Evento.query.filter_by(
             idUsuario = session['idUsuario'],
-            idEvento = session['eventoReg']
+            idEvento = id
         ).first()
         if usuario_evento == None:
             session['eventoReg'] = id
