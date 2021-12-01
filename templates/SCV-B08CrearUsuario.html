@@ -1,0 +1,64 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+        <h1>Gestion Administrativa</h1>
+        <div id="agregarUsuarioModalContainer"></div>
+        
+        <br>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Tipo de Usuario</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Permisos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(len.general) %}
+                <tr>
+                    <th scope="row">{{i+1}}</th>
+                    <th>{{general[i].tipoUsuario}}</th>
+                    <td>{{general[i].nombre}}</td>
+                    <td>{{general[i].correo}}</td>
+                    <td>{{general[i].permisos}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <button id="agregarUsuario" class="btn btn-outline-primary btn-block" type="button">
+                    <i class="fa fa-plus"></i> Agregar Usuario
+                </button>
+                
+            </div>
+            <div class="col-4"></div>
+        </div>
+        <br>
+        
+
+        
+{% endblock %}
+{% block script %}
+    <script>
+        idbutton = "agregarUsuario"
+        idModal = "agregarUsuarioModal"
+        datosForm = [
+            {"nombre":"nombreCompleto","texto":"Nombre Completo","tipo_dato":"text"},
+            {"nombre":"correo","texto":"Correo","tipo_dato":"mail"},
+            {"nombre":"tipoUsuario","texto":"Tipo de usuario","tipo_dato":"text"},
+            {"nombre":"nombreUsuario","texto":"Nombre de Usuario","tipo_dato":"text"},
+            {"nombre":"contrasenia","texto":"Contraseña","tipo_dato":"text"}
+        ]
+        let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModal,"Creación de nuevo usuario",datosForm)
+        BOOSTTRAP.Utilities.onlyChild(idModal+"Container",formModal)
+        document.getElementById(idModal+"-form").method = "post"       
+
+        BOOSTTRAP.Utilities.convertToCallModal(idbutton,idModal)
+        
+    </script>
+{% endblock %}
+</html>

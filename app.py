@@ -824,5 +824,36 @@ def gestionar_inscripcion(id):
         descuento = descuento
     )
 
+@app.route('/gestionarUsuario/', methods=['POST','GET'])
+def gestionarUsuario():
+    general =[
+        {'tipoUsuario':'Colaborador','nombre':'A','correo':'a@a.a','permisos':'todos'}
+    ]
+    lens={
+        'general' : len(general)
+    }
+    return render_template(
+        "SCV-B08CrearUsuario.html",
+        idEvento="0",
+        general=general,
+        len = lens
+    )
+
+@app.route('/listaEventosParticipante/', methods=['POST','GET'])
+def listaEventosParticipante():
+    general =[
+        {'nombre':'Evento','estado':'En curso','fechaInicioEvento':'ahora'}
+    ]
+    lens={
+        'general' : len(general)
+    }
+    return render_template(
+        "SCV-B20VisualizarListaEventosParticipante.html",
+        idEvento=1,
+        general=general,
+        len = lens
+    )
+
+
 if __name__ == '__main__':
     app.run()
