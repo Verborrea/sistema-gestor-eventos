@@ -875,5 +875,30 @@ def validarInscripcion():
         lens = lens
     )
 
+@app.route('/asistencia/<id>', methods=['POST','GET'])
+def asistencia(id):
+    return "Registra asistencia de: "+id
+@app.route('/materiales/<id>', methods=['POST','GET'])
+def materiales(id):
+    return "Registra materiales de: "+id
+@app.route('/obtenerCodigQR/<id>', methods=['POST','GET'])
+def obtenerCodigQR(id):
+    return "obtenerCodigQR de: "+id
+
+@app.route('/pruebaColaborador/', methods=['POST','GET'])
+def pruebaColaborador():
+    print("poner en el index")
+    general=[
+        {"nombreEvento":"Evento 1"}
+    ]
+    len = {
+        "general":1,
+    }
+    return render_template(
+        "SCV-B16-17PaginaColaborador.html",
+        general=general,
+        len=len
+    )
+
 if __name__ == '__main__':
     app.run()
