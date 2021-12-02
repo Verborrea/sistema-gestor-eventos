@@ -45,10 +45,10 @@
                 let idModalNuevo = "nuevoEventoModal"
                 let idModalPlantilla = "plantillaEventoModal"
                 let datosForm = [
-                    {"nombre":"nombreEvento","tipo_dato":"text"},
-                    {"nombre":"tipoEvento","tipo_dato":"text"},
-                    {"nombre":"descripcionBreve","tipo_dato":"text"},
-                    {"nombre":"lugar","tipo_dato":"text"},
+                    {"nombre":"nombreEvento","tipo_dato":"text","texto":"Nombre del Evento"},
+                    {"nombre":"tipoEvento","tipo_dato":"text","texto":"Tipo del Evento"},
+                    {"nombre":"descripcionBreve","tipo_dato":"text","texto":"Descripción breve"},
+                    {"nombre":"lugar","tipo_dato":"text","texto":"Lugar"},
                 ]
                 //Crear evento desde 0
                 formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalNuevo,"Creación de nuevo evento",datosForm)

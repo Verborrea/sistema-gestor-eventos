@@ -82,10 +82,10 @@
         let idModalModify = "modalModificar"
         let datosForm = [
             {"nombre":"idEvento","tipo_dato":"text","extra":String.raw`style="display: none;" disabled`},
-            {"nombre":"nombreEvento","tipo_dato":"text"},
-            {"nombre":"tipoEvento","tipo_dato":"text"},
-            {"nombre":"descripcion","tipo_dato":"text"},
-            {"nombre":"lugar","tipo_dato":"text"},
+            {"nombre":"nombreEvento","texto":"Nombre del Evento","tipo_dato":"text"},
+            {"nombre":"tipoEvento","tipo_dato":"text","texto":"Tipo del Evento"},
+            {"nombre":"descripcion","tipo_dato":"text","texto":"Descripción"},
+            {"nombre":"lugar","tipo_dato":"text","texto":"Lugar"},
         ]
         formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalModify,"Modificar evento",datosForm)
         BOOSTTRAP.Utilities.onlyChild("modalModificarContainer",formModal)

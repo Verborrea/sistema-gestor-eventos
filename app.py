@@ -854,6 +854,26 @@ def listaEventosParticipante():
         len = lens
     )
 
+@app.route('/porTransferencia/', methods=['POST','GET'])
+def porTransferencia():
+    return "yei"
+
+@app.route('/porEfectivo/', methods=['POST','GET'])
+def porEfectivo():
+    return "yei"
+
+@app.route('/validarInscripcion/', methods=['POST','GET'])
+def validarInscripcion():
+    lens={
+        "general":1
+    }
+    return render_template(
+        "SCV-B07ValidarInscripcion.html",
+        general = [
+            {"codigoPago":"EST", "categoria":"Estudiante", "paquete":"Estudiante Starter Pack", "monto":70}
+        ],#codigoPago, categoria, presupuesto, monto
+        lens = lens
+    )
 
 if __name__ == '__main__':
     app.run()

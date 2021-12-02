@@ -165,10 +165,10 @@
             let titulo = "Ambiente"
             let datosForm = [
                 {"nombre":"idAmbiente","tipo_dato":"text","extra":String.raw`style="display: none;"`},
-                {"nombre":"nombreAmbiente","tipo_dato":"text"},
-                {"nombre":"tipoAmbiente","tipo_dato":"text"},
-                {"nombre":"descripcionBreve","tipo_dato":"text"},
-                {"nombre":"aforo","tipo_dato":"number"},
+                {"nombre":"nombreAmbiente","tipo_dato":"text","texto":"Nombre del Ambiente"},
+                {"nombre":"tipoAmbiente","tipo_dato":"text","texto":"Tipo de Ambiente"},
+                {"nombre":"descripcionBreve","tipo_dato":"text","texto":"Descripción Breve"},
+                {"nombre":"aforo","tipo_dato":"number","texto":"Aforo"},
             ]
             let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
             BOOSTTRAP.Utilities.onlyChild("modalAmbienteContainer",formModal)//Agrega el modal al doc
@@ -209,11 +209,11 @@
             let titulo = "Material"
             let datosForm = [
                 {"nombre":"idMaterial","tipo_dato":"text","extra":String.raw`style="display: none;"`},
-                {"nombre":"nombreMaterial","tipo_dato":"text"},
-                {"nombre":"tipoMaterial","tipo_dato":"text"},
-                {"nombre":"descripcionBreve","tipo_dato":"text"},
-                {"nombre":"stockInicial","tipo_dato":"number"},
-                {"nombre":"costoUnitario","tipo_dato":"number","extra":String.raw`step='.01'`}
+                {"nombre":"nombreMaterial","tipo_dato":"text","texto":"Nombre del Material"},
+                {"nombre":"tipoMaterial","tipo_dato":"text","texto":"Tipo de Material"},
+                {"nombre":"descripcionBreve","tipo_dato":"text","texto":"Descripción Breve"},
+                {"nombre":"stockInicial","tipo_dato":"number","texto":"Stock Inicial"},
+                {"nombre":"costoUnitario","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Costo Unitario"}
             ]
             let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
             BOOSTTRAP.Utilities.onlyChild("modalMaterialContainer",formModal)//Agrega el modal al doc

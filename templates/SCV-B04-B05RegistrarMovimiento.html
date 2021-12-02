@@ -126,13 +126,13 @@
             let idModalEgreso = "RegistrarMovimientoEgresoModal"
             let idModalIngreso = "RegistrarMovimientoIngresoModal"
             let datosForm1 = [{"nombre":"concepto","tipo_dato":"text"},
-                {"nombre":"detalle","tipo_dato":"text"},
-                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`},
+                {"nombre":"detalle","tipo_dato":"text","texto":"Detalle"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Monto"},
             ]
             let datosForm2 = [{"nombre":"nombre","tipo_dato":"text"},
-                {"nombre":"factura","tipo_dato":"text"},
-                {"nombre":"detalle","tipo_dato":"text"},
-                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`},
+                {"nombre":"factura","tipo_dato":"text","texto":"Factura"},
+                {"nombre":"detalle","tipo_dato":"text","texto":"Detalle"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Monto"},
             ]
             formModal1 = BOOSTTRAP.GenerateComplex.buildFormModal(
                 idModalEgreso,
@@ -142,7 +142,7 @@
             )
             formModal2 = BOOSTTRAP.GenerateComplex.buildFormModal(
                 idModalIngreso,
-                "Nuevo Movimineto Ingreso",
+                "Nuevo Movimiento Ingreso",
                 datosForm2,
                 BOOSTTRAP.Utilities.basicButton("Confirmar") + BOOSTTRAP.Utilities.basicButton("Cancelar",'cancelIngreso','btn-outline-danger','reset')
             )

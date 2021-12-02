@@ -270,7 +270,7 @@ BOOSTTRAP.Forms.buildInput = function(formRow,idForm){
     return String.raw`
         <div class="col" ${formRow.extra}>
             <div class="form-group row">
-                <label for="${idForm}-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.nombre}</label>
+                <label for="${idForm}-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.texto || formRow.nombre}</label>
                 <div class="col-sm-10">
                     <input type="${formRow.tipo_dato}" class="form-control" id="${idForm}-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}>
                 </div>
