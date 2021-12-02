@@ -753,7 +753,7 @@ def crearPaquete():
         
     nuevoPaqueteDict = {
         "id": nuevoPaquete.id,
-        "nombreActividad": "Nombre del Paquete",
+        "nombreActividad": "Nombre del Paquete", 
         "monto": 0
     }
 
