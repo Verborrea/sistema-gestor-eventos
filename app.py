@@ -103,7 +103,7 @@ def evento(idEvento):
             "id":actividad.id,
             "nombre":actividad.nombre
         })
-
+    print(miEvento.estado)
     return render_template(
         'SCV-B10MenuEvento.html',
         estado = miEvento.estado,
@@ -407,7 +407,6 @@ def modificarActividad(id):
 def actividad(id):
     miEvento = Evento.query.get_or_404(session['idEvento'])
     estadoEvento = miEvento.estado
-
     miActividad = Actividad.query.get_or_404(id)
 
     datos ={
@@ -897,7 +896,8 @@ def pruebaColaborador():
     return render_template(
         "SCV-B16-17PaginaColaborador.html",
         general=general,
-        len=len
+        len=len,
+        idEvento = 1
     )
 
 if __name__ == '__main__':

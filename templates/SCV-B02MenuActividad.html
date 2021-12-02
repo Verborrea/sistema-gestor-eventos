@@ -98,10 +98,10 @@
                                 <div class="col"> {{ambiente.nombre}}</div>
                                 <div class="col-2 text-right">
                                     {% if estado == 'Borrador' %}
-                                    <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fa fa-pencil"> </i></a>
-                                    <a href="{{url_for('eliminarAmbiente',idActividad = actividad.id,idAmbiente = ambiente.id)}}"><i class="fa fa-trash"> </i></a>
+                                    <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fas fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarAmbiente',idActividad = actividad.id,idAmbiente = ambiente.id)}}"><i class="fas fa-trash"> </i></a>
                                     {% else %}
-                                    <a href=""><i class="fa fa-eye"> </i></a>
+                                    <a href=""><i class="fas fa-eye"> </i></a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -111,7 +111,7 @@
                     {%endfor%}
 
                     <p class="text-center">
-                        <button id="crearAmbienteButton" type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar ambiente</button>
+                        <button id="crearAmbienteButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar ambiente</button>
                     </p>
 
                 </div>
@@ -134,8 +134,8 @@
                             <div class="row">
                                 <div class="col"> {{material.nombre}}</div>
                                 <div class="col-2 text-right">
-                                    <a href="" onclick="setModalMaterialModificar('{{material.id}}')" data-toggle="modal" data-target="#materialModal"><i class="fa fa-pencil"> </i></a>
-                                    <a href="{{url_for('eliminarMaterial',idActividad = actividad.id,idMaterial = material.id)}}"><i class="fa fa-trash"> </i></a> 
+                                    <a href="" onclick="setModalMaterialModificar('{{material.id}}')" data-toggle="modal" data-target="#materialModal"><i class="fas fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarMaterial',idActividad = actividad.id,idMaterial = material.id)}}"><i class="fas fa-trash"> </i></a> 
                                 </div>
                             </div>
                         </div>
@@ -144,7 +144,7 @@
                     {%endfor%}
 
                     <p class="text-center">
-                        <button id="crearMaterialButton" type="button" class="btn btn-outline-primary"> <i class="fa fa-plus"></i> Agregar material</button>
+                        <button id="crearMaterialButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar material</button>
                     </p>
 
                 </div>
