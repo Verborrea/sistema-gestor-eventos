@@ -1,107 +1,7 @@
-from datetime import datetime
 from markupsafe import escape
-
-from flask import Flask, request, redirect, url_for, session
-from flask.templating import render_template
-from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
-from sqlalchemy.orm import defaultload
+from models import *
 import json
 
-app = Flask(__name__)
-app.secret_key = b'192b9bdd22ab9ed4d12e236c77823bcbf'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/sge.db'
-
-db = SQLAlchemy(app)
-
-class Usuario(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.String(30), nullable=False)
-    nombre = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    tipodoc = db.Column(db.String(10), nullable=False)
-    doc = db.Column(db.String(10), nullable=False)
-
-class Evento(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    tipo = db.Column(db.String(100), nullable=False)
-    descripcion = db.Column(db.String(130), nullable=False)
-    lugar = db.Column(db.String(100), nullable=False)
-    estado = db.Column(db.String(20), default="Borrador")
-    fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
-    fechaPreInscripcion = db.Column(db.Date)
-    fechaAprtrInscripcion = db.Column(db.Date)
-    fechaLmtDscnto = db.Column(db.Date)
-    fechaCierreInscripcion = db.Column(db.Date)
-    fechaInicio = db.Column(db.Date)
-    fechaFin = db.Column(db.Date)
-    cntInscritos = db.Column(db.Integer, default=0)
-    cntPreInscritos = db.Column(db.Integer, default=0)
-    prcntjDscnto = db.Column(db.Float, default=0)
-    plantilla = db.Column(db.Boolean, default=False)
-
-    activities = db.relationship('Actividad', backref='evento', lazy=True)
-
-class Actividad(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30))
-    descripcion = db.Column(db.String(130))
-    consideraciones = db.Column(db.String(100))
-    fechaInicio = db.Column(db.DateTime)
-    fechaFin = db.Column(db.DateTime)
-    ponente = db.Column(db.String(50))
-
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-    ambientes = db.relationship('Ambiente', backref='actividad', lazy = True)
-    materiales = db.relationship('Material', backref='actividad', lazy = True)
-
-class Ambiente(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
-    descripcion = db.Column(db.String(100))
-    aforo = db.Column(db.Integer, nullable = False)
-
-    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
-
-class Material(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
-    descripcion = db.Column(db.String(100))
-    stockInicial = db.Column(db.Integer, nullable = False)
-    costoUnitario = db.Column(db.Float, nullable = False)
-
-    idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
-    
-class Movimiento(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    tipo = db.Column(db.String(30), nullable=False)
-    nombre = db.Column(db.String(30), nullable=False)
-    factura = db.Column(db.String(30), nullable=False)
-    detalle = db.Column(db.String(90))
-    cantidad = db.Column(db.Integer)
-    monto = db.Column(db.Float, nullable = False)
-    
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
-
-
-class Categoria(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)  
-
-class Paquete(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(30), nullable=False)
-    monto = db.Column(db.Float,  default=0)
-    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)  
-    
-
-    
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
 
 @app.context_processor
@@ -109,7 +9,6 @@ def utility_processor():
     def modulo(a,b):
         return a%b
     return dict(modulo=modulo)
-
 
 def crearFecha(date, format):
     str = 'No definida'
@@ -122,13 +21,54 @@ def crearFechaHora(date, hour):
     date_time_obj = datetime.strptime(datehour, '%Y-%m-%d %H:%M:%S')
     return date_time_obj
 
+def breakArr(array,division):
+    arr =[]
+    sizes = []
+    for i in range(0,len(array),division):
+        arr.append([])
+        sizes.append(0)
+        for j in range(i,i+division):
+            if j<len(array):
+                arr[i//division].append(array[j])
+                sizes[i//division]=sizes[i//division]+1
+    return arr,sizes, len(sizes)
+
+# =============== creacion de un administrador primigenio =============== #
+
+# usuario_admin = Usuario.query.filter_by(
+#     username = 'admin',
+#     tipoUsuario = 'Admin',
+#     password = 'admin',
+#     nombre = 'Administrador',
+#     email = 'admin@sge.com'
+# ).first()
+
+# if usuario_admin:
+#     print("Admin exists")
+# else:
+#     nuevo_usuario = Usuario(
+#         username = 'admin',
+#         tipoUsuario = 'Admin',
+#         password = 'admin',
+#         nombre = 'Administrador',
+#         email = 'admin@sge.com'
+#     )
+#     db.session.add(nuevo_usuario)
+#     db.session.commit()
+
 # ============================== eventos ============================== #
 
-@app.route('/')
-def index():
+@app.route('/listaEventos')
+def listaEventos():
+    usuario_evento = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
+    usuario = Usuario.query.get_or_404(session['idUsuario'])
+    listaIdEventos = []
+    for usr_evt in usuario_evento:
+        listaIdEventos.append(usr_evt.idEvento)
     datos = []
-    eventos = Evento.query.all()
-    for evento in eventos:
+    # eventos = Evento.query.all()
+    for idEvt in listaIdEventos:
+        evento = Evento.query.get_or_404(idEvt)
         datos.append({
             "id":evento.id,
             "nombre":evento.nombre,
@@ -139,7 +79,7 @@ def index():
             'estadoEvento':evento.estado
         })
     session.pop('idEvento', None)
-    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():
@@ -186,6 +126,15 @@ def crearEvento():
     db.session.add(nuevoEvento)
     db.session.commit()
 
+    nuevoEventoUsuario = Usuario_Evento(
+        idEvento = nuevoEvento.id,
+        idUsuario = session['idUsuario'],
+        estaInscrito = False
+    )
+
+    db.session.add(nuevoEventoUsuario)
+    db.session.commit()
+
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
 @app.route('/modificarEvento/', methods=['POST'])
@@ -204,7 +153,6 @@ def modificarEvento():
 
 @app.route('/obtenerPlantillas/', methods=['POST','GET'])
 def obtenerPlantillas():
-    #headers=["Nombre","Fecha","TipoEvento"]
 
     plantillas = []
     eventos = Evento.query.all()
@@ -252,34 +200,39 @@ def lanzarEvento():
 @app.route('/cargarEjemplos', methods=['GET'])
 def cargarEjemplos():
     aEvnt = Evento(
-        nombre = "Primer Ejemplo",
+        nombre = "IntArtificial",
         tipo = "Congreso",
         descripcion = "Super Descripcion",
-        lugar = "Arequipa"
+        lugar = "Arequipa",
+        estado = "Inscripciones",
     )
     bEvnt = Evento(
-        nombre = "Segundo Ejemplo",
+        nombre = "Festidanza",
         tipo = "Danza",
         descripcion = "Nueva Descripcion",
-        lugar = "Cusco"
+        lugar = "Cusco",
+        estado = "Borrador",
     )
     cEvnt = Evento(
-        nombre = "Tercer Ejemplo",
+        nombre = "IoT",
         tipo = "Charla",
         descripcion = "Otra Descripcion",
-        lugar = "Lima"
+        lugar = "Lima",
+        estado = "En Curso",
     )
     dEvnt = Evento(
-        nombre = "Cuarto Ejemplo",
+        nombre = "Porcesamiento de lenguaje",
         tipo = "Congreso",
         descripcion = "Mas Descripcion",
-        lugar = "Lima"
+        lugar = "Lima",
+        estado = "Finalizado",
     )
     eEvnt = Evento(
-        nombre = "Quinto Ejemplo",
+        nombre = "Liderazgo",
         tipo = "Simposio",
-        descripcion = "ZZZZZZZZZZZZZZZZZZ",
-        lugar = "Arequipa"
+        descripcion = "Aprendizaje continuo",
+        lugar = "Arequipa",
+        estado = "Borrador",
     )
     db.session.add(aEvnt)
     db.session.add(bEvnt)
@@ -297,59 +250,97 @@ def registrarMovimiento():
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
-
-
-@app.route('/movimiento/')
+#genera problemas al compilar (comentar route movimiento hasta que no este culminado)
+@app.route('/movimiento/', methods=['GET','POST'])
 def movimiento():
-    miEvento = Evento.query.get_or_404(session['idEvento'])
-    estadoEvento = miEvento.estado
-
-    listaGeneral = []
-    listaIngresos = []
-    listaEgresos = []
-    movimientos = Movimiento.query.filter_by(idEvento = miEvento)
-    for movimiento in movimientos:  
-        if tipo == "Ingreso" :
-            listaIngresos.append({
-                "id":movimiento.id,
-                "nombre":movimiento.nombre,
-                "factura":movimiento.factura,
-                "detalle":movimiento.detalle,
-                "cantidad":movimiento.cantidad,
-                "monto":movimiento.monto,
-                "tipo":movimiento.tipo
+    general = []
+    ingresos = []
+    egresos = []
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento'])
+    numeroIngreso = 0
+    numeroEgreso = 0
+    numeroGeneral = 0
+    balanceIngreso = 0
+    balanceEgreso = 0
+    balanceGeneral = 0
+    for movimiento in movimientos:
+        numeroGeneral += 1
+        if movimiento.tipo == 'Ingreso':
+            numeroIngreso += 1
+            ingresos.append({
+                "numero":numeroIngreso,
+                "concepto":movimiento.nombre,
+                "monto":movimiento.monto
             })
-        elif tipo == "Egreso" :    
-            listaEgresos.append({
-                "id":movimiento.id,
-                "nombre":movimiento.nombre,
-                "factura":movimiento.factura,
-                "detalle":movimiento.detalle,
-                "cantidad":movimiento.cantidad,
+            balanceIngreso += movimiento.monto
+        else:
+            numeroEgreso += 1
+            egresos.append({
+                "numero":numeroEgreso,
+                "numeroRecibo":movimiento.factura,
+                "concepto":movimiento.nombre,
                 "monto":movimiento.monto,
-                "tipo":movimiento.tipo
+                "cantidad":movimiento.cantidad
             })
-        listaGeneral.append({
-                "id":movimiento.id,
-                "nombre":movimiento.nombre,
-                "factura":movimiento.factura,
-                "detalle":movimiento.detalle,
-                "cantidad":movimiento.cantidad,
-                "monto":movimiento.monto,
-                "tipo":movimiento.tipo
-            })    
-         
+            balanceEgreso += movimiento.monto
+        general.append({
+            "numero":numeroGeneral,
+            "concepto":movimiento.nombre,
+            "tipo":movimiento.tipo,
+            "monto":movimiento.monto,
+        })
+        balanceGeneral += movimiento.monto
 
-    return render_template(
-        'SCV-B02MenuActividad.html',
-        actividad=datos,
-        estado = estadoEvento,
-        ambientes=listaAmbientes,
-        lenAmbientes = len(listaAmbientes),
-        materiales=listaMateriales,
-        lenMateriales = len(listaMateriales),
-        idEvento=session['idEvento'])
+    balance={
+        "general":balanceGeneral,
+        "ingresos":balanceIngreso,
+        "egresos":balanceEgreso
+    }
+    lens={
+        "general" : len(general),
+        "ingresos" : len(ingresos),
+        "egresos" : len(egresos)
+    }
+    return render_template('SCV-B04-B05RegistrarMovimiento.html',
+        general=general,
+        ingresos=ingresos,
+        egresos=egresos,
+        balance=balance,
+        len=lens
+    )
 
+@app.route('/nuevoIngreso/', methods=['POST'])
+def nuevoIngreso():
+    miNuevoIngreso = Movimiento(
+        nombre = request.form.get('nombre'),
+        tipo = 'Ingreso',
+        factura = request.form.get('factura'),
+        detalle = request.form.get('detalle'),
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
+
+    db.session.add(miNuevoIngreso)
+    db.session.commit()
+      
+    return redirect(url_for('movimiento'), code=302)
+
+
+@app.route('/nuevoEgreso/', methods=['POST'])
+def nuevoEgreso():
+    miNuevoEgreso = Movimiento(
+        nombre = request.form.get('concepto'),
+        tipo = 'Egreso',
+        factura = 'F12345',
+        detalle = request.form.get('detalle'),
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
+
+    db.session.add(miNuevoEgreso)
+    db.session.commit()
+      
+    return redirect(url_for('movimiento'), code=302)
 # ============================== actividades ============================== #
 
 @app.route('/crearActividad', methods=['POST'])
@@ -394,7 +385,6 @@ def eliminarActividad(id):
     db.session.delete(miActividad)
     db.session.commit()
     return redirect(url_for('evento',idEvento=session['idEvento']), code=302)
-
 
 @app.route('/modificarActividad/<id>', methods=['POST'])
 def modificarActividad(id):
@@ -506,7 +496,6 @@ def obtenerAmbiente(idAmb):
     }
     return json.dumps(ambienteDict)
 
-
 # ============================== material ============================== #
 @app.route('/<idActividad>/eliminarMaterial/<idMaterial>', methods=['GET','POST'])
 def eliminarMaterial(idActividad,idMaterial):
@@ -559,66 +548,104 @@ def obtenerMaterial(idMat):
 
 # ============================== login ============================== #
 
-@app.route('/profile/<username>')
-def profile(username):
-    return render_template('usuario.html', usuario=username)
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         user = Usuario.query.filter_by(
-            username = request.form.get('usuario'),
+            email = request.form.get('usuario'),
             password = request.form.get('contra')
         ).first()
 
         if user:
-            return redirect(url_for('profile', username=request.form.get('usuario')))
+            session['tipoUsuario'] = user.tipoUsuario
+            session['idUsuario'] = user.id
+            if 'eventoReg' in session:
+                registrarUsuario(user.id)
+                return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
+            if session['tipoUsuario'] == 'Admin':
+                return redirect(url_for('listaEventos'))
+            return redirect(url_for('index'))
         else:
-            return 'Usuario no existente'
+            miAlerta ={
+                "tipo":"failiure",
+                "title":"Error",
+                "texto":"Usuario no encontrado",
+                "masTexto":"Por favor, ingrese un correo o contraseña válidos.",#opcional
+            }
+            return render_template('login.html',alerta=miAlerta,tipoUsuario='Visitante')
     else:
-        return render_template('login.html')
+        return render_template('login.html',tipoUsuario='Visitante')
+
+def registrarUsuario(id):
+    nuevo_inscrito = Usuario_Evento(
+        idEvento = session['eventoReg'],
+        idUsuario = id,
+        estaInscrito = False
+    )
+    session.pop('eventoReg', None)
+    session['idUsuario'] = id # login automatico
+    session['tipoUsuario'] = 'Participante'
+    db.session.add(nuevo_inscrito)
+    db.session.commit()
 
 @app.route('/signup')
 def register():
-    return render_template('signup.html')
+    profesion = [
+        {"value":"ING","texto":"Ingeniero"},
+        {"value":"ARQ","texto":"Arquitecto"},
+        {"value":"SIS","texto":"Sistemas"}
+    ]
+    alert = {
+        'existe':False,
+        'mensaje':''
+    }
+    return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
+    alert = {
+        'existe':False,
+        'mensaje':''
+    }
+    # registro en la pagina
     user = Usuario.query.filter_by(username = request.form.get('usuario')).first()
     mail = Usuario.query.filter_by(email = request.form.get('correo')).first()
     if user:
-        return 'Usuario ya existente'
+        alert['existe'] = True
+        alert['mensaje'] = 'Nombre de Usuario ya existente'
+        return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
     if mail:
-        return 'El correo ingresado ya tiene una cuenta asociada'
+        alert['existe'] = True
+        alert['mensaje'] = 'El correo ingresado ya tiene una cuenta asociada'
+        return render_template('signup.html',tipoUsuario='Visitante',msg_alerta=alert)
     nuevo_usuario = Usuario(
         username = request.form.get('usuario'),
+        tipoUsuario = 'Participante',
         password = request.form.get('contra'),
         nombre = request.form.get('nombre'),
         email = request.form.get('correo'),
         tipodoc = request.form.get('tipo_doc'),
-        doc = request.form.get('doc')
+        doc = request.form.get('doc'),
+        profesion = request.form.get('profesion')
     )
     db.session.add(nuevo_usuario)
     db.session.commit()
-    print(Usuario.query.all())
+    # registro en el evento
+    if 'eventoReg' in session:
+        registrarUsuario(nuevo_usuario.id)
+        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
     return redirect(url_for('login'))
 
-def breakArr(array,division):
-    arr =[]
-    sizes = []
-    for i in range(0,len(array),division):
-        arr.append([])
-        sizes.append(0)
-        for j in range(i,i+division):
-            if j<len(array):
-                arr[i//division].append(array[j])
-                sizes[i//division]=sizes[i//division]+1
-    return arr,sizes, len(sizes)
-
-@app.route('/visitante')#para probar la vista de participante
-def visitante():
+@app.route('/')#para probar la vista de participante
+def index():
+    if 'tipoUsuario' not in session:
+        session['tipoUsuario'] = 'Visitante'
     eventos = []
     info = Evento.query.all()
+    nom_usuario = 'no existe'
+    if 'idUsuario' in session:
+        usuario = Usuario.query.get_or_404(session['idUsuario'])
+        nom_usuario = usuario.nombre
     for evento in info:
         if evento.estado == 'Inscripciones':
             eventos.append({
@@ -627,34 +654,52 @@ def visitante():
                 "summary" : evento.descripcion
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
-    #en el render template deberia quitarse tipoUsuario Visitante y guardarlo en la sesion
-    return render_template('SCV-B03SeleccionarEvento.html',tipoUsuario='Visitante',evento=renderEventos,arrSizes=arrSizes,size=size)
+    return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size)
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
-    return "te estas registrando en: "+id
+    # si ya esta logeado
+    if 'idUsuario' in session and session['tipoUsuario'] == 'Participante':
+        # buscar si ya esta inscrito en el evento
+        usuario_evento = Usuario_Evento.query.filter_by(
+            idUsuario = session['idUsuario'],
+            idEvento = id
+        ).first()
+        if usuario_evento == None:
+            session['eventoReg'] = id
+            registrarUsuario(session['idUsuario'])
+        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
+    session['eventoReg'] = id
+    return redirect(url_for('login'))
 
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
+    miEvento = Evento.query.get_or_404(id)
+
     evento = {
-        "id":id,
-        "title":"Evento1",
-        "descripcion":"descripcion",
-        "lugar":"lugar",
-        "fechas":"01/01/01 - 02/02/02"
+        "id": id,
+        "title": miEvento.nombre,
+        "descripcion": miEvento.descripcion,
+        "lugar": miEvento.lugar,
+        "fechas": miEvento.fechaCierreInscripcion
     }
-    actividad =[
-        {
-            "nombre":"Actividad1",
-            "duracion":"1 anio",
-            "ponente":"FulanoPerez"
-        },
-        {
-            "nombre":"Actividad2",
-            "duracion":"1/2 anio",
-            "ponente":"FulanoJuarez"
-        }
-    ]
+
+    actividades = []
+
+    datos = Actividad.query.filter_by(
+            idEvento = id
+        )
+    for actividad in datos:
+        delta = actividad.fechaFin - actividad.fechaInicio
+        duracion = str(delta.seconds//3600) + ' hora'
+        if duracion != '1 hora':
+            duracion += 's'
+        actividades.append({
+            "nombre": actividad.nombre,
+            "duracion": duracion,
+            "ponente": actividad.ponente
+        })
+    #.
     paquete=["Paquete 1","Paquete 2","Paquete 3"]
     categoria=["Categoria 1","Categoria 2"]
     categoria_paquete = {
@@ -671,30 +716,47 @@ def verEvento(id):
     }
     categorias = 2
     paquetes = 3
-    lenActividad = len(actividad)
     return render_template('SCV-B01VisualizarEvento.html',
         evento=evento,
-        actividad=actividad,
-        lenActividad=lenActividad,
+        actividad=actividades,
+        lenActividad=len(actividades),
         categoria_paquete=categoria_paquete,
         categorias=categorias,
         paquetes=paquetes,
         paquete=paquete,
-        categoria=categoria
-        )
+        categoria=categoria,
+        tipoUsuario = session['tipoUsuario']
+    )
 
-if __name__ == '__main__':
-    app.run()
+@app.route('/logout/')
+def logout():
+    session.pop('idUsuario', None)
+    session.pop('tipoUsuario', None)
+    session.pop('idEvento', None)
+    return redirect(url_for('index'))
 
+@app.route('/navbar/<tipoUsuario>')
+def navbar(tipoUsuario):
+    #Visitante, Colaborador, Caja, Admin
+    return render_template("Layout.html",tipoUsuario=tipoUsuario)
 
-# ============================== Categoria ============================== #
+# ================== gestionar inscripciones ==================
+@app.route('/obtenerNombreActividades/', methods=['GET','POST'])
+def obtenerNombreActividades():
+    actividades =[
+        {"id":"A01","nombre":"Conferencia"},
+        {"id":"A01","nombre":"Conferencia2"},
+        {"id":"A01","nombre":"Conferencia3"},
+        {"id":"A01","nombre":"Conferencia4"},
+        {"id":"A01","nombre":"Conferencia5"}
+    ]
+    return json.dumps(actividades)
 
-
-@app.route('/crearCategoria', methods=['POST'])
-def crearCategoria():
+@app.route('/crearCategoria/', methods=['POST'])
+def crearCategoria(id):
     nuevaCategoria = Categoria(
         nombre = 'Nombre de la Categoria',
-        idEvento = session['idEvento']
+        idEvento = id
     )
 
     db.session.add(nuevaCategoria)
@@ -702,7 +764,7 @@ def crearCategoria():
         
     nuevaCategoriaDict = {
         "id": nuevaCategoria.id,
-        "nombreActividad": "Nombre de la Categoria",
+        "nombre": "Nombre de la Categoria",
     }
 
     return render_template(
@@ -712,11 +774,10 @@ def crearCategoria():
         ambientes=[], lenAmbientes = 0,
         materiales=[], lenMateriales = 0)
     
-    
 
 @app.route('/categorias/')
-def Categoria():
-    miEvento = Evento.query.get_or_404(session['idEvento'])
+def Categoria(id):
+    miEvento = Evento.query.get_or_404(id)
     estadoEvento = miEvento.estado
 
     listaCategorias = []
@@ -737,15 +798,14 @@ def Categoria():
         lenMateriales = len(listaMateriales),
         idEvento=session['idEvento'])
 
-# ============================== Paquete ============================== #
-
-
-@app.route('/crearPaquete', methods=['POST'])
-def crearPaquete():
-    nuevoPaquete = Paquete(
+    
+    
+@app.route('/crearPaquete/', methods=['POST'])
+def crearPaquete(id):
+    nuevaPaquete = Paquete(
         nombre = 'Nombre del Paquete',
         monto = 0,
-        idEvento = session['idEvento']
+        idEvento = id
     )
 
     db.session.add(nuevoPaquete)
@@ -753,7 +813,7 @@ def crearPaquete():
         
     nuevoPaqueteDict = {
         "id": nuevoPaquete.id,
-        "nombreActividad": "Nombre del Paquete", 
+        "nombre": "Nombre del Paquete", 
         "monto": 0
     }
 
@@ -763,11 +823,11 @@ def crearPaquete():
         estado = "Borrador",
         ambientes=[], lenAmbientes = 0,
         materiales=[], lenMateriales = 0)
-    
+
 
 @app.route('/paquetes/')
-def Categoria():
-    miEvento = Evento.query.get_or_404(session['idEvento'])
+def Categoria(id):
+    miEvento = Evento.query.get_or_404(id)
     estadoEvento = miEvento.estado
 
     listaPaquetes = []
@@ -788,3 +848,149 @@ def Categoria():
         materiales=listaMateriales,
         lenMateriales = len(listaMateriales),
         idEvento=session['idEvento'])
+
+
+
+@app.route('/gestionar_inscripcion/<id>', methods=['GET','POST'])
+def gestionar_inscripcion(id):
+    descuento = 10#numero del 1 al 100
+    #fechas del evento
+    fecha = {
+        "Preinscripción":"010101",
+        "Inscripciones":"010101",
+        "Descuento":"010101",
+    }
+
+    #categoriaPaquete
+    paquete=["Paquete 1","Paquete 2","Paquete 3"]
+    categoria=["Categoria 1","Categoria 2"]
+    categoria_paquete = {
+        "Categoria 1":{
+            "Paquete 1":5,
+            "Paquete 2":10,
+            "Paquete 3":7,
+        },
+        "Categoria 2":{
+            "Paquete 1":6,
+            "Paquete 2":11,
+            "Paquete 3":6,
+        }
+    }
+    categorias = 2
+    paquetes = 3
+    
+    #Datos provisionales para probar, no llenar, reusaremos la tabla con otros datos
+    general = [#la numeracion de 1 a n
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+    preinscritos = [#numeracion igual a la de general
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+    inscritos = [
+        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
+    ]
+
+
+    lens={
+        "general" : len(general),
+        "preinscritos" : len(preinscritos),
+        "inscritos" : len(inscritos)
+    }
+
+    return render_template(
+        "SCV-B09GestionarConfiguracionInscripcion.html",
+        idEvento=id,
+        estado="Finalizado",
+        general=general,
+        preinscritos=preinscritos,
+        inscritos=inscritos,
+        len=lens,
+        nombreEvento="nombreEvento",
+        categoria_paquete=categoria_paquete,
+        categorias=categorias,
+        paquetes=paquetes,
+        paquete=paquete,
+        categoria=categoria,
+        tipoUsuario = "",
+        fecha = fecha,
+        descuento = descuento
+    )
+
+@app.route('/gestionarUsuario/', methods=['POST','GET'])
+def gestionarUsuario():
+    general =[
+        {'tipoUsuario':'Colaborador','nombre':'A','correo':'a@a.a','permisos':'todos'}
+    ]
+    lens={
+        'general' : len(general)
+    }
+    return render_template(
+        "SCV-B08CrearUsuario.html",
+        idEvento="0",
+        general=general,
+        len = lens
+    )
+
+@app.route('/listaEventosParticipante/', methods=['POST','GET'])
+def listaEventosParticipante():
+    general =[
+        {'nombre':'Evento','estado':'En curso','fechaInicioEvento':'ahora'}
+    ]
+    lens={
+        'general' : len(general)
+    }
+    return render_template(
+        "SCV-B20VisualizarListaEventosParticipante.html",
+        idEvento=1,
+        general=general,
+        len = lens
+    )
+
+@app.route('/porTransferencia/', methods=['POST','GET'])
+def porTransferencia():
+    return "yei"
+
+@app.route('/porEfectivo/', methods=['POST','GET'])
+def porEfectivo():
+    return "yei"
+
+@app.route('/validarInscripcion/', methods=['POST','GET'])
+def validarInscripcion():
+    lens={
+        "general":1
+    }
+    return render_template(
+        "SCV-B07ValidarInscripcion.html",
+        general = [
+            {"codigoPago":"EST", "categoria":"Estudiante", "paquete":"Estudiante Starter Pack", "monto":70}
+        ],#codigoPago, categoria, presupuesto, monto
+        lens = lens
+    )
+
+@app.route('/asistencia/<id>', methods=['POST','GET'])
+def asistencia(id):
+    return "Registra asistencia de: "+id
+@app.route('/materiales/<id>', methods=['POST','GET'])
+def materiales(id):
+    return "Registra materiales de: "+id
+@app.route('/obtenerCodigQR/<id>', methods=['POST','GET'])
+def obtenerCodigQR(id):
+    return "obtenerCodigQR de: "+id
+
+@app.route('/pruebaColaborador/', methods=['POST','GET'])
+def pruebaColaborador():
+    print("poner en el index")
+    general=[
+        {"nombreEvento":"Evento 1"}
+    ]
+    len = {
+        "general":1,
+    }
+    return render_template(
+        "SCV-B16-17PaginaColaborador.html",
+        general=general,
+        len=len
+    )
+
+if __name__ == '__main__':
+    app.run()
