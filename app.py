@@ -753,10 +753,102 @@ def obtenerNombreActividades():
 
 @app.route('/crearCategoria/', methods=['POST'])
 def crearCategoria(id):
-    return "creo"
+    nuevaCategoria = Categoria(
+        nombre = 'Nombre de la Categoria',
+        idEvento = id
+    )
+
+    db.session.add(nuevaCategoria)
+    db.session.commit()
+        
+    nuevaCategoriaDict = {
+        "id": nuevaCategoria.id,
+        "nombre": "Nombre de la Categoria",
+    }
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        categoria = nuevaCategoriaDict,
+        estado = "Borrador",
+        ambientes=[], lenAmbientes = 0,
+        materiales=[], lenMateriales = 0)
+    
+
+@app.route('/categorias/')
+def Categoria(id):
+    miEvento = Evento.query.get_or_404(id)
+    estadoEvento = miEvento.estado
+
+    listaCategorias = []
+    categorias = Categoria.query.filter_by(idEvento = miEvento)
+    for categoria in categorias:  
+        listaCategorias.append({
+            "id":categoria.id,
+            "nombre":categoria.nombre
+        })
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        actividad=datos,
+        estado = estadoEvento,
+        ambientes=listaAmbientes,
+        lenAmbientes = len(listaAmbientes),
+        materiales=listaMateriales,
+        lenMateriales = len(listaMateriales),
+        idEvento=session['idEvento'])
+
+    
+    
 @app.route('/crearPaquete/', methods=['POST'])
 def crearPaquete(id):
-    return "creo"
+    nuevaPaquete = Paquete(
+        nombre = 'Nombre del Paquete',
+        monto = 0,
+        idEvento = id
+    )
+
+    db.session.add(nuevoPaquete)
+    db.session.commit()
+        
+    nuevoPaqueteDict = {
+        "id": nuevoPaquete.id,
+        "nombre": "Nombre del Paquete", 
+        "monto": 0
+    }
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        paquete = nuevoPaqueteDict,
+        estado = "Borrador",
+        ambientes=[], lenAmbientes = 0,
+        materiales=[], lenMateriales = 0)
+
+
+@app.route('/paquetes/')
+def Categoria(id):
+    miEvento = Evento.query.get_or_404(id)
+    estadoEvento = miEvento.estado
+
+    listaPaquetes = []
+    paquetes = Paquete.query.filter_by(idEvento = miEvento)
+    for paquete in paquetes:  
+        listaPaquetes.append({
+            "id":paquete.id,
+            "nombre":paquete.nombre,
+            "monto":paquete.monto
+        })
+
+    return render_template(
+        'SCV-B02MenuActividad.html',
+        actividad=datos,
+        estado = estadoEvento,
+        ambientes=listaAmbientes,
+        lenAmbientes = len(listaAmbientes),
+        materiales=listaMateriales,
+        lenMateriales = len(listaMateriales),
+        idEvento=session['idEvento'])
+
+
 
 @app.route('/gestionar_inscripcion/<id>', methods=['GET','POST'])
 def gestionar_inscripcion(id):
