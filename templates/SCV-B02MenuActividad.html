@@ -1,0 +1,260 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+
+<h1>Datos de la actividad</h1>
+<a href="{{url_for('evento',idEvento = idEvento)}}"> << Regresar a evento </a>
+<br>
+<div id="modalAmbienteContainer"></div>
+<div id="modalMaterialContainer"></div>
+<div class="container marquito">
+    <br>
+    <form action="{{url_for('modificarActividad',id = actividad.id)}}" method="post">
+        <fieldset id="fieldset" {% if estado == 'Borrador' or estado == 'Inscripciones' %} "" {% else %} disabled {% endif %}>
+            <div class="form-row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="nombreActividad">Nombre de la actividad</label>
+                        <input type="text" class="form-control" id="nombreActividad" name="nombreActividad" value="{{actividad.nombreActividad}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcionActividad">Breve descripcion</label>
+                        <input type="text" class="form-control" id="descripcionActividad" name="descripcionActividad" value="{{actividad.descripcion}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="consideracionesAsistentes">Consideraciones para asistentes</label>
+                        <input type="text" class="form-control" id="consideracionesAsistentes" name="consideracionesAsistentes"  value="{{actividad.consideraciones}}">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="tipoActividad">Tipo de actividad</label>
+                        <input type="text" class="form-control" id="tipoActividad" name="tipoActividad" value="{{actividad.tipoActividad}}">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="fechaInicio">Fecha inicio</label>
+                                <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="{{actividad.fechaInicio}}">
+                            </div>
+                            
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="fechaFin">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="{{actividad.fechaFin}}">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class=" col-4">
+                    <div class="form-group">
+                        <label for="expositor">Expositor</label>
+                        <input type="text" class="form-control" id="expositor" name="expositor" value="{{actividad.expositor}}">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="horaInicio">Hora inicio</label>
+                                <input type="time" class="form-control" id="horaInicio" name="horaInicio" value="{{actividad.horaInicio}}">
+                            </div>
+                            
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="horaFin">Hora Fin</label>
+                            <input type="time" class="form-control" id="horaFin" name="horaFin" value="{{actividad.horaFin}}">
+                            </div>
+                        </div>
+
+                    </div>
+                    {% if estado == 'Borrador' or estado == 'Inscripciones' %}
+                    <div class="form-group">
+                        <br>
+                        <button class="btn btn-success btn-lg btn-block" type="submit">Guardar Cambios</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+
+    </form>
+    
+</div>
+<div class="row">
+    <div class="col">
+        <div id="ambientes" class="container marquito">
+            <br>
+            <h3>Ambientes</h3>
+            <div class="row">
+                <div class="col-1"></div>
+                <div id="activities-list" class="col">
+                    {%for ambiente in ambientes%}
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> {{ambiente.nombre}}</div>
+                                <div class="col-2 text-right">
+                                    {% if estado == 'Borrador' %}
+                                    <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fas fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarAmbiente',idActividad = actividad.id,idAmbiente = ambiente.id)}}"><i class="fas fa-trash"> </i></a>
+                                    {% else %}
+                                    <a href=""><i class="fas fa-eye"> </i></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {%endfor%}
+
+                    <p class="text-center">
+                        <button id="crearAmbienteButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar ambiente</button>
+                    </p>
+
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col">
+        <div id="materiales" class="container marquito">
+            <br>
+            <h3>Materiales</h3>
+            
+            <div class="row">
+                <div class="col-1"></div>
+                <div id="materials-list" class="col">
+                    {% for material in materiales %}
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col"> {{material.nombre}}</div>
+                                <div class="col-2 text-right">
+                                    <a href="" onclick="setModalMaterialModificar('{{material.id}}')" data-toggle="modal" data-target="#materialModal"><i class="fas fa-pencil"> </i></a>
+                                    <a href="{{url_for('eliminarMaterial',idActividad = actividad.id,idMaterial = material.id)}}"><i class="fas fa-trash"> </i></a> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {%endfor%}
+
+                    <p class="text-center">
+                        <button id="crearMaterialButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar material</button>
+                    </p>
+
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+{% block script %}
+    <script>
+        //Ambientes
+        function generarModalAmbiente(){
+            //id,titulo, datosForm
+            let id = "ambienteModal"
+            let titulo = "Ambiente"
+            let datosForm = [
+                {"nombre":"idAmbiente","tipo_dato":"text","extra":String.raw`style="display: none;"`},
+                {"nombre":"nombreAmbiente","tipo_dato":"text","texto":"Nombre del Ambiente"},
+                {"nombre":"tipoAmbiente","tipo_dato":"text","texto":"Tipo de Ambiente"},
+                {"nombre":"descripcionBreve","tipo_dato":"text","texto":"Descripción Breve"},
+                {"nombre":"aforo","tipo_dato":"number","texto":"Aforo"},
+            ]
+            let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
+            BOOSTTRAP.Utilities.onlyChild("modalAmbienteContainer",formModal)//Agrega el modal al doc
+            BOOSTTRAP.Utilities.convertToCallModal("crearAmbienteButton",id)
+        }
+        
+        function getInfoAmbiente(id,idModalAmbiente){
+            const request = new XMLHttpRequest();
+            request.open('GET', "/obtenerAmbiente/"+id, false);
+            
+            request.onload = () => {
+                const data = JSON.parse(request.responseText);
+                BOOSTTRAP.Forms.fillForm(data,idModalAmbiente)
+            };
+            request.send({id:id})
+        }
+        
+        function setModalAmbienteModificar(id){
+            let idModalAmbiente = "ambienteModal-form"
+            BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente',idActividad = actividad.id)}}")
+            BOOSTTRAP.Forms.resetForm(idModalAmbiente)
+            getInfoAmbiente(id,idModalAmbiente)
+            //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
+        }
+        function setModalAmbienteCrear(){
+            let idModalAmbiente = "ambienteModal-form"
+            BOOSTTRAP.Utilities.setTitle("ambienteModal","Crear nuevo Ambiente")
+            BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('crearAmbiente',idActividad = actividad.id)}}")
+            BOOSTTRAP.Forms.resetForm(idModalAmbiente)
+            //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
+        }
+
+        //Materiales
+        function generarModalMaterial(){
+            //id,titulo, datosForm
+            let id = "materialModal"
+            let titulo = "Material"
+            let datosForm = [
+                {"nombre":"idMaterial","tipo_dato":"text","extra":String.raw`style="display: none;"`},
+                {"nombre":"nombreMaterial","tipo_dato":"text","texto":"Nombre del Material"},
+                {"nombre":"tipoMaterial","tipo_dato":"text","texto":"Tipo de Material"},
+                {"nombre":"descripcionBreve","tipo_dato":"text","texto":"Descripción Breve"},
+                {"nombre":"stockInicial","tipo_dato":"number","texto":"Stock Inicial"},
+                {"nombre":"costoUnitario","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Costo Unitario"}
+            ]
+            let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(id,titulo,datosForm)
+            BOOSTTRAP.Utilities.onlyChild("modalMaterialContainer",formModal)//Agrega el modal al doc
+            BOOSTTRAP.Utilities.convertToCallModal("crearMaterialButton",id)
+        }
+        
+        function getInfoMaterial(id,idModalMaterial){
+            const request = new XMLHttpRequest();
+            request.open('GET',  "/obtenerMaterial/"+id, false);
+            
+            request.onload = () => {
+                const data = JSON.parse(request.responseText);
+                BOOSTTRAP.Forms.fillForm(data,idModalMaterial)
+            };
+            request.send({id:id})
+        }
+        
+        function setModalMaterialModificar(id){
+            let idModalMaterial = "materialModal-form"
+            BOOSTTRAP.Utilities.setTitle("materialModal","Modificar Material")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('modificarMaterial',idActividad = actividad.id)}}")
+            BOOSTTRAP.Forms.resetForm(idModalMaterial)
+            getInfoMaterial(id,idModalMaterial)
+        }
+        function setModalMaterialCrear(){
+            let idModalMaterial= "materialModal-form"
+            BOOSTTRAP.Utilities.setTitle("materialModal","Crear nuevo Material")
+            BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('crearMaterial',idActividad = actividad.id)}}")
+            BOOSTTRAP.Forms.resetForm(idModalMaterial)
+        }
+
+        window.onload = ()=>{
+            //Material
+            generarModalMaterial()
+            document.getElementById("crearMaterialButton").addEventListener('click',setModalMaterialCrear)
+            //Ambiente
+            generarModalAmbiente()
+            document.getElementById("crearAmbienteButton").addEventListener('click',setModalAmbienteCrear)
+        }
+
+
+    </script>
+{% endblock %}
+</html>

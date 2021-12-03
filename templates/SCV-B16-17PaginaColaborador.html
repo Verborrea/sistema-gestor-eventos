@@ -1,0 +1,58 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+    
+    <h1>¡Bienvenido Colaborador!</h1>
+    <div id="listaEventosDisponiblesParticipanteContainer"></div>
+    
+    <br>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nombre del Evento</th>
+                <th scope="col">Asistencias</th>
+                <th scope="col">Materiales</th>
+                <th scope="col">Obtener Códigos QR</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(len.general) %}
+            <tr>
+                <th scope="row">{{i+1}}</th>
+                <th >{{general[i].nombreEvento}}</th>
+                <td>
+                    <form action="{{url_for('asistencia')}}">
+                        <input type="text" value="{{idEvento}}" name="idEvento" style="display: none;">
+                        <button id="" class="btn btn-primary btn-sm" type="submit">
+                            <span class="fas fa-check-circle"></span>
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <form action="{{url_for('materiales')}}">
+                        <input type="text" value="{{idEvento}}" name="idEvento" style="display: none;">
+                        <button id="" class="btn btn-primary btn-sm" type="submit">
+                            <span class="fas fa-thumbtack"></span>
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <form action="{{url_for('obtenerCodigoQR')}}">
+                        <input type="text" value="{{idEvento}}" name="idEvento" style="display: none;">
+                        <button id="" class="btn btn-primary btn-sm" type="submit">
+                            <span class="fas fa-qrcode"></span>
+                        </button>
+                    </form>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+       
+        
+
+        
+{% endblock %}
+</html>

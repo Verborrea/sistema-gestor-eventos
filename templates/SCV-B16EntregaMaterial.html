@@ -1,0 +1,131 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+        <h1>Entrega de materiales</h1>
+        <form method="post">
+        <div id="registrarEntregaMaterialContainer"></div>
+        
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="form-group col-sm">
+                    <label for="inputAmbiente">Ambiente</label>
+                    <select id="inputAmbiente" class="form-control" name="ambiente" onchange="getActividades(this.value)" required>
+                        <option value="null"> ... </option>
+                        {% for i in range(len.Ambiente)%}
+                        <option value="{{ ambiente[i].id }}">{{ ambiente[i].texto }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-sm">
+                    <label for="inputActividad">Actividad</label>
+                    <select id="inputActividad" class="form-control" name="actividad" onchange="getParticipantes(this.value)" required>
+                        <option value="none" selected>Seleccione un ambiente primero</option>
+                        
+                    </select>
+                </div>
+    
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Participante</th>
+                    <th scope="col">Material Asignado</th>
+                    <th scope="col">Confirmación</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                
+            </tbody>
+        </table>
+        </form>
+        <input id="Who" type="text" value="" style="display: none;" name="idParticipante">
+{% endblock %}
+{% block script %}
+<script>
+    var idAmbienteSeleccionado = ""
+    let idAmbiente = "inputAmbiente"
+    let idActividad = "inputActividad"
+    let idTablaBody = "tbody"
+    function getActividades(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerActividadesAmbiente/", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idActividad," ")
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let actividad = data.actividad
+            let optionsHtml = String.raw`<option value="none" selected> ... </option>`
+            for (let i in actividad){
+                optionsHtml+=String.raw`<option value="${actividad[i].id}">${actividad[i].nombre}</option>`
+            }
+            BOOSTTRAP.Utilities.onlyChild(idActividad,optionsHtml)
+            idAmbienteSeleccionado = idAmb
+        };
+        request.send(idAmb=idAmb)
+    }
+    //
+    idModal = "ConfirmarEntregaMaterial"
+    function generarModalConfirmacion(participante,material,idParticipante){
+            //id,titulo, datosForm
+            let titulo = "¿ Desea confirmar la entrega de materiales? "
+            let body=String.raw`
+            
+            <div class="row marquito">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <div class="text-center">
+                        <br>
+                        <h3>Participante</h3>
+                        <h4>${participante}</h4>
+                        
+                        <h3>Material</h3>
+                        <h4>${material}</h4>
+                        <br>
+                    </div> 
+                </div>
+                <div class="col-1"></div>
+            </div>
+            
+            `
+            let footer=String.raw`
+            <div>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success">Continuar</button>
+            <div>
+            `
+            let formModal = BOOSTTRAP.GenerateSimple.buildModal(titulo,body,footer,idModal,"")
+            document.getElementById("Who").value =idParticipante
+            BOOSTTRAP.Utilities.onlyChild("registrarEntregaMaterialContainer",formModal)//Agrega el modal al doc
+    }
+
+    //Obtener Participantes
+
+    function getParticipantes(idAct){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerParticipantesActividadAmbiente/", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let participante = data.participante
+            let tableRows = ""
+            for (let i in participante){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${i+1}</th>
+                    <th >${participante[i].participante}</th>
+                    <th >${participante[i].materialAsignado}</th>
+                    <td><button type="button" data-toggle="modal" data-target="#ConfirmarEntregaMaterial"
+                        onclick="generarModalConfirmacion('${participante[i].participante}','${participante[i].materialAsignado}','${participante[i].idparticipante}')"
+                        id="" class="btn btn-primary"> Entregar</button></td>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
+        };
+        request.send(idAmbiente=idAmbienteSeleccionado,idAct=idAct)
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+        <h1>Bienvenido a Caja</h1>
+        <div id="modalEleccionContainer"></div>
+        <div id="modalIngresoContainer"></div>
+        <div id="modalEgresoContainer"></div>
+
+        <br>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <button id="registrarMovimiento" class="btn btn-outline-primary btn-block" type="button">
+                    <i class="fas fa-plus"></i> Registrar Movimiento
+                </button>
+                
+            </div>
+            <div class="col-4"></div>
+        </div>
+        <br>
+        <div>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-link active" id="nav-general-tab" data-toggle="tab" href="#nav-general" role="tab" aria-controls="nav-general" aria-selected="true">General</a>
+                    <a class="nav-link" id="nav-ingresos-tab" data-toggle="tab" href="#nav-ingresos" role="tab" aria-controls="nav-ingresos" aria-selected="false">Ingresos</a>
+                    <a class="nav-link" id="nav-egresos-tab" data-toggle="tab" href="#nav-egresos" role="tab" aria-controls="nav-egresos" aria-selected="false">Egresos</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.general) %}
+                            <tr>
+                                <th scope="row">{{general[i].numero}}</th>
+                                <td>{{general[i].concepto}}</td>
+                                <td>{{general[i].tipo}}</td>
+                                <td>{{general[i].monto}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.general}}</h5>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane fade" id="nav-ingresos" role="tabpanel" aria-labelledby="nav-ingresos-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.ingresos) %}
+                            <tr>
+                                <th scope="row">{{ingresos[i].numero}}</th>
+                                <td>{{ingresos[i].concepto}}</td>
+                                <td>{{ingresos[i].monto}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.ingresos}}</h5>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-egresos" role="tabpanel" aria-labelledby="nav-egresos-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Número de recibo</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(len.egresos) %}
+                            <tr>
+                                <th scope="row">{{egresos[i].numero}}</th>
+                                <td>{{egresos[i].numeroRecibo}}</td>
+                                <td>{{egresos[i].concepto}}</td>
+                                <td>{{egresos[i].cantidad}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <h5>Balance: {{balance.egresos}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+{% endblock %}
+{% block script %}
+    <script>
+        function cargarBotonesModal(){
+            idModal = "modalEleccion"
+            modalIngreso = "RegistrarMovimientoIngresoModal"
+            modalEgreso = "RegistrarMovimientoEgresoModal"
+            let buttons = String.raw`
+            <div class="marquito" style="padding: 1%;">
+                <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#${modalIngreso}">Ingreso</button>
+                <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#${modalEgreso}">Egreso</button>
+            </div>
+            `
+            let modalEleccion = BOOSTTRAP.GenerateSimple.buildModal("Nuevo Movimiento",buttons,"",idModal,"")
+            BOOSTTRAP.Utilities.onlyChild("modalEleccionContainer",modalEleccion)
+            BOOSTTRAP.Utilities.convertToCallModal("registrarMovimiento",idModal)
+        }
+        function formularioMovimiento(){
+            let idModalEgreso = "RegistrarMovimientoEgresoModal"
+            let idModalIngreso = "RegistrarMovimientoIngresoModal"
+            let datosForm1 = [{"nombre":"concepto","tipo_dato":"text","texto":"Nombre"},
+                {"nombre":"detalle","tipo_dato":"text","texto":"Detalle"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Monto"},
+            ]
+            let datosForm2 = [{"nombre":"nombre","tipo_dato":"text"},
+                {"nombre":"factura","tipo_dato":"text","texto":"Factura"},
+                {"nombre":"detalle","tipo_dato":"text","texto":"Detalle"},
+                {"nombre":"monto","tipo_dato":"number","extra":String.raw`step='.01'`,"texto":"Monto"},
+            ]
+            formModal1 = BOOSTTRAP.GenerateComplex.buildFormModal(
+                idModalEgreso,
+                "Nuevo Movimiento Egreso",
+                datosForm1,
+                BOOSTTRAP.Utilities.basicButton("Confirmar") + BOOSTTRAP.Utilities.basicButton("Cancelar",'cancelEgreso','btn-outline-danger','reset')
+            )
+            formModal2 = BOOSTTRAP.GenerateComplex.buildFormModal(
+                idModalIngreso,
+                "Nuevo Movimiento Ingreso",
+                datosForm2,
+                BOOSTTRAP.Utilities.basicButton("Confirmar") + BOOSTTRAP.Utilities.basicButton("Cancelar",'cancelIngreso','btn-outline-danger','reset')
+            )
+
+            BOOSTTRAP.Utilities.onlyChild("modalEgresoContainer",formModal1)
+            BOOSTTRAP.Utilities.onlyChild("modalIngresoContainer",formModal2)
+            BOOSTTRAP.Forms.setActionMethod(idModalEgreso+"-form","{{ url_for('nuevoEgreso') }}")
+            BOOSTTRAP.Forms.setActionMethod(idModalIngreso+"-form","{{ url_for('nuevoIngreso') }}")
+           
+        }
+
+        cargarBotonesModal()
+        formularioMovimiento()
+        
+    </script>
+{% endblock %}
+</html>
