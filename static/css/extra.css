@@ -1,0 +1,51 @@
+label::first-letter th::first-letter{
+    text-transform: uppercase;
+}
+.marquito{
+    margin: 10px;
+    box-sizing: border-box;
+    border: 2.25px solid skyblue;
+    border-style: dashed;
+    border-radius: 5px;
+    background-color: white;
+}
+.breveDescripcion{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+.breveTitulo {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.dot {
+    top: 15%;
+    right: 8%;
+
+    position: absolute;
+    height: 350px;
+    width: 350px;
+    background-color: rgb(214, 242, 246);
+    border-radius: 50%;
+    display: inline-block;
+    z-index: -2;
+}
+
+.datosEventos{
+    margin-bottom: -2.5vh;
+    padding: 3% 5% 2% 5%;
+}
+
+.gray {
+    top: 14%;
+    left: 0px;
+    position: absolute;
+    height: 350px;
+    width: 100%;
+    background-color: #F0F0F0;
+    display: inline-block;
+    z-index: -2;
+}
