@@ -1,5 +1,7 @@
 from markupsafe import escape
 from models import *
+from sendEmail import *
+
 import json
 
 loremLipsum='''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum aliquet metus, sed hendrerit quam maximus ut. Sed cursus mi ut ligula dapibus elementum. Proin vel finibus arcu. Ut tincidunt ornare velit, vel lacinia lectus. Fusce ante mi, posuere nec feugiat at, suscipit non magna. Ut facilisis ultricies enim, in rutrum sapien tempus vehicula. In imperdiet dolor sed volutpat sodales'''
@@ -703,6 +705,10 @@ def registrarse(id):
         if usuario_evento == None:
             session['eventoReg'] = id
             registrarUsuario(session['idUsuario'])
+        
+        user = Usuario.query.get_or_404(session['idUsuario'])
+        sedEmail(user.email)    
+        
         return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
     session['eventoReg'] = id
     return redirect(url_for('login'))
@@ -861,17 +867,53 @@ def gestionar_inscripcion():
         for pqt in dictPaquetes:
             categoria_paquete[cat][pqt] = 5
 
-    #Datos provisionales para probar, no llenar, reusaremos la tabla con otros datos
-    general = [#la numeracion de 1 a n
-        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
-    ]
-    preinscritos = [#numeracion igual a la de general
-        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
-    ]
-    inscritos = [
-        {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
-    ]
+    #  Usuarios en el Evento #
+    idUsuariosG = []
+    idUsuariosPre = []
+    idUsuariosIns = []
+    
+    usuarioEventos = Usuario_Evento.query.filter_by(idEvento = session['idEvento'])
+    for ue in usuarioEventos:
+        if ue.estaInscrito == True: 
+            idUsuariosIns.append(ue.idUsuario)
+        elif ue.estaInscrito == False:
+            idUsuariosPre.append(ue.idUsuario)
+        idUsuariosG.append(ue.idUsuario)
 
+    #  Listado de Usuarios General #
+    general = []
+    usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosG)).all()
+    for usuario in usuarios:
+        general.append({
+            "numero":usuario.id,
+            "nombre":usuario.nombre,
+            "documento":usuario.doc,
+            "tipoDocumento":usuario.tipodoc
+        })
+
+    
+    #  Listado de Usuarios PreInscritos #
+    preinscritos = []
+    usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosPre)).all()
+    for usuario in usuarios:
+        preinscritos.append({
+            "numero":usuario.id,
+            "nombre":usuario.nombre,
+            "documento":usuario.doc,
+            "tipoDocumento":usuario.tipodoc
+        })
+    
+    #  Listado de Usuarios Inscritos #
+    inscritos = []
+    usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosIns)).all()
+    for usuario in usuarios:
+        preinscritos.append({
+            "numero":usuario.id,
+            "nombre":usuario.nombre,
+            "documento":usuario.doc,
+            "tipoDocumento":usuario.tipodoc
+        })
+        
     lens={
         "general" : len(general),
         "preinscritos" : len(preinscritos),
