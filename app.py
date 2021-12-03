@@ -899,7 +899,7 @@ def obtenerCodigoQR():
     return "obtenerCodigoQR de: "
 
 @app.route('/colaborador/', methods=['POST','GET'])
-def pruebaColaborador():
+def colaborador():
     print("poner en el index")
     general=[
         {"nombreEvento":"Evento 1"}
