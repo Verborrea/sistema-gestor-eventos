@@ -663,6 +663,9 @@ def create_user():
     )
     db.session.add(nuevo_usuario)
     db.session.commit()
+    
+    sedEmail(request.form.get('correo'))
+    
     # registro en el evento
     if 'eventoReg' in session:
         registrarUsuario(nuevo_usuario.id)
@@ -705,9 +708,6 @@ def registrarse(id):
         if usuario_evento == None:
             session['eventoReg'] = id
             registrarUsuario(session['idUsuario'])
-        
-        user = Usuario.query.get_or_404(session['idUsuario'])
-        sedEmail(user.email)    
         
         return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
     session['eventoReg'] = id
