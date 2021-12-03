@@ -822,18 +822,58 @@ def gestionar_inscripcion():
         descuento = descuento
     )
 
+# ================== gestion administrativa ==================
 @app.route('/gestionarUsuario/', methods=['POST','GET'])
 def gestionarUsuario():
-    general =[
-        {'tipoUsuario':'Colaborador','nombre':'A','correo':'a@a.a','permisos':'todos'}
-    ]
+    if request.method == 'POST':
+        nuevoUsuario = Usuario(
+            tipoUsuario = request.form.get('tipoUsuario'),
+            username = request.form.get('nombreUsuario'),
+            password = request.form.get('contrasenia'),
+            nombre = request.form.get('nombreCompleto'),
+            email = request.form.get('correo')
+        )
+        db.session.add(nuevoUsuario)
+        db.session.commit()
+        
+        nuevoUsuarioEvento = Usuario_Evento(
+            idUsuario = nuevoUsuario.id,
+            idEvento = session['idEvento'],
+            idCategoria_Paquete = '0',
+            estaInscrito = False
+        )
+        db.session.add(nuevoUsuarioEvento)
+        db.session.commit()
+        
+    idUsuarios = []
+    usuarioEventos = Usuario_Evento.query.filter_by(idEvento = session['idEvento'])
+    for ue in usuarioEventos:
+        idUsuarios.append(ue.idUsuario)
+
+    listaUsuarios = []
+    usuarios = Usuario.query.filter(Usuario.id.in_(idUsuarios)).all()
+    for usuario in usuarios:
+        permisoUsuario = ""
+        if usuario.tipoUsuario == "Admin":
+            permisoUsuario = "Todos"
+        else:
+            permisoUsuario = "Restringido"
+        
+        if usuario.tipoUsuario != "Participante":
+            listaUsuarios.append({
+                "tipoUsuario":usuario.tipoUsuario,
+                "nombre":usuario.nombre,
+                "correo":usuario.email,
+                "permisos":permisoUsuario
+            })
+
     lens={
-        'general' : len(general)
+        'general' : len(listaUsuarios)
     }
     return render_template(
         "SCV-B08CrearUsuario.html",
-        idEvento="0",
-        general=general,
+        idEvento=session['idEvento'],
+        general=listaUsuarios,
         len = lens
     )
 

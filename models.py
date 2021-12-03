@@ -117,4 +117,4 @@ class Usuario_Evento(db.Model):
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     idCategoria_Paquete = db.Column(db.Integer, db.ForeignKey('categoria_paquete.id'))
-    estaInscrito = db.Column(db.Boolean, nullable=False)
+    estaInscrito = db.Column(db.Boolean, nullable=True)
