@@ -77,7 +77,7 @@ def listaEventos():
             'estadoEvento':evento.estado
         })
     session.pop('idEvento', None)
-    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():
@@ -636,8 +636,12 @@ def create_user():
 
 @app.route('/')#para probar la vista de participante
 def index():
+    var_notShow = False
     if 'tipoUsuario' not in session:
         session['tipoUsuario'] = 'Visitante'
+    else:
+        if session['tipoUsuario'] not in ['Visitante','Participante'] :
+            var_notShow = True
     eventos = []
     info = Evento.query.all()
     nom_usuario = 'no existe'
@@ -652,7 +656,7 @@ def index():
                 "summary" : evento.descripcion
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
-    return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size)
+    return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size,notShow=var_notShow)
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
