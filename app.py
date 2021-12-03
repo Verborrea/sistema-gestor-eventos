@@ -33,26 +33,26 @@ def breakArr(array,division):
 
 # =============== creacion de un administrador primigenio =============== #
 
-# usuario_admin = Usuario.query.filter_by(
-#     username = 'admin',
-#     tipoUsuario = 'Admin',
-#     password = 'admin',
-#     nombre = 'Administrador',
-#     email = 'admin@sge.com'
-# ).first()
+usuario_admin = Usuario.query.filter_by(
+    username = 'admin',
+    tipoUsuario = 'Admin',
+    password = 'admin',
+    nombre = 'Administrador',
+    email = 'admin@sge.com'
+).first()
 
-# if usuario_admin:
-#     print("Admin exists")
-# else:
-#     nuevo_usuario = Usuario(
-#         username = 'admin',
-#         tipoUsuario = 'Admin',
-#         password = 'admin',
-#         nombre = 'Administrador',
-#         email = 'admin@sge.com'
-#     )
-#     db.session.add(nuevo_usuario)
-#     db.session.commit()
+if usuario_admin:
+    print("Admin exists")
+else:
+    nuevo_usuario = Usuario(
+        username = 'admin',
+        tipoUsuario = 'Admin',
+        password = 'admin',
+        nombre = 'Administrador',
+        email = 'admin@sge.com'
+    )
+    db.session.add(nuevo_usuario)
+    db.session.commit()
 
 # ============================== eventos ============================== #
 
@@ -85,6 +85,8 @@ def seleccionarevento():
         id = request.form.get('selection')
         if id==None:
             return redirect(url_for('listaEventos'), code=302)
+    if session['tipoUsuario'] == 'Caja':
+        return redirect(url_for('validarInscripcion'), code=302)
     return redirect(url_for('evento',idEvento=id), code=302)
     
 @app.route('/evento/<idEvento>', methods=['GET','POST'])
@@ -663,7 +665,7 @@ def index():
     if 'tipoUsuario' not in session:
         session['tipoUsuario'] = 'Visitante'
     else:
-        if session['tipoUsuario'] not in ['Visitante','Participante'] :
+        if session['tipoUsuario'] == 'Administrador' :
             var_notShow = True
     eventos = []
     info = Evento.query.all()
@@ -982,7 +984,7 @@ def porTransferencia():
 def porEfectivo():
     return "yei"
 
-@app.route('/validarInscripcion/', methods=['POST','GET'])
+@app.route('/validarInscripcion', methods=['POST','GET'])
 def validarInscripcion():
     lens={
         "general":1
@@ -993,7 +995,7 @@ def validarInscripcion():
             {"codigoPago":"EST", "categoria":"Estudiante", "paquete":"Estudiante Starter Pack", "monto":70}
         ],#codigoPago, categoria, presupuesto, monto
         lens = lens,
-        tipoUsuario = "Caja"
+        tipoUsuario = session['tipoUsuario']
     )
 
 @app.route('/asistencia', methods=['POST','GET'])
