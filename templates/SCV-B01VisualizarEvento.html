@@ -60,17 +60,19 @@
                                 <td scope="row">{{categoria[i]}}</td>
                                 {% for j in range(paquetes)%}
                                     <td>{{categoria_paquete[categoria[i]][paquete[j]]}}</td>
-                                {%endfor%}
+                                {% endfor %}
                                 
                             </tr>
-                            {%endfor%}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
+            {% if tipoUsuario != "Admin" and disponible == True%}
             <div class="text-center">
                 <a href="{{url_for('registrarse',id=evento.id)}}" class="btn btn-primary btn-lg">    PreInscribirse    </a>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

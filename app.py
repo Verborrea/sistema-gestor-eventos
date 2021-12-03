@@ -102,6 +102,23 @@ def evento(idEvento):
             "nombre":actividad.nombre
         })
 
+    # actualizar fecha inicial y final
+    if actividades:
+        fechaMin = miEvento.fechaInicio
+        fechaMax = miEvento.fechaFin
+        if not fechaMin:
+            fechaMin = actividad.fechaInicio.date()
+        if not fechaMax:
+            fechaMax = actividad.fechaFin.date()
+        for actividad in actividades:
+            if actividad.fechaInicio.date() < fechaMin:
+                fechaMin = actividad.fechaInicio.date()
+            if actividad.fechaFin.date() > fechaMax:
+                fechaMax = actividad.fechaFin.date()
+        miEvento.fechaInicio = fechaMin
+        miEvento.fechaFin = fechaMax
+        db.session.commit()
+
     return render_template(
         'SCV-B10MenuEvento.html',
         estado = miEvento.estado,
@@ -677,7 +694,14 @@ def registrarse(id):
 @app.route('/visualizarEvento/<id>')
 def verEvento(id):
     miEvento = Evento.query.get_or_404(id)
-
+    mePuedoInscribir = True
+    if 'idUsuario' in session:
+        usuario_evento = Usuario_Evento.query.filter_by(
+            idUsuario = session['idUsuario'],
+            idEvento = id
+        ).first()
+        if usuario_evento:
+            mePuedoInscribir = False
     evento = {
         "id": id,
         "title": miEvento.nombre,
@@ -719,6 +743,7 @@ def verEvento(id):
     categorias = 2
     paquetes = 3
     return render_template('SCV-B01VisualizarEvento.html',
+        notShow=True,
         evento=evento,
         actividad=actividades,
         lenActividad=len(actividades),
@@ -727,6 +752,7 @@ def verEvento(id):
         paquetes=paquetes,
         paquete=paquete,
         categoria=categoria,
+        disponible=mePuedoInscribir,
         tipoUsuario = session['tipoUsuario']
     )
 
@@ -745,51 +771,80 @@ def navbar(tipoUsuario):
 # ================== gestionar inscripciones ==================
 @app.route('/obtenerNombreActividades/', methods=['GET','POST'])
 def obtenerNombreActividades():
-    actividades =[
-        {"id":"A01","nombre":"Conferencia"},
-        {"id":"A01","nombre":"Conferencia2"},
-        {"id":"A01","nombre":"Conferencia3"},
-        {"id":"A01","nombre":"Conferencia4"},
-        {"id":"A01","nombre":"Conferencia5"}
-    ]
+    miEvento = Evento.query.get_or_404(session['idEvento'])
+    misActividades = miEvento.actividades
+    actividades = []
+    for act in misActividades:
+        actividades.append({
+            "id":act.id,
+            "nombre":act.nombre
+        })
     return json.dumps(actividades)
 
 @app.route('/crearCategoria/', methods=['POST'])
-def crearCategoria(id):
-    return "creo"
+def crearCategoria():
+    nombreCategoria = request.form.get('nombreCategoria')
+
+    if nombreCategoria != None:
+        nombreCategoria = Categoria(
+            idEvento = session['idEvento'],
+            nombre = request.form.get('nombreCategoria'),
+            monto = 0
+        )
+
+        db.session.add(nombreCategoria)
+        db.session.commit()
+
+    return redirect(url_for(gestionar_inscripcion))
+
 @app.route('/crearPaquete/', methods=['POST'])
-def crearPaquete(id):
-    return "creo"
+def crearPaquete():
+
+    nombrePaquete = request.form.get('nombrePaquete')
+
+    if nombrePaquete != None:   
+        nuevoPaquete = Paquete(
+            idEvento = session['idEvento'],
+            nombre = request.form.get('nombrePaquete'),
+            monto = 0
+        )
+
+        db.session.add(nuevoPaquete)
+        db.session.commit()
+
+    return redirect(url_for(gestionar_inscripcion))
 
 @app.route('/gestionar_inscripcion/', methods=['GET','POST'])
 def gestionar_inscripcion():
     miEvento = Evento.query.get_or_404(session['idEvento'])
-    descuento = 10#numero del 1 al 100
+    descuento = miEvento.prcntjDscnto #numero del 1 al 100
     #fechas del evento
     fecha = {
-        "Preinscripción":"010101",
-        "Inscripciones":"010101",
-        "Descuento":"010101",
+        "Preinscripción" : miEvento.fechaPreInscripcion,
+        "Inscripciones": miEvento.fechaPreInscripcion,
+        "Descuento": descuento,
     }
 
     #categoriaPaquete
-    paquete=["Paquete 1","Paquete 2","Paquete 3"]
-    categoria=["Categoria 1","Categoria 2"]
-    categoria_paquete = {
-        "Categoria 1":{
-            "Paquete 1":5,
-            "Paquete 2":10,
-            "Paquete 3":7,
-        },
-        "Categoria 2":{
-            "Paquete 1":6,
-            "Paquete 2":11,
-            "Paquete 3":6,
-        }
-    }
-    categorias = 2
-    paquetes = 3
-    
+    misCategorias = miEvento.categorias
+    dictCategorias = []
+    dictPaquetes = []
+    for categoria in misCategorias:
+        dictCategorias.append({
+            categoria.nombre
+        })
+    misPaquetes = miEvento.paquetes
+    for paquete in misPaquetes:
+        dictPaquetes.append({
+            paquete.nombre
+        })
+
+    categoria_paquete = {}
+    for cat in dictCategorias:
+        categoria_paquete[cat] = {}
+        for pqt in dictPaquetes:
+            categoria_paquete[cat][pqt] = 5
+
     #Datos provisionales para probar, no llenar, reusaremos la tabla con otros datos
     general = [#la numeracion de 1 a n
         {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
@@ -800,7 +855,6 @@ def gestionar_inscripcion():
     inscritos = [
         {"numero":1,"nombre":"Dino","apellido":"dino","documento":"156","tipoDocumento":"Nadie lo sabee"}
     ]
-
 
     lens={
         "general" : len(general),
@@ -818,10 +872,10 @@ def gestionar_inscripcion():
         len=lens,
         nombreEvento="nombreEvento",
         categoria_paquete=categoria_paquete,
-        categorias=categorias,
-        paquetes=paquetes,
-        paquete=paquete,
-        categoria=categoria,
+        categorias=len(dictCategorias),
+        paquetes=len(dictPaquetes),
+        paquete=dictPaquetes,
+        categoria=dictCategorias,
         tipoUsuario = "",
         fecha = fecha,
         descuento = descuento
@@ -884,21 +938,25 @@ def gestionarUsuario():
 
 @app.route('/listaEventosParticipante/', methods=['POST','GET'])
 def listaEventosParticipante():
-    usuarioEventos = Usuario_Evento.query.filterby(idUsuario = session['idUsuario'])
+    usuarioEventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
     idEventos = []
     for ue in usuarioEventos:
         idEventos.append(ue.idEvento)
     listaIdEventos = []
     for idEvento in idEventos:
         evento = Evento.query.get_or_404(idEvento)
-        usuarioEvento = Usuario_Evento.query.filterby(
+        usuarioEvento = Usuario_Evento.query.filter_by(
             idUsuario = session['idUsuario'],
             idEvento = evento.id).first()
+        estaInscrito = "No"
+        if usuarioEvento.estaInscrito == True:
+            estaInscrito = "Sí"
         listaIdEventos.append({
+            "idEvento":evento.id,
             "nombre":evento.nombre,
             "estado":evento.estado,
-            "fechaInicioEvento":"ahora",
-            "estaInscrito": usuarioEvento.estaInscrito
+            "fechaInicioEvento":evento.fechaInicio.strftime("%d/%m/%Y"),
+            "estaInscrito": estaInscrito
         })
     lens={
         'general' : len(listaIdEventos)
@@ -906,7 +964,8 @@ def listaEventosParticipante():
     return render_template(
         "SCV-B20VisualizarListaEventosParticipante.html",
         general=listaIdEventos,
-        len = lens
+        len = lens,
+        tipoUsuario = session['tipoUsuario']
     )
 
 @app.route('/porTransferencia/', methods=['POST','GET'])

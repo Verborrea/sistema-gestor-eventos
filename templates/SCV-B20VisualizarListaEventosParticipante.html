@@ -24,7 +24,7 @@
                     <td>{{general[i].estado}}</td>
                     <td>{{general[i].fechaInicioEvento}}</td>
                     <td>{{general[i].estaInscrito}}</td>
-                    <td><a href="{{ url_for('verEvento',id=idEvento) }}" id="" class="btn btn-primary btn-lg btn-block" ><i class="fas fa-info-circle"></i></a></td>
+                    <td><a href="{{ url_for('verEvento',id=general[i].idEvento) }}" id="" class="btn btn-primary btn-lg btn-block" ><i class="fas fa-info-circle"></i></a></td>
 
                 </tr>
                 {% endfor %}
