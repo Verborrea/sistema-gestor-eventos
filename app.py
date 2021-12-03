@@ -84,7 +84,7 @@ def seleccionarevento():
     if request.method == 'POST':
         id = request.form.get('selection')
         if id==None:
-            return redirect(url_for('index'), code=302)
+            return redirect(url_for('listaEventos'), code=302)
     return redirect(url_for('evento',idEvento=id), code=302)
     
 @app.route('/evento/<idEvento>', methods=['GET','POST'])
@@ -763,6 +763,7 @@ def crearPaquete(id):
 
 @app.route('/gestionar_inscripcion/', methods=['GET','POST'])
 def gestionar_inscripcion():
+    miEvento = Evento.query.get_or_404(session['idEvento'])
     descuento = 10#numero del 1 al 100
     #fechas del evento
     fecha = {
@@ -809,8 +810,8 @@ def gestionar_inscripcion():
 
     return render_template(
         "SCV-B09GestionarConfiguracionInscripcion.html",
-        idEvento=1,
-        estado="Finalizado",
+        idEvento=session['idEstado'],
+        estado=miEvento.estado,
         general=general,
         preinscritos=preinscritos,
         inscritos=inscritos,
