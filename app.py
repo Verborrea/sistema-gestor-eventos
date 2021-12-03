@@ -616,13 +616,21 @@ def register():
     profesion = [
         {"value":"ING","texto":"Ingeniero"},
         {"value":"ARQ","texto":"Arquitecto"},
-        {"value":"SIS","texto":"Sistemas"}
+        {"value":"SIS","texto":"Sistemas"},
+        {"value":"EST","texto":"Estudiante"}
     ]
     alert = {
         'existe':False,
         'mensaje':''
     }
-    return render_template('Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),msg_alerta=alert)
+    categoria = [
+        {"id":"CAT","texto":"Estudiante"},
+        {"id":"CAT2","texto":"Profesor"},
+    ]
+    lens ={
+        "Categoria":len(categoria),
+    }
+    return render_template('Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),categoria=categoria,len=lens,msg_alerta=alert)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
@@ -1049,6 +1057,17 @@ def obtenerActividadesAmbiente():
     }
     
     return response
+
+@app.route('/obtenerCategoriasPaquete/', methods=['POST','GET'])
+def obtenerCategoriasPaquete():
+    paquete = [
+        {"id":"PAP","nombre":"Basico"}
+    ]
+    response ={
+        "paquete":paquete
+    }
+    return response
+
 
 @app.route('/obtenerParticipantesActividadAmbiente/', methods=['POST','GET'])
 def obtenerParticipantesActividadAmbiente():
