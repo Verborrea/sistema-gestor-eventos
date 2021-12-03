@@ -106,11 +106,11 @@ def evento(idEvento):
     if actividades:
         fechaMin = miEvento.fechaInicio
         fechaMax = miEvento.fechaFin
-        if not fechaMin:
-            fechaMin = actividad.fechaInicio.date()
-        if not fechaMax:
-            fechaMax = actividad.fechaFin.date()
         for actividad in actividades:
+            if not fechaMin:
+                fechaMin = actividad.fechaInicio.date()
+            if not fechaMax:
+                fechaMax = actividad.fechaFin.date()
             if actividad.fechaInicio.date() < fechaMin:
                 fechaMin = actividad.fechaInicio.date()
             if actividad.fechaFin.date() > fechaMax:
