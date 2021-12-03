@@ -12,6 +12,7 @@
                     <th scope="col">Nombre</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Fecha Inicio Evento</th>
+                    <th scope="col">¿Inscrito?</th>
                     <th scope="col">Información</th>
                 </tr>
             </thead>
@@ -22,6 +23,7 @@
                     <th >{{general[i].nombre}}</th>
                     <td>{{general[i].estado}}</td>
                     <td>{{general[i].fechaInicioEvento}}</td>
+                    <td>{{general[i].estaInscrito}}</td>
                     <td><a href="{{ url_for('verEvento',id=idEvento) }}" id="" class="btn btn-primary btn-lg btn-block" ><i class="fas fa-info-circle"></i></a></td>
 
                 </tr>

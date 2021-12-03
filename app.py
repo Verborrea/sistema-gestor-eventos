@@ -33,26 +33,26 @@ def breakArr(array,division):
 
 # =============== creacion de un administrador primigenio =============== #
 
-usuario_admin = Usuario.query.filter_by(
-    username = 'admin',
-    tipoUsuario = 'Admin',
-    password = 'admin',
-    nombre = 'Administrador',
-    email = 'admin@sge.com'
-).first()
+# usuario_admin = Usuario.query.filter_by(
+#     username = 'admin',
+#     tipoUsuario = 'Admin',
+#     password = 'admin',
+#     nombre = 'Administrador',
+#     email = 'admin@sge.com'
+# ).first()
 
-if usuario_admin:
-    print("Admin exists")
-else:
-    nuevo_usuario = Usuario(
-        username = 'admin',
-        tipoUsuario = 'Admin',
-        password = 'admin',
-        nombre = 'Administrador',
-        email = 'admin@sge.com'
-    )
-    db.session.add(nuevo_usuario)
-    db.session.commit()
+# if usuario_admin:
+#     print("Admin exists")
+# else:
+#     nuevo_usuario = Usuario(
+#         username = 'admin',
+#         tipoUsuario = 'Admin',
+#         password = 'admin',
+#         nombre = 'Administrador',
+#         email = 'admin@sge.com'
+#     )
+#     db.session.add(nuevo_usuario)
+#     db.session.commit()
 
 # ============================== eventos ============================== #
 
@@ -884,16 +884,28 @@ def gestionarUsuario():
 
 @app.route('/listaEventosParticipante/', methods=['POST','GET'])
 def listaEventosParticipante():
-    general =[
-        {'nombre':'Evento','estado':'En curso','fechaInicioEvento':'ahora'}
-    ]
+    usuarioEventos = Usuario_Evento.query.filterby(idUsuario = session['idUsuario'])
+    idEventos = []
+    for ue in usuarioEventos:
+        idEventos.append(ue.idEvento)
+    listaIdEventos = []
+    for idEvento in idEventos:
+        evento = Evento.query.get_or_404(idEvento)
+        usuarioEvento = Usuario_Evento.query.filterby(
+            idUsuario = session['idUsuario'],
+            idEvento = evento.id).first()
+        listaIdEventos.append({
+            "nombre":evento.nombre,
+            "estado":evento.estado,
+            "fechaInicioEvento":"ahora",
+            "estaInscrito": usuarioEvento.estaInscrito
+        })
     lens={
-        'general' : len(general)
+        'general' : len(listaIdEventos)
     }
     return render_template(
         "SCV-B20VisualizarListaEventosParticipante.html",
-        idEvento=1,
-        general=general,
+        general=listaIdEventos,
         len = lens
     )
 
