@@ -46,6 +46,8 @@ class Evento(db.Model):
     actividades = db.relationship('Actividad', backref='evento', lazy=True)
     usuarios_eventos = db.relationship('Usuario_Evento', backref='evento', lazy=True)
     movimientos = db.relationship('Movimiento', backref='evento', lazy=True)
+    categorias = db.relationship('Categoria', backref='evento', lazy=True)
+    paquetes = db.relationship('Paquete', backref='evento', lazy=True)
 
 class Actividad(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -94,6 +96,7 @@ class Movimiento(db.Model):
 class Categoria(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
     cat_pqt = db.relationship('Categoria_Paquete', backref='categoria', lazy = True)
 
@@ -101,6 +104,7 @@ class Paquete(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
     monto = db.Column(db.Float, nullable = False)
+    idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
     cat_pqt = db.relationship('Categoria_Paquete', backref='paquete', lazy = True)
 

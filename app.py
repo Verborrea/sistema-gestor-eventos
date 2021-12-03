@@ -33,26 +33,26 @@ def breakArr(array,division):
 
 # =============== creacion de un administrador primigenio =============== #
 
-# usuario_admin = Usuario.query.filter_by(
-#     username = 'admin',
-#     tipoUsuario = 'Admin',
-#     password = 'admin',
-#     nombre = 'Administrador',
-#     email = 'admin@sge.com'
-# ).first()
+usuario_admin = Usuario.query.filter_by(
+    username = 'admin',
+    tipoUsuario = 'Admin',
+    password = 'admin',
+    nombre = 'Administrador',
+    email = 'admin@sge.com'
+).first()
 
-# if usuario_admin:
-#     print("Admin exists")
-# else:
-#     nuevo_usuario = Usuario(
-#         username = 'admin',
-#         tipoUsuario = 'Admin',
-#         password = 'admin',
-#         nombre = 'Administrador',
-#         email = 'admin@sge.com'
-#     )
-#     db.session.add(nuevo_usuario)
-#     db.session.commit()
+if usuario_admin:
+    print("Admin exists")
+else:
+    nuevo_usuario = Usuario(
+        username = 'admin',
+        tipoUsuario = 'Admin',
+        password = 'admin',
+        nombre = 'Administrador',
+        email = 'admin@sge.com'
+    )
+    db.session.add(nuevo_usuario)
+    db.session.commit()
 
 # ============================== eventos ============================== #
 
