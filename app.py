@@ -584,7 +584,7 @@ def login():
             session['idUsuario'] = user.id
             if 'eventoReg' in session:
                 registrarUsuario(user.id)
-                return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
+                return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
             if session['tipoUsuario'] == 'Admin':
                 return redirect(url_for('listaEventos'))
             return redirect(url_for('index'))
@@ -664,7 +664,7 @@ def create_user():
     # registro en el evento
     if 'eventoReg' in session:
         registrarUsuario(nuevo_usuario.id)
-        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
+        return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
     return redirect(url_for('login'))
 
 @app.route('/')#para probar la vista de participante
@@ -703,7 +703,7 @@ def registrarse(id):
         if usuario_evento == None:
             session['eventoReg'] = id
             registrarUsuario(session['idUsuario'])
-        return '<h1>Ya estas registrado en el evento</h1><a href="/">Regresar</a>'
+        return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
     session['eventoReg'] = id
     return redirect(url_for('login'))
 
