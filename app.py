@@ -170,8 +170,14 @@ def modificarEvento():
 def obtenerPlantillas():
 
     plantillas = []
-    eventos = Evento.query.all()
-    for evento in eventos:
+ 
+    usuario_evento = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
+    listaIdEventos = []
+    for usr_evt in usuario_evento:
+        listaIdEventos.append(usr_evt.idEvento)
+
+    for idEvt in listaIdEventos:
+        evento = Evento.query.get_or_404(idEvt)
         plantillas.append({
             "id":evento.id,
             "Nombre":evento.nombre,
