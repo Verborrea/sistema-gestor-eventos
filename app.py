@@ -810,7 +810,7 @@ def gestionar_inscripcion():
 
     return render_template(
         "SCV-B09GestionarConfiguracionInscripcion.html",
-        idEvento=session['idEstado'],
+        idEvento=session['idEvento'],
         estado=miEvento.estado,
         general=general,
         preinscritos=preinscritos,
