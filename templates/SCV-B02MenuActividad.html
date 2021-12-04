@@ -70,7 +70,7 @@
                         </div>
 
                     </div>
-                    {% if estado == 'Borrador' or estado == 'Inscripciones' %}
+                    {% if estado == 'Borrador' %}
                     <div class="form-group">
                         <br>
                         <button class="btn btn-success btn-lg btn-block" type="submit">Guardar Cambios</button>
@@ -97,11 +97,12 @@
                             <div class="row">
                                 <div class="col"> {{ambiente.nombre}}</div>
                                 <div class="col-2 text-right">
-                                    {% if estado == 'Borrador' %}
+                                    {% if estado == 'Borrador' or estado == 'Inscripciones' %}
                                     <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}')" data-toggle="modal" data-target="#ambienteModal"><i class="fas fa-pencil-alt"> </i></a>
                                     <a href="{{url_for('eliminarAmbiente',idActividad = actividad.id,idAmbiente = ambiente.id)}}"><i class="fas fa-trash"> </i></a>
                                     {% else %}
-                                    <a href=""><i class="fas fa-eye"> </i></a>
+                                    <a href="" onclick="setModalAmbienteModificar('{{ambiente.id}}',1)" data-toggle="modal" data-target="#ambienteModal"><i class="fas fa-eye"> </i></a>
+
                                     {% endif %}
                                 </div>
                             </div>
@@ -109,11 +110,11 @@
                     </div>
                     <br>
                     {%endfor%}
-
+                    {% if estado ==	'Borrador'  or estado == 'Inscripciones' %}
                     <p class="text-center">
                         <button id="crearAmbienteButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar ambiente</button>
                     </p>
-
+                    {% endif %}
                 </div>
                 <div class="col-1"></div>
             </div>
@@ -134,19 +135,23 @@
                             <div class="row">
                                 <div class="col"> {{material.nombre}}</div>
                                 <div class="col-2 text-right">
+                                    {% if estado == 'Borrador' or estado == 'Inscripciones' %}
                                     <a href="" onclick="setModalMaterialModificar('{{material.id}}')" data-toggle="modal" data-target="#materialModal"><i class="fas fa-pencil-alt"> </i></a>
                                     <a href="{{url_for('eliminarMaterial',idActividad = actividad.id,idMaterial = material.id)}}"><i class="fas fa-trash"> </i></a> 
+                                    {% else %}
+                                    <a href="" onclick="setModalMaterialModificar('{{material.id}}',1)" data-toggle="modal" data-target="#materialModal"><i class="fas fa-eye"> </i></a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <br>
                     {%endfor%}
-
+                    {% if estado ==	'Borrador' or estado == 'Inscripciones' %}
                     <p class="text-center">
                         <button id="crearMaterialButton" type="button" class="btn btn-outline-primary"> <i class="fas fa-plus"></i> Agregar material</button>
                     </p>
-
+                    {% endif %}
                 </div>
                 <div class="col-1"></div>
             </div>
@@ -186,12 +191,19 @@
             request.send({id:id})
         }
         
-        function setModalAmbienteModificar(id){
+        function setModalAmbienteModificar(id,ver=0){
             let idModalAmbiente = "ambienteModal-form"
             BOOSTTRAP.Utilities.setTitle("ambienteModal","Modificar Ambiente")
             BOOSTTRAP.Forms.setActionMethod(idModalAmbiente,"{{url_for('modificarAmbiente',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalAmbiente)
             getInfoAmbiente(id,idModalAmbiente)
+            if(ver){
+                var form = document.getElementById(idModalAmbiente);
+                var elements = form.elements;
+                for (var i = 0, len = elements.length; i < len; ++i) {
+                    elements[i].readOnly = true;
+                }
+            }
             //BOOSTTRAP.Forms.setButtonText(idModalAmbiente,"Guardar Cambios") //No es necesario porque texto es continuar
         }
         function setModalAmbienteCrear(){
@@ -231,12 +243,19 @@
             request.send({id:id})
         }
         
-        function setModalMaterialModificar(id){
+        function setModalMaterialModificar(id,ver){
             let idModalMaterial = "materialModal-form"
             BOOSTTRAP.Utilities.setTitle("materialModal","Modificar Material")
             BOOSTTRAP.Forms.setActionMethod(idModalMaterial,"{{url_for('modificarMaterial',idActividad = actividad.id)}}")
             BOOSTTRAP.Forms.resetForm(idModalMaterial)
             getInfoMaterial(id,idModalMaterial)
+            if(ver){
+                var form = document.getElementById(idModalMaterial);
+                var elements = form.elements;
+                for (var i = 0, len = elements.length; i < len; ++i) {
+                    elements[i].readOnly = true;
+                }
+            }
         }
         function setModalMaterialCrear(){
             let idModalMaterial= "materialModal-form"

@@ -45,31 +45,14 @@
                         </div>
                         <div class="form-group">
                             <label for="inputState">Profesión</label>
-                            <select id="inputState" class="form-control" name="profesion" required>
+                            <select id="inputState" class="custom-select" name="profesion" required>
                                 <option value="none" selected>None</option>
                                 {% for i in range(lenProfesion)%}
                                 <option value="{{ profesion[i].value }}">{{ profesion[i].texto }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="row">
-                            <div class="form-group col-sm">
-                                <label for="inputCategoria">Categoria</label>
-                                <select id="inputCategoria" class="form-control" name="categoria" onchange="getPaquetes(this.value)" required>
-                                    <option value="null"> ... </option>
-                                    {% for i in range(len.Categoria)%}
-                                    <option value="{{ categoria[i].id }}">{{ categoria[i].texto }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group col-sm">
-                                <label for="inputPaquete">Paquete</label>
-                                <select id="inputPaquete" class="form-control" name="paquete" required>
-                                    <option value="none" selected>Seleccione una categoria primero</option>
-                                    
-                                </select>
-                            </div>
-                        </div>
+                        
                         
 
                         <div class="row">
@@ -87,29 +70,6 @@
 </body>
 {% endblock %}
 {% block script %}
-<script>
-    let idCategoria = "inputCategoria"
-    let idPaquete = "inputPaquete"
-    let idTablaBody = "tbody"
-    function getPaquetes(idCat){
-        const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerCategoriasPaquete/", false);
-        request.onload = () => {
-            BOOSTTRAP.Utilities.onlyChild(idPaquete," ")
-            const data = JSON.parse(request.responseText);
-            let paquete = data.paquete
-            let optionsHtml = ""
-            for (let i in paquete){
-                optionsHtml+=String.raw`<option value="${paquete[i].id}">${paquete[i].nombre}</option>`
-            }
-            BOOSTTRAP.Utilities.onlyChild(idPaquete,optionsHtml)
-        };
-        request.send(idCat=idCat)
-    }
-
-</script>
-
-
 <script type="text/javascript">
     let alerta = {{msg_alerta|tojson}}
     if (alerta.existe){

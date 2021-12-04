@@ -58,7 +58,17 @@
         document.getElementById(idModal+"-form").method = "post"       
 
         BOOSTTRAP.Utilities.convertToCallModal(idbutton,idModal)
-        
+        let roles = ["Colaborador","Caja","Administrador"]
+        let opciones = ""
+        for (i in roles){
+            opciones+=String.raw`<option value="${roles[i]}">${roles[i]}</option>`
+        }
+        document.getElementById("agregarUsuarioModal-form-tipoUsuario").parentElement.innerHTML = String.raw`
+            <select id="inputState" class="form-control" name="profesion" required>
+                ${opciones}
+            </select>
+        `
+
     </script>
 {% endblock %}
 </html>

@@ -772,6 +772,13 @@ def verEvento(id):
     }
     categorias = 2
     paquetes = 3
+    cat = [
+        {"id":"CAT","texto":"Estudiante"},
+        {"id":"CAT2","texto":"Profesor"},
+    ]
+    lens ={
+        "Categoria":len(categoria),
+    }
     return render_template('SCV-B01VisualizarEvento.html',
         notShow=True,
         evento=evento,
@@ -782,7 +789,9 @@ def verEvento(id):
         paquetes=paquetes,
         paquete=paquete,
         categoria=categoria,
+        cat=cat,
         disponible=mePuedoInscribir,
+        len=lens,
         tipoUsuario = session['tipoUsuario']
     )
 
@@ -1130,7 +1139,9 @@ def obtenerParticipantesActividadAmbiente():
     
     return response
 
-
+@app.route('/nosotros/', methods=['GET'])
+def nosotros():
+    return render_template("Nosotros.html")
 
 if __name__ == '__main__':
     app.run()

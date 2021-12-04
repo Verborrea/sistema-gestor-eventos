@@ -30,15 +30,16 @@
         </table>
     </div>
     <br>
-    <div id="botonesCrear" class="row">
+    <div id="botonesCrear" class="row text-center">
         {% if estado == 'Borrador' %}
+        <div class="col-1"></div>
         <div class="col">
             <button id="crearCategoria" class="btn btn-primary btn-lg" type="submit">Nueva Categoria</button>
         </div>
         <div class="col">
             <button id="crearPaquete" class="btn btn-primary btn-lg" type="submit">Nuevo Paquete</button>
         </div>
-        
+        <div class="col-1"></div>
         {% endif %}
     </div>
     <br>
@@ -197,7 +198,7 @@
             
         //Nuevo paquete
         let idModalPaquete = "modalPaquete"
-        let datosPaquete = [{"nombre":"nombrePaquete","tipo_dato":"text"}]
+        let datosPaquete = [{"nombre":"nombrePaquete","tipo_dato":"text","texto":"Nombre del Paquete"}]
         let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalPaquete,"Nuevo Paquete",datosPaquete)
         BOOSTTRAP.Utilities.onlyChild("modalNuevoPaqueteContainer",formModal)
         document.getElementById(idModalPaquete+"-form").action = "{{url_for('crearPaquete')}}"
@@ -232,7 +233,7 @@
         //Nueva Categoria
         let idModalCategoria = "modalCategoria"
         let datosForm = [
-            {"nombre":"nombreCategoria","tipo_dato":"text"},
+            {"nombre":"nombreCategoria","tipo_dato":"text","texto":"Nombre de la Categoría"},
         ]
         formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalCategoria,"Nueva Categoria",datosForm)
         BOOSTTRAP.Utilities.onlyChild("modalNuevaCategoriaContainer",formModal)

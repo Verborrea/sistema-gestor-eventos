@@ -222,9 +222,11 @@ BOOSTTRAP.GenerateComplex.buildTableModal = function(id, titulo, datosTabla){
 
 BOOSTTRAP.GenerateComplex.buildFormModal = function(id,titulo,datosForm,button=false){
     let form = String.raw`
-        <div class = "marquito"><div class = "container"><br>
-            ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm,button)}
-        </div></div>
+        <div class = "marquito">
+            <div class = "container"><br>
+                ${BOOSTTRAP.GenerateSimple.buildForm(id+"-form",datosForm,button)}
+            </div>
+        </div>
     `
     return BOOSTTRAP.GenerateSimple.buildModal(titulo,form,"",id)
 }
@@ -258,7 +260,7 @@ BOOSTTRAP.Forms.buildRow = function(content,idForm){
 
 BOOSTTRAP.Forms.buildTextarea = function(formRow,idForm){
     return String.raw`
-        <div class="col">
+        <div >
             <div class="mb-3">
                 <label for="${idForm}-${formRow.nombre}">${formRow.nombre}</label>
                 <textarea class="form-control" id="${idForm}-${formRow.nombre}" name="${formRow.nombre}" ${formRow.extra}></textarea>
@@ -268,7 +270,7 @@ BOOSTTRAP.Forms.buildTextarea = function(formRow,idForm){
 }
 BOOSTTRAP.Forms.buildInput = function(formRow,idForm){
     return String.raw`
-        <div class="col" ${formRow.extra}>
+        <div ${formRow.extra}>
             <div class="form-group row">
                 <label for="${idForm}-${formRow.nombre}" class="col-sm-2 col-form-label">${formRow.texto || formRow.nombre}</label>
                 <div class="col-sm-10">
