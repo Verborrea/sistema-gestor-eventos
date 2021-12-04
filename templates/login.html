@@ -6,7 +6,7 @@
         <br><br><br><br><br><br><br>
         Bienvenido
         <h2>Ingresa a tu cuenta</h2>    
-        <form class="align-self-center" method="post">
+        <form class="align-self-center" method="post" autocomplete="off" >
             <div class="form-group">
                 <label for="fname">Cuenta</label>
                 <input type="email" class="form-control" id="fname" name="usuario" required>
@@ -15,7 +15,7 @@
                 <label for="contra">Contraseña</label>
                 <input type="password" class="form-control"  id="contra" name="contra" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-block float-right" >Accede ahora</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block float-right" >Accede ahora</button>
             <small id="warningNoRegistrado" class="form-text text-muted">¿No estas registrado? </small>
             <a href="{{ url_for('register') }}" id="" class="btn btn-primary btn-lg btn-block" >Sign Up</a>
         </form>

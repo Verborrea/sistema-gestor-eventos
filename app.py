@@ -57,8 +57,7 @@ else:
     db.session.commit()
 
 # ============================== eventos ============================== #
-
-@app.route('/listaEventos')
+@app.route('/listaEventos', methods=['POST','GET'])
 def listaEventos():
     usuario_evento = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
     usuario = Usuario.query.get_or_404(session['idUsuario'])
@@ -79,7 +78,17 @@ def listaEventos():
             'estadoEvento':evento.estado
         })
     session.pop('idEvento', None)
-    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
+    #######################
+    plantilla = [
+        {"id":"PP","nombre":"Plantilla1","fechaInicioEvento":"hoy","tipoEvento":"charlas"},
+    ]
+    #######################
+    lens = {
+        "general":len(datos),
+        "plantilla":len(plantilla),
+    }
+   
+    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,general=datos,len = lens,plantilla=plantilla,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
 
 @app.route('/seleccionarevento/', methods=['POST'])
 def seleccionarevento():

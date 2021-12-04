@@ -5,9 +5,92 @@
         <h3>Historial de eventos:</h3>
 
         <div id="modalEventoNuevo"></div>
-        <div id="modalEventoPlantilla"></div>
+        <div id="modalEventoPlantilla">
+            <div class="modal" id="plantillaEventoModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Creacion a partir de plantilla</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{url_for('crearEventoPlantilla')}}">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">Fecha de Inicio de Evento</th>
+                                            <th scope="col">Tipo de Evento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in range(len.plantilla) %}
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="selection" value="{{plantilla[i].id}}" >
+                                                </div>
+                                            </th>
+                                            <th >{{plantilla[i].nombre}}</th>
+                                            <td>{{plantilla[i].fechaInicioEvento}}</td>
+                                            <td>{{plantilla[i].tipoEvento}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                                <button type="submit" class="btn btn-primary btn-block">Continuar</button>
+                            </form>
+
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <form action="{{url_for('seleccionarevento')}}" method="post">
-            <div id="historialEventos"></div>
+            <div id="historialEventos">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Fecha de creación </th>
+                            <th scope="col">Fecha de cierre de inscripción</th>
+                            <th scope="col">Fecha de Inicio de Evento</th>
+                            <th scope="col">Fecha de Cierre de Evento</th>
+                            <th scope="col">Estado de evento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(len.general) %}
+                        <tr>
+                            <th scope="row">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="selection" value="{{general[i].id}}" >
+                                </div>
+                            </th>
+                            <td >{{general[i].nombre}}</td>
+                            <td >{{general[i].fechaCreacion}}</td>
+                            <td>{{general[i].fechaCierreInscripcion}}</td>
+                            <td>{{general[i].fechaInicioEvento}}</td>
+                            <td>{{general[i].fechaCierreEvento}}</td>
+                            <td>{{general[i].estadoEvento}}</td>
+                            
+        
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+
+
+            </div>
             <div class="row">
                 <div class="col-8"></div>
                 <div class="col-4">
@@ -34,12 +117,7 @@
 {% block script %}
     <script>
         loadedButton = false
-        let tabla = BOOSTTRAP.GenerateComplex.buildTableSelection(//Genera la table
-            "tablaHistorialEventos",
-            ["nombre","fechaCreacion","fechaCierreInscripcion","fechaInicioEvento","fechaCierreEvento","estadoEvento"],
-            {{ contenido| tojson }}
-            )
-        BOOSTTRAP.Utilities.onlyChild("historialEventos",tabla)//Coloca la tabla
+
         function generarButtonsAdd(){//Crea los modals y botones de crear nuevo y crear a partir de plantilla
             if(!loadedButton){
                 let idModalNuevo = "nuevoEventoModal"
@@ -56,33 +134,6 @@
                 document.getElementById(idModalNuevo+"-form").action = "{{url_for('crearEvento')}}"
                 document.getElementById(idModalNuevo+"-form").method = "post"
 
-                //Crear evento desde plantilla
-                datosTabla = {
-                    tipo_tabla:"Seleccion",
-                    headers:["Nombre","Fecha","TipoEvento"],
-                    contenido:""}
-                tableModal = BOOSTTRAP.GenerateComplex.buildTableModal(idModalPlantilla, "Creación a partir de Plantilla", datosTabla)
-                
-                console.log(tableModal)
-                
-                
-                BOOSTTRAP.Utilities.onlyChild("modalEventoPlantilla",tableModal)
-                BOOSTTRAP.Utilities.addChild(idModalPlantilla+"-tableModalForm",BOOSTTRAP.Utilities.basicButton("Seleccionar"))
-
-                document.getElementById(idModalPlantilla+"-tableModalForm").action = "{{url_for('crearEventoPlantilla')}}"
-
-                //Llena la tabla
-                    //Request
-                    const request = new XMLHttpRequest();
-                    request.open('GET', "{{url_for('obtenerPlantillas')}}", false);
-                    
-                    request.onload = () => {
-                        const data = JSON.parse(request.responseText);
-                        BOOSTTRAP.Tables.fillTable(idModalPlantilla+"-tableModalForm-table",datosTabla.headers,data,true,false)
-                    };
-                    request.send(null)
-
-                
 
                 //Aniade botones de los modals
                 BOOSTTRAP.Utilities.onlyChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalNuevo,"Nuevo Evento"))

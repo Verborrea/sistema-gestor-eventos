@@ -148,7 +148,7 @@ BOOSTTRAP.GenerateSimple.buildForm = function(id, datos,button=false){
     if(button==false){
         button=BOOSTTRAP.Utilities.basicButton("Continuar",id+"-button","btn-outline-primary")
     }
-    let formText =String.raw`<form action="" id="${id}">`
+    let formText =String.raw`<form autocomplete="off" action="" id="${id}">`
     for(let i in datos)
         formText += BOOSTTRAP.Forms.buildRow(datos[i],id)
     formText += String.raw`<div class="justify-content-end">${button}</div>`
