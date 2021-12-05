@@ -1141,7 +1141,7 @@ def obtenerParticipantesActividadAmbiente():
 
 @app.route('/nosotros/', methods=['GET'])
 def nosotros():
-    return render_template("Nosotros.html")
+    return render_template("Nosotros.html",tipoUsuario="Visitante")
 
 if __name__ == '__main__':
     app.run()
