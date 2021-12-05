@@ -1,0 +1,133 @@
+{% extends "Layout.html" %}
+<html>
+{% block body %}
+        <br>
+        <h1 class="text-center">Registrar Asistencia</h1>
+        <br>
+        <div class="modal" tabindex="-1" id="modalQR">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title">Escanea el código QR</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="{{codigo.rutaImagen}}" alt="Generando código QR para el llenado de asistencia" id="imgQR" style="height: 100px;width: 100px;background-color: aliceblue;">
+                    </div>
+                    <div class="modal-footer">
+                    <form action="{{url_for('terminarAsistencia')}}">
+                        <input type="text" name="codigo" id="codigoAsistencia" value="{{codigo.sesion}}" style="display: none;" readonly>
+                        <button type="submit" class="btn btn-primary">Finalizar asistencia</button>
+                    </form>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <form class="row" method="">
+                <div class="col-1"></div>
+                
+                <div class="form-group col-5">
+                    <label for="inputAmbiente"><h5>Ambiente</h5></label>
+                    <select id="inputAmbiente" class="form-control" name="ambiente" onchange="getParticipantes(this.value)" required >
+                        <option value="null"> ... </option>
+                        {% for i in range(len.Ambiente)%}
+                        <option value="{{ ambiente[i].id }}">{{ ambiente[i].texto }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-2"></div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" onclick="obtenerQr(document.getElementById('inputAmbiente').value)"
+                    data-toggle="modal" data-target="#modalQR">Tomar <br>Asistencia</button>
+                </div>
+                <div class="col-1"></div>
+            
+        </div>                
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm datosAsistencia">
+                    <h5>{{asistencia.turno}}</h5>
+                    <small id="asistenciaTurno" class="form-text text-muted">Turno</small>
+                </div>
+                <div class="col-sm">
+                    <h5>{{asistencia.dia}}</h5>
+                    <small id="asistenciaDia" class="form-text text-muted">Día</small>
+                </div>
+                <div class="col-sm">
+                    <h5>{{asistencia.horaInicio}}</h5>
+                    <small id="asistenciaHoraInicio" class="form-text text-muted">Hora de Inicio</small>
+                </div>
+                <div class="col-sm">
+                    <h5>{{asistencia.participantes}}</h5>
+                    <small id="asistenciaParticipantes" class="form-text text-muted">Participantes</small>
+                </div>
+            </div>
+        </div>
+        <br>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Participante</th>
+                    <th scope="col">Hora de ingreso</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                
+            </tbody>
+        </table>
+        </form>
+        <input id="Who" type="text" value="" style="display: none;" name="idParticipante">
+{% endblock %}
+{% block script %}
+<script>
+    let idTablaBody = "tbody"
+
+    //Obtener Participantes
+    function getParticipantes(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia/", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let participante = data.participante
+            let tableRows = ""
+            for (let i in participante){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${i+1}</th>
+                    <th >${participante[i].participante}</th>
+                    <th >${participante[i].horaIngreso}</th>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
+        };
+        request.send(idAmb=idAmb)
+    }
+
+
+    //
+    //Obtener Participantes
+    /*function obtenerQr(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerNombreQR/", false);
+        request.onload = () => {
+            const data = JSON.parse(request.responseText);
+            let imgSrc = String.raw` url_for('static', filename='qr/'+data.nombreQR) }}`
+            document.getElementById("imgQR").src = imgSrc
+            document.getElementById("codigoAsistencia").value = "data.codigo"
+        };
+        request.send(idAmb=idAmb)
+    }*/
+
+</script>
+{% endblock %}

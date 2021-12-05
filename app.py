@@ -1,4 +1,5 @@
 from markupsafe import escape
+from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
 
@@ -1142,6 +1143,60 @@ def obtenerParticipantesActividadAmbiente():
 @app.route('/nosotros/', methods=['GET'])
 def nosotros():
     return render_template("Nosotros.html",tipoUsuario="Visitante")
+
+@app.route('/registrarAsistencia/', methods=['GET','POST'])
+def registrarAsistencia():
+    ambiente =[
+        {"id":"AMB1", "texto":"Nombre de Ambiente"}
+    ]
+    lens={
+        "Ambiente":len(ambiente)
+    }
+    asistencia ={
+        "turno":"noche",
+        "dia":"30 de Febrero",
+        "horaInicio":"10:10",
+        "participantes":20
+    }
+    codigo = {
+        "rutaImagen":"qr/qrqrqr.jpg",
+        "sesion":"codigoSesionAsistencia"
+    }
+    return render_template(
+        "SCV-B17RegistrarAsistencia.html",
+        tipoUsuario="Colaborador",
+        ambiente=ambiente,
+        len=lens,
+        codigo = codigo,
+        asistencia=asistencia,
+    )
+
+@app.route('/obtenerParticipantesAmbienteAsistencia/', methods=['GET'])
+def obtenerParticipantesAmbienteAsistencia():
+    #idAmb #mandamos en el request
+    participante = [
+        {"participante":"Dino","horaIngreso":"10:10"}
+    ]
+    response = {
+        "participante":participante
+    }
+    return response
+
+#no usamos
+@app.route('/obtenerNombreQR/', methods=['GET'])
+def obtenerNombreQR():
+    #idAmb #mandamos en el request
+    response = {
+        "nombreQR":"qrqrqr.jpg",
+        "codigo":"codigoSesionTomadoAsistencia"
+    }
+    return response
+
+
+@app.route('/terminarAsistencia/', methods=['GET'])
+def terminarAsistencia():
+    return "Que los juegos del hambre comiencen"
+
 
 if __name__ == '__main__':
     app.run()
