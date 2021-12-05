@@ -9,7 +9,11 @@
 <div id="modalMaterialContainer"></div>
 <div class="container marquito">
     <br>
+    {% if nuevaActividad == True %}
+    <form action="{{url_for('crearActividad')}}" method="post">
+    {% else %}
     <form action="{{url_for('modificarActividad',id = actividad.id)}}" method="post">
+    {% endif %}
         <fieldset id="fieldset" {% if estado == 'Borrador' or estado == 'Inscripciones' %} "" {% else %} disabled {% endif %}>
             <div class="form-row">
                 <div class="col-4">
@@ -83,6 +87,7 @@
     </form>
     
 </div>
+{% if nuevaActividad == False %}
 <div class="row">
     <div class="col">
         <div id="ambientes" class="container marquito">
@@ -159,6 +164,7 @@
 
     </div>
 </div>
+{% endif %}
 
 {% endblock %}
 {% block script %}

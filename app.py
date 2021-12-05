@@ -378,41 +378,45 @@ def nuevoEgreso():
     return redirect(url_for('movimiento'), code=302)
 # ============================== actividades ============================== #
 
-@app.route('/crearActividad', methods=['POST'])
+@app.route('/crearActividad', methods=['GET','POST'])
 def crearActividad():
-    nuevaActividad = Actividad(
-        nombre = 'Nombre de la Actividad',
-        tipo = 'Tipo de actividad',
-        descripcion = 'Breve descripcion',
-        consideraciones = 'Consideraciones para asistentes',
-        ponente = 'Expositor',
-        fechaInicio = datetime.utcnow(),
-        fechaFin = datetime.utcnow(),
-        idEvento = session['idEvento']
-    )
+    if request.method == 'POST':
+        nuevaActividad = Actividad(
+            nombre = request.form.get('nombreActividad'),
+            tipo = request.form.get('tipoActividad'),
+            descripcion = request.form.get('descripcionActividad'),
+            consideraciones = request.form.get('consideracionesAsistentes'),
+            ponente = request.form.get('expositor'),
+            fechaInicio = crearFechaHora(request.form.get('fechaInicio'),request.form.get('horaInicio')),
+            fechaFin = crearFechaHora(request.form.get('fechaFin'),request.form.get('horaFin')),
+            idEvento = session['idEvento']
+        )
+        db.session.add(nuevaActividad)
+        db.session.commit()
 
-    db.session.add(nuevaActividad)
-    db.session.commit()
-        
+        return redirect(url_for('actividad',id=nuevaActividad.id), code=302)
+
+    # mostrar form con valores x defecto para crear actividad
     nuevaActividadDict = {
-        "id": nuevaActividad.id,
         "nombreActividad": "Nombre de la Actividad",
         "descripcion": "Breve descripcion",
         "consideraciones": "Consideraciones para asistentes",
         "tipoActividad": "Tipo de actividad",
         "expositor": "Expositor",
-        "fechaInicio": crearFecha(nuevaActividad.fechaInicio,"%Y-%m-%d"),
-        "fechaFin": crearFecha(nuevaActividad.fechaFin,"%Y-%m-%d"),
-        "horaInicio": "00:00",
-        "horaFin": "23:59"
+        "fechaInicio": crearFecha(datetime.now(),"%Y-%m-%d"),
+        "fechaFin": crearFecha(datetime.now(),"%Y-%m-%d"),
+        "horaInicio": "07:00",
+        "horaFin": "22:30"
     }
 
     return render_template(
         'SCV-B02MenuActividad.html',
         actividad = nuevaActividadDict,
         estado = "Borrador",
+        idEvento = session['idEvento'],
         ambientes=[], lenAmbientes = 0,
-        materiales=[], lenMateriales = 0)
+        materiales=[], lenMateriales = 0,
+        nuevaActividad = True)
 
 @app.route('/eliminarActividad/<id>', methods=['GET','POST'])
 def eliminarActividad(id):
@@ -482,7 +486,8 @@ def actividad(id):
         lenAmbientes = len(listaAmbientes),
         materiales=listaMateriales,
         lenMateriales = len(listaMateriales),
-        idEvento=session['idEvento'])
+        idEvento=session['idEvento'],
+        nuevaActividad = False)
 
 # ============================== AMBIENTE ============================== #
 @app.route('/<idActividad>/eliminarAmbiente/<idAmbiente>', methods=['GET','POST'])
@@ -688,7 +693,7 @@ def index():
     if 'tipoUsuario' not in session:
         session['tipoUsuario'] = 'Visitante'
     else:
-        if session['tipoUsuario'] == 'Administrador' :
+        if session['tipoUsuario'] == 'Admin' :
             var_notShow = True
     eventos = []
     info = Evento.query.all()
@@ -704,6 +709,7 @@ def index():
                 "summary" : evento.descripcion
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
+    print(var_notShow)
     return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size,notShow=var_notShow)
 
 @app.route('/registrarse/<id>')
