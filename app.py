@@ -91,7 +91,7 @@ def listaEventos():
    
     return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,general=datos,len = lens,plantilla=plantilla,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
 
-@app.route('/seleccionarevento/', methods=['POST'])
+@app.route('/seleccionarevento', methods=['POST'])
 def seleccionarevento():
     if request.method == 'POST':
         id = request.form.get('selection')
@@ -143,7 +143,7 @@ def evento(idEvento):
         lenActividad = len(listaAct),
         nombreEvento = miEvento.nombre)
 
-@app.route('/crearEvento/', methods=['POST'])
+@app.route('/crearEvento', methods=['POST'])
 def crearEvento():
     nuevoEvento = Evento(
         nombre = request.form.get('nombreEvento'),
@@ -166,7 +166,7 @@ def crearEvento():
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
-@app.route('/modificarEvento/', methods=['POST'])
+@app.route('/modificarEvento', methods=['POST'])
 def modificarEvento():
     miEvento = Evento.query.get_or_404(session['idEvento'])
 
@@ -180,7 +180,7 @@ def modificarEvento():
         print("Error")
     return redirect(url_for('evento',idEvento=miEvento.id), code=302)
 
-@app.route('/obtenerPlantillas/', methods=['POST','GET'])
+@app.route('/obtenerPlantillas', methods=['POST','GET'])
 def obtenerPlantillas():
 
     plantillas = []
@@ -201,7 +201,7 @@ def obtenerPlantillas():
 
     return json.dumps(plantillas)
 
-@app.route('/crearEventoPlantilla/', methods=['POST'])
+@app.route('/crearEventoPlantilla', methods=['POST'])
 def crearEventoPlantilla():
     id = request.form.get('selection')
     if id == None:
@@ -222,7 +222,7 @@ def crearEventoPlantilla():
 
     return redirect(url_for('evento',idEvento=nuevoEvento.id), code=302)
 
-@app.route('/lanzarEvento/', methods=['POST'])
+@app.route('/lanzarEvento', methods=['POST'])
 def lanzarEvento():
     miEvento = Evento.query.get_or_404(session['idEvento'])
     miEvento.estado = 'Inscripciones'
@@ -279,14 +279,14 @@ def cargarEjemplos():
 
 # ============================== movimiento ============================== #
 
-@app.route('/registrarMovimiento/', methods=['GET','POST'])
+@app.route('/registrarMovimiento', methods=['GET','POST'])
 def registrarMovimiento():
     datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
 
     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 #genera problemas al compilar (comentar route movimiento hasta que no este culminado)
-@app.route('/movimiento/', methods=['GET','POST'])
+@app.route('/movimiento', methods=['GET','POST'])
 def movimiento():
     general = []
     ingresos = []
@@ -344,7 +344,7 @@ def movimiento():
         len=lens
     )
 
-@app.route('/nuevoIngreso/', methods=['POST'])
+@app.route('/nuevoIngreso', methods=['POST'])
 def nuevoIngreso():
     miNuevoIngreso = Movimiento(
         nombre = request.form.get('nombre'),
@@ -361,7 +361,7 @@ def nuevoIngreso():
     return redirect(url_for('movimiento'), code=302)
 
 
-@app.route('/nuevoEgreso/', methods=['POST'])
+@app.route('/nuevoEgreso', methods=['POST'])
 def nuevoEgreso():
     miNuevoEgreso = Movimiento(
         nombre = request.form.get('concepto'),
@@ -640,14 +640,14 @@ def register():
         'existe':False,
         'mensaje':''
     }
-    categoria = [
-        {"id":"CAT","texto":"Estudiante"},
-        {"id":"CAT2","texto":"Profesor"},
-    ]
-    lens ={
-        "Categoria":len(categoria),
-    }
-    return render_template('Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),categoria=categoria,len=lens,msg_alerta=alert)
+    # categoriad = [
+    #     {"id":"CAT","texto":"Estudiante"},
+    #     {"id":"CAT2","texto":"Profesor"},
+    # ]
+    # lens ={
+    #     "Categoria":len(categoriad),
+    # }
+    return render_template('Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),msg_alerta=alert)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
@@ -802,7 +802,7 @@ def verEvento(id):
         tipoUsuario = session['tipoUsuario']
     )
 
-@app.route('/logout/')
+@app.route('/logout')
 def logout():
     session.pop('idUsuario', None)
     session.pop('tipoUsuario', None)
@@ -815,7 +815,7 @@ def navbar(tipoUsuario):
     return render_template("Layout.html",tipoUsuario=tipoUsuario)
 
 # ================== gestionar inscripciones ==================
-@app.route('/obtenerNombreActividades/', methods=['GET','POST'])
+@app.route('/obtenerNombreActividades', methods=['GET','POST'])
 def obtenerNombreActividades():
     miEvento = Evento.query.get_or_404(session['idEvento'])
     misActividades = miEvento.actividades
@@ -827,23 +827,22 @@ def obtenerNombreActividades():
         })
     return json.dumps(actividades)
 
-@app.route('/crearCategoria/', methods=['POST'])
+@app.route('/crearCategoria', methods=['POST'])
 def crearCategoria():
     nombreCategoria = request.form.get('nombreCategoria')
 
     if nombreCategoria != None:
-        nombreCategoria = Categoria(
+        nuevaCategoria = Categoria(
             idEvento = session['idEvento'],
-            nombre = request.form.get('nombreCategoria'),
-            monto = 0
+            nombre = request.form.get('nombreCategoria')
         )
 
-        db.session.add(nombreCategoria)
+        db.session.add(nuevaCategoria)
         db.session.commit()
 
-    return redirect(url_for(gestionar_inscripcion))
+    return redirect(url_for('gestionar_inscripcion'))
 
-@app.route('/crearPaquete/', methods=['POST'])
+@app.route('/crearPaquete', methods=['POST'])
 def crearPaquete():
 
     nombrePaquete = request.form.get('nombrePaquete')
@@ -858,9 +857,9 @@ def crearPaquete():
         db.session.add(nuevoPaquete)
         db.session.commit()
 
-    return redirect(url_for(gestionar_inscripcion))
+    return redirect(url_for('gestionar_inscripcion'))
 
-@app.route('/gestionar_inscripcion/', methods=['GET','POST'])
+@app.route('/gestionar_inscripcion', methods=['GET','POST'])
 def gestionar_inscripcion():
     miEvento = Evento.query.get_or_404(session['idEvento'])
     descuento = miEvento.prcntjDscnto #numero del 1 al 100
@@ -873,23 +872,19 @@ def gestionar_inscripcion():
 
     #categoriaPaquete
     misCategorias = miEvento.categorias
-    dictCategorias = []
-    dictPaquetes = []
+    listCategorias = []
+    listPaquetes = []
     for categoria in misCategorias:
-        dictCategorias.append({
-            categoria.nombre
-        })
+        listCategorias.append(categoria.nombre)
     misPaquetes = miEvento.paquetes
     for paquete in misPaquetes:
-        dictPaquetes.append({
-            paquete.nombre
-        })
+        listPaquetes.append(paquete.nombre)
 
-    categoria_paquete = {}
-    for cat in dictCategorias:
-        categoria_paquete[cat] = {}
-        for pqt in dictPaquetes:
-            categoria_paquete[cat][pqt] = 5
+    categoria_paquete_mtrx = []
+    for cat in range(len(listCategorias)):
+        categoria_paquete_mtrx.append([])
+        for pqt in range(len(listPaquetes)):
+            categoria_paquete_mtrx[cat].append(5)
 
     #  Usuarios en el Evento #
     idUsuariosG = []
@@ -915,7 +910,6 @@ def gestionar_inscripcion():
             "tipoDocumento":usuario.tipodoc
         })
 
-    
     #  Listado de Usuarios PreInscritos #
     preinscritos = []
     usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosPre)).all()
@@ -948,23 +942,23 @@ def gestionar_inscripcion():
         "SCV-B09GestionarConfiguracionInscripcion.html",
         idEvento=session['idEvento'],
         estado=miEvento.estado,
+        nombreEvento=miEvento.nombre,
         general=general,
         preinscritos=preinscritos,
         inscritos=inscritos,
         len=lens,
-        nombreEvento="nombreEvento",
-        categoria_paquete=categoria_paquete,
-        categorias=len(dictCategorias),
-        paquetes=len(dictPaquetes),
-        paquete=dictPaquetes,
-        categoria=dictCategorias,
+        categoria_paquete=categoria_paquete_mtrx,
+        categorias=len(listCategorias),
+        paquetes=len(listPaquetes),
+        paquete=listPaquetes,
+        categoria=listCategorias,
         tipoUsuario = "",
         fecha = fecha,
         descuento = descuento
     )
 
 # ================== gestion administrativa ==================
-@app.route('/gestionarUsuario/', methods=['POST','GET'])
+@app.route('/gestionarUsuario', methods=['POST','GET'])
 def gestionarUsuario():
     if request.method == 'POST':
         nuevoUsuario = Usuario(
@@ -1018,7 +1012,7 @@ def gestionarUsuario():
         len = lens
     )
 
-@app.route('/listaEventosParticipante/', methods=['POST','GET'])
+@app.route('/listaEventosParticipante', methods=['POST','GET'])
 def listaEventosParticipante():
     usuarioEventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario'])
     idEventos = []
@@ -1050,11 +1044,11 @@ def listaEventosParticipante():
         tipoUsuario = session['tipoUsuario']
     )
 
-@app.route('/porTransferencia/', methods=['POST','GET'])
+@app.route('/porTransferencia', methods=['POST','GET'])
 def porTransferencia():
     return "yei"
 
-@app.route('/porEfectivo/', methods=['POST','GET'])
+@app.route('/porEfectivo', methods=['POST','GET'])
 def porEfectivo():
     return "yei"
 
@@ -1096,7 +1090,7 @@ def materiales():
 def obtenerCodigoQR():
     return "obtenerCodigoQR de: "
 
-@app.route('/colaborador/', methods=['POST','GET'])
+@app.route('/colaborador', methods=['POST','GET'])
 def colaborador():
     print("poner en el index")
     general=[
@@ -1113,7 +1107,7 @@ def colaborador():
         tipoUsuario = "Colaborador"
     )
 
-@app.route('/obtenerActividadesAmbiente/', methods=['POST','GET'])
+@app.route('/obtenerActividadesAmbiente', methods=['POST','GET'])
 def obtenerActividadesAmbiente():
     actividad = [
         {"id":"ACAC","nombre":"Actividad 1"}
@@ -1124,7 +1118,7 @@ def obtenerActividadesAmbiente():
     
     return response
 
-@app.route('/obtenerCategoriasPaquete/', methods=['POST','GET'])
+@app.route('/obtenerCategoriasPaquete', methods=['POST','GET'])
 def obtenerCategoriasPaquete():
     paquete = [
         {"id":"PAP","nombre":"Basico"}
@@ -1135,7 +1129,7 @@ def obtenerCategoriasPaquete():
     return response
 
 
-@app.route('/obtenerParticipantesActividadAmbiente/', methods=['POST','GET'])
+@app.route('/obtenerParticipantesActividadAmbiente', methods=['POST','GET'])
 def obtenerParticipantesActividadAmbiente():
     participante = [
         {"participante":"Pepe","materialAsignado":"PC","idParticipante":"1"}
@@ -1146,11 +1140,11 @@ def obtenerParticipantesActividadAmbiente():
     
     return response
 
-@app.route('/nosotros/', methods=['GET'])
+@app.route('/nosotros', methods=['GET'])
 def nosotros():
     return render_template("Nosotros.html",tipoUsuario="Visitante")
 
-@app.route('/registrarAsistencia/', methods=['GET','POST'])
+@app.route('/registrarAsistencia', methods=['GET','POST'])
 def registrarAsistencia():
     ambiente =[
         {"id":"AMB1", "texto":"Nombre de Ambiente"}
@@ -1177,7 +1171,7 @@ def registrarAsistencia():
         asistencia=asistencia,
     )
 
-@app.route('/obtenerParticipantesAmbienteAsistencia/', methods=['GET'])
+@app.route('/obtenerParticipantesAmbienteAsistencia', methods=['GET'])
 def obtenerParticipantesAmbienteAsistencia():
     #idAmb #mandamos en el request
     participante = [
@@ -1189,7 +1183,7 @@ def obtenerParticipantesAmbienteAsistencia():
     return response
 
 #no usamos
-@app.route('/obtenerNombreQR/', methods=['GET'])
+@app.route('/obtenerNombreQR', methods=['GET'])
 def obtenerNombreQR():
     #idAmb #mandamos en el request
     response = {
@@ -1199,7 +1193,7 @@ def obtenerNombreQR():
     return response
 
 
-@app.route('/terminarAsistencia/', methods=['GET'])
+@app.route('/terminarAsistencia', methods=['GET'])
 def terminarAsistencia():
     return "Que los juegos del hambre comiencen"
 

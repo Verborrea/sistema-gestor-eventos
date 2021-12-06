@@ -21,7 +21,7 @@
                 <tr>
                     <td scope="row">{{categoria[i]}}</td>
                     {% for j in range(paquetes)%}
-                        <td>{{categoria_paquete[categoria[i]][paquete[j]]}}</td>
+                        <td>{{categoria_paquete[i][j]}}</td>
                     {%endfor%}
                     
                 </tr>
@@ -145,7 +145,7 @@
 {% if estado == 'Borrador' or estado == 'Inscripciones'%}
 <div>
     <hr>
-    <form action="" method="post">
+    <form action="gestionar_inscripcion" method="post">
         <input type="text" name="idEvento" id="" style="display: none;" value={{idEvento}}>
         <div id="fechas" class="row">
             <div class="col">
