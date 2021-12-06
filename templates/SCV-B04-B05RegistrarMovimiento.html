@@ -49,7 +49,7 @@
                         </tbody>
                     </table>
                     <div class="text-right">
-                        <h5>Balance: {{balance.general}}</h5>
+                        <h5>Balance: s/ {{balance.general}}</h5>
                     </div>
                     
                 </div>
@@ -73,7 +73,7 @@
                         </tbody>
                     </table>
                     <div class="text-right">
-                        <h5>Balance: {{balance.ingresos}}</h5>
+                        <h5>Ingresos Totales: s/ {{balance.ingresos}}</h5>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="nav-egresos" role="tabpanel" aria-labelledby="nav-egresos-tab">
@@ -83,7 +83,7 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Número de recibo</th>
                                 <th scope="col">Concepto</th>
-                                <th scope="col">Cantidad</th>
+                                <th scope="col">Monto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,13 +92,13 @@
                                 <th scope="row">{{egresos[i].numero}}</th>
                                 <td>{{egresos[i].numeroRecibo}}</td>
                                 <td>{{egresos[i].concepto}}</td>
-                                <td>{{egresos[i].cantidad}}</td>
+                                <td>{{egresos[i].monto}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     <div class="text-right">
-                        <h5>Balance: {{balance.egresos}}</h5>
+                        <h5>Egresos Totales: s/ {{balance.egresos}}</h5>
                     </div>
                 </div>
             </div>

@@ -103,7 +103,6 @@ class Categoria(db.Model):
 class Paquete(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nombre = db.Column(db.String(30), nullable=False)
-    monto = db.Column(db.Float, nullable = False)
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
     cat_pqt = db.relationship('Categoria_Paquete', backref='paquete', lazy = True)
@@ -113,7 +112,7 @@ class Categoria_Paquete(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     idPaquete = db.Column(db.Integer, db.ForeignKey('paquete.id'), nullable=False)
-    descripcion = db.Column(db.String(150))
+    monto = db.Column(db.Float, nullable = False)
     usuarios_eventos = db.relationship('Usuario_Evento', backref='categoria_paquete', lazy = True)
 
 class Usuario_Evento(db.Model):

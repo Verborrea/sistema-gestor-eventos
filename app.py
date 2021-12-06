@@ -22,6 +22,10 @@ def crearFechaHora(date, hour):
     date_time_obj = datetime.strptime(datehour, '%Y-%m-%d %H:%M:%S')
     return date_time_obj
 
+def dateFromStr(str):
+    date_time_obj = datetime.strptime(str, '%Y-%m-%d')
+    return date_time_obj
+
 def breakArr(array,division):
     arr =[]
     sizes = []
@@ -135,6 +139,7 @@ def evento(idEvento):
 
     return render_template(
         'SCV-B10MenuEvento.html',
+        idEvento = session['idEvento'],
         estado = miEvento.estado,
         descripcion = miEvento.descripcion,
         lugar = miEvento.lugar,
@@ -279,11 +284,11 @@ def cargarEjemplos():
 
 # ============================== movimiento ============================== #
 
-@app.route('/registrarMovimiento', methods=['GET','POST'])
-def registrarMovimiento():
-    datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
+# @app.route('/registrarMovimiento', methods=['GET','POST'])
+# def registrarMovimiento():
+#     datos = [{"concepto":"Evento01","detalle":"Evento1",'monto':'05/05/21'}]
 
-    return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
+#     return render_template('SCV-B0XRegistrarMovimiento.html', nombreUsuario='Joe',contenido=datos,tipoUsuario="Admin",nombreEvento="Our Point")
 
 #genera problemas al compilar (comentar route movimiento hasta que no este culminado)
 @app.route('/movimiento', methods=['GET','POST'])
@@ -308,23 +313,23 @@ def movimiento():
                 "monto":movimiento.monto
             })
             balanceIngreso += movimiento.monto
+            balanceGeneral += movimiento.monto
         else:
             numeroEgreso += 1
             egresos.append({
                 "numero":numeroEgreso,
                 "numeroRecibo":movimiento.factura,
                 "concepto":movimiento.nombre,
-                "monto":movimiento.monto,
-                "cantidad":movimiento.cantidad
+                "monto":movimiento.monto
             })
             balanceEgreso += movimiento.monto
+            balanceGeneral -= movimiento.monto
         general.append({
             "numero":numeroGeneral,
             "concepto":movimiento.nombre,
             "tipo":movimiento.tipo,
-            "monto":movimiento.monto,
+            "monto":movimiento.monto
         })
-        balanceGeneral += movimiento.monto
 
     balance={
         "general":balanceGeneral,
@@ -337,6 +342,7 @@ def movimiento():
         "egresos" : len(egresos)
     }
     return render_template('SCV-B04-B05RegistrarMovimiento.html',
+        idEvento = session['idEvento'],
         general=general,
         ingresos=ingresos,
         egresos=egresos,
@@ -862,14 +868,23 @@ def crearPaquete():
 @app.route('/gestionar_inscripcion', methods=['GET','POST'])
 def gestionar_inscripcion():
     miEvento = Evento.query.get_or_404(session['idEvento'])
-    descuento = miEvento.prcntjDscnto #numero del 1 al 100
-    #fechas del evento
-    fecha = {
-        "Preinscripción" : miEvento.fechaPreInscripcion,
-        "Inscripciones": miEvento.fechaPreInscripcion,
-        "Descuento": descuento,
-    }
+    if request.method == 'POST':
+        miEvento.fechaAprtrInscripcion = dateFromStr(request.form.get('cierrePreInscripcion'))
+        miEvento.fechaCierreInscripcion = dateFromStr(request.form.get('CierreInscripciones'))
+        miEvento.fechaLmtDscnto = dateFromStr(request.form.get('fechaLimiteDescuento'))
+        miEvento.prcntjDscnto = request.form.get('descuento')
 
+        db.session.commit()
+
+    # fechas del evento
+    fecha = {
+        "Preinscripcion" : crearFecha(miEvento.fechaAprtrInscripcion,"%Y-%m-%d"),
+        "Inscripciones": crearFecha(miEvento.fechaCierreInscripcion,"%Y-%m-%d"),
+        "Descuento": crearFecha(miEvento.fechaLmtDscnto,"%Y-%m-%d")
+    }
+    #numero del 1 al 100
+    descuento = miEvento.prcntjDscnto
+    
     #categoriaPaquete
     misCategorias = miEvento.categorias
     listCategorias = []
@@ -940,19 +955,15 @@ def gestionar_inscripcion():
 
     return render_template(
         "SCV-B09GestionarConfiguracionInscripcion.html",
-        idEvento=session['idEvento'],
-        estado=miEvento.estado,
-        nombreEvento=miEvento.nombre,
-        general=general,
-        preinscritos=preinscritos,
-        inscritos=inscritos,
+        idEvento=miEvento.id, estado=miEvento.estado, nombreEvento=miEvento.nombre,
+        general=general, preinscritos=preinscritos, inscritos=inscritos,
         len=lens,
         categoria_paquete=categoria_paquete_mtrx,
         categorias=len(listCategorias),
         paquetes=len(listPaquetes),
         paquete=listPaquetes,
         categoria=listCategorias,
-        tipoUsuario = "",
+        tipoUsuario = session['idUsuario'],
         fecha = fecha,
         descuento = descuento
     )
