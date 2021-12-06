@@ -372,7 +372,7 @@ def nuevoEgreso():
     miNuevoEgreso = Movimiento(
         nombre = request.form.get('concepto'),
         tipo = 'Egreso',
-        factura = 'F12345',
+        factura = request.form.get('factura'),
         detalle = request.form.get('detalle'),
         monto = request.form.get('monto'),
         idEvento = session['idEvento']
@@ -856,8 +856,7 @@ def crearPaquete():
     if nombrePaquete != None:   
         nuevoPaquete = Paquete(
             idEvento = session['idEvento'],
-            nombre = request.form.get('nombrePaquete'),
-            monto = 0
+            nombre = request.form.get('nombrePaquete')
         )
 
         db.session.add(nuevoPaquete)
