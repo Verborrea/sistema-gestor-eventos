@@ -93,7 +93,7 @@ def listaEventos():
         "plantilla":len(plantilla),
     }
    
-    return render_template('SCV-B10VisualizarListaEventos.html', nombreUsuario=usuario.nombre,general=datos,len = lens,plantilla=plantilla,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
+    return render_template('SCV-B01VisualizarListaEventosAdmin.html', nombreUsuario=usuario.nombre,general=datos,len = lens,plantilla=plantilla,tipoUsuario="Admin",nombreEvento="Our Point",notShow=True)
 
 @app.route('/seleccionarevento', methods=['POST'])
 def seleccionarevento():
@@ -138,7 +138,7 @@ def evento(idEvento):
         db.session.commit()
 
     return render_template(
-        'SCV-B10MenuEvento.html',
+        'SCV-B01MenuEventoAdmin.html',
         idEvento = session['idEvento'],
         estado = miEvento.estado,
         descripcion = miEvento.descripcion,
@@ -341,7 +341,7 @@ def movimiento():
         "ingresos" : len(ingresos),
         "egresos" : len(egresos)
     }
-    return render_template('SCV-B04-B05RegistrarMovimiento.html',
+    return render_template('SCV-B09RegistrarMovimiento.html',
         idEvento = session['idEvento'],
         general=general,
         ingresos=ingresos,
@@ -618,9 +618,9 @@ def login():
                 "texto":"Usuario no encontrado",
                 "masTexto":"Por favor, ingrese un correo o contraseña válidos.",#opcional
             }
-            return render_template('Login.html',alerta=miAlerta,tipoUsuario='Visitante')
+            return render_template('SCV-B04Login.html',alerta=miAlerta,tipoUsuario='Visitante')
     else:
-        return render_template('Login.html',tipoUsuario='Visitante')
+        return render_template('SCV-B04Login.html',tipoUsuario='Visitante')
 
 def registrarUsuario(id):
     nuevo_inscrito = Usuario_Evento(
@@ -653,7 +653,7 @@ def register():
     # lens ={
     #     "Categoria":len(categoriad),
     # }
-    return render_template('Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),msg_alerta=alert)
+    return render_template('SCV-B20Signup.html',tipoUsuario='Visitante', profesion=profesion, lenProfesion=len(profesion),msg_alerta=alert)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
@@ -718,7 +718,7 @@ def index():
             })
     renderEventos, arrSizes, size = breakArr(eventos,3)
     print(var_notShow)
-    return render_template('SCV-B03SeleccionarEvento.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size,notShow=var_notShow)
+    return render_template('SCV-B05SeleccionarEventoParticipante.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size,notShow=var_notShow)
 
 @app.route('/registrarse/<id>')
 def registrarse(id):
@@ -794,7 +794,7 @@ def verEvento(id):
     lens ={
         "Categoria":len(categoria),
     }
-    return render_template('SCV-B01VisualizarEvento.html',
+    return render_template('SCV-B07VisualizarEventoParticipante.html',
         notShow=True,
         evento=evento,
         actividad=actividades,
@@ -962,7 +962,7 @@ def gestionar_inscripcion():
     }
 
     return render_template(
-        "SCV-B09GestionarConfiguracionInscripcion.html",
+        "SCV-B03GestionarConfiguracionInscripcion.html",
         idEvento=miEvento.id, estado=miEvento.estado, nombreEvento=miEvento.nombre,
         general=general, preinscritos=preinscritos, inscritos=inscritos,
         len=lens,
@@ -1034,7 +1034,7 @@ def gestionarUsuario():
         'general' : len(listaUsuarios)
     }
     return render_template(
-        "SCV-B08CrearUsuario.html",
+        "SCV-B19CrearUsuario.html",
         idEvento=session['idEvento'],
         general=listaUsuarios,
         len = lens
@@ -1066,7 +1066,7 @@ def listaEventosParticipante():
         'general' : len(listaIdEventos)
     }
     return render_template(
-        "SCV-B20VisualizarListaEventosParticipante.html",
+        "SCV-B06VisualizarListaEventosParticipante.html",
         general=listaIdEventos,
         len = lens,
         tipoUsuario = session['tipoUsuario']
@@ -1074,11 +1074,11 @@ def listaEventosParticipante():
 
 @app.route('/porTransferencia', methods=['POST','GET'])
 def porTransferencia():
-    return "yei"
+    return "dinero dinero"
 
 @app.route('/porEfectivo', methods=['POST','GET'])
 def porEfectivo():
-    return "yei"
+    return "viva el dinero"
 
 @app.route('/validarInscripcion', methods=['POST','GET'])
 def validarInscripcion():
@@ -1086,7 +1086,7 @@ def validarInscripcion():
         "general":1
     }
     return render_template(
-        "SCV-B07ValidarInscripcion.html",
+        "SCV-B08ValidarInscripcion.html",
         general = [
             {"codigoPago":"EST", "categoria":"Estudiante", "paquete":"Estudiante Starter Pack", "monto":70}
         ],#codigoPago, categoria, presupuesto, monto
@@ -1109,7 +1109,7 @@ def materiales():
         
     }
     return render_template(
-        "SCV-B16EntregaMaterial.html",
+        "SCV-B11EntregaMaterial.html",
         ambiente=ambiente,
         len=lens
     )
@@ -1128,7 +1128,7 @@ def colaborador():
         "general":1,
     }
     return render_template(
-        "SCV-B16-17PaginaColaborador.html",
+        "PaginaColaborador.html",
         general=general,
         len=len,
         idEvento=1,
@@ -1191,7 +1191,7 @@ def registrarAsistencia():
         "sesion":"codigoSesionAsistencia"
     }
     return render_template(
-        "SCV-B17RegistrarAsistencia.html",
+        "SCV-B12RegistrarAsistencia.html",
         tipoUsuario="Colaborador",
         ambiente=ambiente,
         len=lens,
