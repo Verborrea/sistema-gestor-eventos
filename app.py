@@ -696,6 +696,8 @@ def create_user():
 @app.route('/')#para probar la vista de participante
 def index():
     var_notShow = False
+    if 'eventoReg' in session:
+        session.pop('eventoReg', None)
     if 'tipoUsuario' not in session:
         session['tipoUsuario'] = 'Visitante'
     else:
@@ -810,9 +812,7 @@ def verEvento(id):
 
 @app.route('/logout')
 def logout():
-    session.pop('idUsuario', None)
-    session.pop('tipoUsuario', None)
-    session.pop('idEvento', None)
+    session.clear()
     return redirect(url_for('index'))
 
 @app.route('/navbar/<tipoUsuario>')
