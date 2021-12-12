@@ -6,45 +6,64 @@
 
 {% if estado == 'Borrador' %}
 <div id="paquetes" class="datosEventos" >
+    <form action="guardar-precios" method="post">
     <div class="marquito">
         <table class="table table-stripped">
             <thead>
                 <tr>
                     <th scope="col">Categoría</th>
                     {%for i in range(paquetes)%}
-                    <th scope="col">{{paquete[i]}}</th>
-                    {%endfor%}
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in range(categorias) %}
-                <tr>
-                    <td scope="row">{{categoria[i]}}</td>
-                    {% for j in range(paquetes)%}
-                        <td>{{categoria_paquete[i][j]}}</td>
+                    <th scope="col">
+                        {{paquete[i]}}
+                        <a href="{{ url_for('eliminarPaquete',id = ids_paquete[paquete[i]]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
+                    </th>
                     {%endfor%}
                     
                 </tr>
-                {%endfor%}
+            </thead>
+            <tbody>
+                
+                    {% for i in range(categorias) %}
+                    <tr>
+                        <td scope="row">
+                            {{categoria[i]}}
+                            <a href="{{ url_for('eliminarCategoria',id = ids_categoria[categoria[i]]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
+
+                        </td>
+                        {% for j in range(paquetes)%}
+                            <td class="form-group">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="" placeholder="{{categoria_paquete[i][j]}}" name="{{ids_categoria[categoria[i]]}}-{{ids_paquete[paquete[i]]}}" min="1">
+                            </td>
+                        {%endfor%}
+
+                    </tr>
+                    {%endfor%}
+                
+                
             </tbody>
         </table>
     </div>
     <br>
     <div id="botonesCrear" class="row text-center">
-        {% if estado == 'Borrador' %}
+        
         <div class="col-1"></div>
         <div class="col">
-            <button id="crearCategoria" class="btn btn-primary btn-lg" type="submit">Nueva Categoria</button>
+            <button id="crearCategoria" class="btn btn-primary btn-lg" type="button">Nueva Categoria</button>
         </div>
+        <div class="col ">
+            <button id="crearPaquete" class="btn btn-primary btn-lg" type="button">Nuevo Paquete</button>
+        </div>
+        <div class="col-1 border-right"></div>
+        <div class="col-1"></div>
         <div class="col">
-            <button id="crearPaquete" class="btn btn-primary btn-lg" type="submit">Nuevo Paquete</button>
+            <button id="" class="btn btn-primary btn-lg" type="submit">Guardar Precios</button>
         </div>
         <div class="col-1"></div>
-        {% endif %}
+        
     </div>
     <br>
     
-    
+    </form>
     <div id="modalNuevaCategoriaContainer"></div>
     <div id="modalNuevoPaqueteContainer"></div>
 </div>

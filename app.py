@@ -900,6 +900,15 @@ def gestionar_inscripcion():
         for pqt in range(len(listPaquetes)):
             categoria_paquete_mtrx[cat].append(5)
 
+    #  Ids categoria paquete #
+    ids_categoria ={
+        "Adulto":"PAQ-C51",
+        "Niño":"PAQ-12H",
+    }
+    ids_paquete={
+        "Básico":"CAT-B05",
+    }
+
     #  Usuarios en el Evento #
     idUsuariosG = []
     idUsuariosPre = []
@@ -964,8 +973,17 @@ def gestionar_inscripcion():
         categoria=listCategorias,
         tipoUsuario = session['idUsuario'],
         fecha = fecha,
-        descuento = descuento
+        descuento = descuento,
+        ids_categoria=ids_categoria,
+        ids_paquete=ids_paquete,
     )
+
+@app.route('/eliminarCategoria/<id>', methods=['POST','GET'])
+def eliminarCategoria(id):
+    return "."
+@app.route('/eliminarPaquete/<id>', methods=['POST','GET'])
+def eliminarPaquete(id):
+    return "."
 
 # ================== gestion administrativa ==================
 @app.route('/gestionarUsuario', methods=['POST','GET'])
