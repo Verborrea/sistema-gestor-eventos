@@ -32,7 +32,7 @@
                         </td>
                         {% for j in range(paquetes)%}
                             <td class="form-group">
-                                <input type="number" step="0.01" class="form-control form-control-sm" id="" placeholder="{{categoria_paquete[i][j]}}" name="{{ids_categoria[categoria[i]]}}-{{ids_paquete[paquete[i]]}}" min="1">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="" value="{{categoria_paquete[i][j]}}" name="{{ids_categoria[categoria[i]]}}-{{ids_paquete[paquete[i]]}}" min="1">
                             </td>
                         {%endfor%}
 
