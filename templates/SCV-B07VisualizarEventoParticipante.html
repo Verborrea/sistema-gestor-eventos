@@ -79,8 +79,8 @@
 
     <div class="modal" tabindex="-1" id="elegirCategoriaPaquete">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{url_for('registrarse',id=evento.id)}}">
+            <div class="modal-content"> 
+                <form action="{{url_for('registrarse',id=evento.id)}}" method="post">
                     <div class="modal-header">
                         <h5 class="modal-title">Categoría y Paquete </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -90,7 +90,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="inputCategoria">Categoria</label>
-                            <select id="inputCategoria" class="custom-select" name="categoria" onchange="getPaquetes(this.value)" required>
+                            <select id="inputCategoria" class="custom-select" name="categoria" onchange="getPaquetes(categoria.value)" required>
                                 <option value="null"> ... </option>
                                 {% for i in range(len.Categoria)%}
                                 <option value="{{ cat[i].id }}">{{ cat[i].texto }}</option>
@@ -120,7 +120,7 @@
     let idTablaBody = "tbody"
     function getPaquetes(idCat){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerCategoriasPaquete/", false);
+        request.open('GET',  "/obtenerCategoriasPaquete/"+idCat, false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idPaquete," ")
             const data = JSON.parse(request.responseText);
