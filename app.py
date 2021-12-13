@@ -623,12 +623,14 @@ def login():
     else:
         return render_template('SCV-B04Login.html',tipoUsuario='Visitante')
 
-def registrarUsuario(id):
+def registrarUsuario(id,idCategoria_Paquete):
     nuevo_inscrito = Usuario_Evento(
         idEvento = session['eventoReg'],
         idUsuario = id,
-        estaInscrito = False
+        estaInscrito = False,
+        idCategoria_Paquete = idCategoria_Paquete
     )
+    
     session.pop('eventoReg', None)
     session['idUsuario'] = id # login automatico
     session['tipoUsuario'] = 'Participante'
@@ -721,8 +723,16 @@ def index():
     print(var_notShow)
     return render_template('SCV-B05SeleccionarEventoParticipante.html',nombreUsuario=nom_usuario,tipoUsuario=session['tipoUsuario'],evento=renderEventos,arrSizes=arrSizes,size=size,notShow=var_notShow)
 
-@app.route('/registrarse/<id>')
+@app.route('/registrarse/<id>', methods=['POST'])
 def registrarse(id):
+    
+    categoria = request.form.get('categoria')
+    paquete = request.form.get('paquete')
+    categoria_paquete = Categoria_Paquete.query.filter_by(
+            idCategoria = categoria,
+            idPaquete = paquete
+        ).first()
+    
     # si ya esta logeado
     if 'idUsuario' in session and session['tipoUsuario'] == 'Participante':
         # buscar si ya esta inscrito en el evento
@@ -732,7 +742,7 @@ def registrarse(id):
         ).first()
         if usuario_evento == None:
             session['eventoReg'] = id
-            registrarUsuario(session['idUsuario'])
+            registrarUsuario(session['idUsuario'],categoria_paquete.id)
         return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
     session['eventoReg'] = id
     return redirect(url_for('login'))
@@ -1147,13 +1157,25 @@ def obtenerActividadesAmbiente():
     
     return response
 
-@app.route('/obtenerCategoriasPaquete', methods=['POST','GET'])
-def obtenerCategoriasPaquete():
-    paquete = [
-        {"id":"PAP","nombre":"Basico"}
-    ]
+@app.route('/obtenerCategoriasPaquete/<idCat>', methods=['POST','GET'])
+def obtenerCategoriasPaquete(idCat):
+    
+    CategoriaPaquete = Categoria_Paquete.query.filter_by(idCategoria = idCat)
+    idPaquetes = []
+    for cp in CategoriaPaquete:
+        idPaquetes.append(cp.idPaquete)
+        
+    paquetes = Paquete.query.filter(Paquete.id.in_(idPaquetes)).all()
+    
+    listaPaquetes = []
+    for paquete in paquetes:
+        listaPaquetes.append({
+            "id":paquete.id,
+            "nombre":paquete.nombre
+        })
+        
     response ={
-        "paquete":paquete
+        "paquete":listaPaquetes
     }
     return response
 
