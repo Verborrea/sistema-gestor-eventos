@@ -144,11 +144,11 @@
         request.open('GET',  "/obtenerReporteInscritos", false);
         request.onload = () => {
             const pdf = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',pdf)
-            document.getElementById("exportar").setAttribute('download',pdf)
+            document.getElementById("exportar").setAttribute('href',pdf.url)
+            document.getElementById("exportar").setAttribute('download',pdf.fileName)
             
         };
-        request.send(idParticipante = idParticipante, formato=formato)
+        request.send(seleccion = seleccion, formato="pdf")
     }
     //Obtener Inscritos
     function getInscritos(){
@@ -185,15 +185,5 @@
         };
         request.send(seleccion = seleccion)
     }
-</script>
-
-<script>
-    /*idPaquete
-    idCategoria
-    fechaDesde
-    fechaHasta
-
-    opcionesPaquetes
-    opcionesCategorias*/
 </script>
 {% endblock %}

@@ -1,0 +1,198 @@
+{% extends "Reportes.html" %}
+<html>
+{% block Reporte %}
+        <h1>Reporte Materiales</h1>
+        <form method="post">
+            <div id="reporteInscritosContainer"></div>
+            
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm">
+                        <label for="inputAmbiente">Ambiente</label>
+                        <select id="inputAmbiente" class="form-control" name="ambiente" onchange="getActividades(this.value)" required>
+                            <option value="all"> Todos </option>
+                            {% for i in range(len.Ambiente)%}
+                            <option value="{{ ambiente[i].id }}">{{ ambiente[i].texto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-sm">
+                        <label for="inputActividad">Actividad</label>
+                        <select id="inputActividad" class="form-control" name="actividad" onchange="changeActividadSeleccionada(this.value)" required>
+                            <option value="all">Seleccione un ambiente primero</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaEntrega">Fecha </label>
+                            <input type="date" class="form-control" id="fechaEntrega" name="fechaEntrega" onchange="changeIdFechaEntrega(this.value)">
+                        </div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="Estado">Estado</label>
+                            <select id="inputEstado" class="form-control" name="estado" onchange="changeEstadoSeleccionado(this.value)" required>
+                                <option value="all">Todos</option>
+                                <option value="entregado">Entregado</option>
+                                <option value="noEntregado">No Entregado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col">
+                        <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="getMateriales()">Buscar</button>
+                    </div>
+                    <div class="col ">
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Material</th>
+                        <th scope="col">Participante</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Detalles</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    
+                </tbody>
+            </table>
+        </form>
+
+        <div id="modalDetallesContainer">
+            <div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Detalles</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nombreMaterial">Nombre del material</label>
+                                <input type="text" class="form-control" id="nombreMaterial" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipoMaterial">Tipo del material</label>
+                                <input type="text" class="form-control" id="tipoMaterial" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcionBreve">Descripción Breve</label>
+                                <input type="text" class="form-control" id="descripcionBreve" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="estadoMaterial">Estado</label>
+                                <input type="text" class="form-control" id="estadoMaterial" readonly>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+{% block script %}
+<script>
+
+    var seleccion ={
+        "idActividad":"All",
+        "idAmbiente":"All",
+        "idFechaEntrega":"All",
+        "idEstado":"All",
+    }
+    let idActividad = "inputActividad"
+    let iAmbiente = "inputAmbiente"
+    let idTablaBody = "tbody"
+
+    function changeActividadSeleccionada(val){ seleccion.idActividad = val }
+    function changeIdFechaEntrega(val){ seleccion.idFechaEntrega = val }
+    function changeEstadoSeleccionado(val){ seleccion.idEstado = val }// utilizar para estado
+
+    function getActividades(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerActividadesAmbiente", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idActividad," ")
+            // BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let actividad = data.actividad
+            let optionsHtml = String.raw`<option value="all" selected> Todos </option>`
+            for (let i in actividad){
+                optionsHtml+=String.raw`<option value="${actividad[i].id}">${actividad[i].nombre}</option>`
+            }
+            BOOSTTRAP.Utilities.onlyChild(idActividad,optionsHtml)
+            seleccion.idAmbiente = idAmb
+        };
+        request.send(idAmb=idAmb)
+    }
+
+    function detallesMaterial(idMaterial){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerDetalleMaterial", false);
+        request.onload = () => {
+            
+            const material = JSON.parse(request.responseText);
+            document.getElementById("nombreMaterial").value = material.nombre;
+            document.getElementById("tipoMaterial").value = material.tipo;
+            document.getElementById("descripcionBreve").value = material.descripcion;
+            document.getElementById("estadoMaterial").value = material.estado;
+            
+        };
+        request.send(idMaterial = idMaterial)
+    }
+
+    function exportar(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerReporteMaterial", false);
+        request.onload = () => {
+            const pdf = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',pdf.url)
+            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+        };
+        request.send(seleccion = seleccion, formato="pdf")
+    }
+    //Obtener Materiales
+    function getMateriales(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerMaterialesActividadesAmbientes", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let material = data.material
+            let tableRows = ""
+            for (let i in material){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${parseInt(i)+1}</th>
+                    <th >${material[i].nombre}</th>
+                    <td>${material[i].participante}</td>
+                    <td>${material[i].estado}</td>
+                    <td>${material[i].fecha}</td>
+                    <td>
+                        <button id="" class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#detallesModal" onclick="detallesMaterial('${material[i].idMaterial}')">
+                            <span class="fas fa-eye"></span>
+                        </button>
+                    </td>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
+        };
+        request.send(seleccion = seleccion)
+    }
+</script>
+{% endblock %}

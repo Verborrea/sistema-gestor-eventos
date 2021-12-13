@@ -1274,8 +1274,64 @@ def obtenerQRparticipante():
 @app.route('/obtenerReporteInscritos/', methods=['POST','GET'])
 def obtenerReporteInscritos():
     # No olvidar generar el pdf
-    fileName = "/static/pdfs/pdf.pdf"
-    return fileName
+    response ={
+        "fileName":"Reporte Inscritos.pdf",
+        "url" : "/static/pdfs/pdf.pdf"
+    }
+    return response
+
+# Reporte Materiales
+
+@app.route('/reporteMateriales', methods=['POST','GET'])
+def reporteMateriales():
+    
+    ambiente = [
+        {"id":"AMBAMB","texto":"Ambientito"}
+    ]
+    lens={
+        "Ambiente":len(ambiente)
+    }
+    return render_template(
+        "SCV-B18reporteMateriales.html",
+        ambiente=ambiente,
+        len=lens
+    )
+
+@app.route('/obtenerDetalleMaterial/', methods=['POST','GET'])
+def obtenerDetalleMaterial():
+    # se manda el idMaterial en el request
+    material = {
+        "nombre":"nombre",
+        "tipo":"tipo",
+        "descripcion":"descripcion",
+        "estado":"estado",
+    }
+    return material
+
+@app.route('/obtenerReporteMaterial/', methods=['POST','GET'])
+def obtenerReporteMaterial():
+    # No olvidar generar el pdf
+    response ={
+        "fileName":"Reporte Materiales.pdf",
+        "url" : "/static/pdfs/pdf.pdf"
+    }
+    return response
+
+@app.route('/obtenerMaterialesActividadesAmbientes', methods=['POST','GET'])
+def obtenerMaterialesActividadesAmbientes():
+    material=[
+        {
+        "idMaterial":"IDIDID",
+        "nombre":"puesNombre",
+        "participante":"paquete",
+        "estado":"categoria",
+        "fecha":"ayer"
+        }
+    ]
+    response={
+        "material":material
+    }
+    return response
 
 
 if __name__ == '__main__':
