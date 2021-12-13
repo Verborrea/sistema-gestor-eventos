@@ -1,0 +1,141 @@
+{% extends "Reportes.html" %}
+<html>
+{% block Reporte %}
+        <h1>Reporte Asistencias</h1>
+        <form method="post">
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm">
+                        <label for="inputAmbiente">Ambiente</label>
+                        <select id="inputAmbiente" class="form-control" name="ambiente" onchange="getActividades(this.value)" required>
+                            <option value="all"> Todos </option>
+                            {% for i in range(len.Ambiente)%}
+                            <option value="{{ ambiente[i].id }}">{{ ambiente[i].texto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-sm">
+                        <label for="inputActividad">Actividad</label>
+                        <select id="inputActividad" class="form-control" name="actividad" onchange="changeActividadSeleccionada(this.value)" required>
+                            <option value="all">Seleccione un ambiente primero</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaInicio">Fecha inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" onchange="changeIdFechaInicio(this.value)">
+                        </div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaFin">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" onchange="changeIdFechaFin(this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col">
+                        <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="getAsistencias()">Buscar</button>
+                    </div>
+                    <div class="col ">
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Turno</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Asistió</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    
+                </tbody>
+            </table>
+        </form>
+
+{% endblock %}
+{% block script %}
+<script>
+
+    var seleccion ={
+        "idActividad":"All",
+        "idAmbiente":"All",
+        "idFechaInicio":"All",
+        "idFechaFin":"All",
+    }
+    let idActividad = "inputActividad"
+    let iAmbiente = "inputAmbiente"
+    let idTablaBody = "tbody"
+
+    function changeActividadSeleccionada(val){ seleccion.idActividad = val }
+    function changeIdFechaInicio(val){ seleccion.idFechaInicio = val }
+    function changeIdFechaFin(val){ seleccion.idFechaFin = val }
+
+    function getActividades(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerActividadesAmbiente", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idActividad," ")
+            // BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let actividad = data.actividad
+            let optionsHtml = String.raw`<option value="all" selected> Todos </option>`
+            for (let i in actividad){
+                optionsHtml+=String.raw`<option value="${actividad[i].id}">${actividad[i].nombre}</option>`
+            }
+            BOOSTTRAP.Utilities.onlyChild(idActividad,optionsHtml)
+            seleccion.idAmbiente = idAmb
+        };
+        request.send(idAmb=idAmb)
+    }
+
+
+    function exportar(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerReporteAsistencia", false);
+        request.onload = () => {
+            const pdf = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',pdf.url)
+            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+        };
+        request.send(seleccion = seleccion, formato="pdf")
+    }
+    //Obtener Asistencias
+    function getAsistencias(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerAsistenciasActividadesAmbientes", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let asistencia = data.asistencia
+            let tableRows = ""
+            for (let i in asistencia){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${parseInt(i)+1}</th>
+                    <th >${asistencia[i].nombre}</th>
+                    <td>${asistencia[i].turno}</td>
+                    <td>${asistencia[i].fecha}</td>
+                    <td>${asistencia[i].hora}</td>
+                    <td>${asistencia[i].asistio}</td>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
+        };
+        request.send(seleccion = seleccion)
+    }
+</script>
+{% endblock %}

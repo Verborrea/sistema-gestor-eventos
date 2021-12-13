@@ -59,13 +59,13 @@ Boundaries y archivos
 - Reporte*
 
 **CD-B16**    ReporteInscritos
-- ReporteInscritos*
+- ReporteInscritos
 
 **CD-B17**    ReporteAsistencia
-- ReporteAsistencia*
+- ReporteAsistencia
 
 **CD-B18**    ReporteMateriales
-- ReporteMateriales*
+- ReporteMateriales
 
 **CD-B19**    CrearGestor
 - CrearUsuario

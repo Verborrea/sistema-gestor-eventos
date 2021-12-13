@@ -1334,5 +1334,49 @@ def obtenerMaterialesActividadesAmbientes():
     return response
 
 
+# Reporte Asistencia
+
+@app.route('/reporteAsistencias', methods=['POST','GET'])
+def reporteAsistencias():
+    
+    ambiente = [
+        {"id":"AMBAMB","texto":"Ambientito"}
+    ]
+    lens={
+        "Ambiente":len(ambiente)
+    }
+    return render_template(
+        "SCV-B17ReporteAsistencia.html",
+        ambiente=ambiente,
+        len=lens
+    )
+
+@app.route('/obtenerReporteAsistencia/', methods=['POST','GET'])
+def obtenerReporteAsistencia():
+    # No olvidar generar el pdf
+    response ={
+        "fileName":"Reporte Asistencia.pdf",
+        "url" : "/static/pdfs/pdf.pdf"
+    }
+    return response
+
+
+@app.route('/obtenerAsistenciasActividadesAmbientes', methods=['POST','GET'])
+def obtenerAsistenciasActividadesAmbientes():
+    asistencia=[
+        {
+        "idAsistencia":"IDIDID",
+        "nombre":"puesNombre",
+        "turno":"puesTurno",
+        "fecha":"En los anios 1600",
+        "hora":"pan pan pan",
+        "asistio":"harina!"
+        }
+    ]
+    response={
+        "asistencia":asistencia
+    }
+    return response
+
 if __name__ == '__main__':
     app.run()
