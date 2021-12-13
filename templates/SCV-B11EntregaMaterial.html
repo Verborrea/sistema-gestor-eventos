@@ -51,7 +51,7 @@
     let idTablaBody = "tbody"
     function getActividades(idAmb){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerActividadesAmbiente/", false);
+        request.open('GET',  "/obtenerActividadesAmbiente", false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idActividad," ")
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
@@ -104,7 +104,7 @@
     //Obtener Participantes
     function getParticipantes(idAct){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerParticipantesActividadAmbiente/", false);
+        request.open('GET',  "/obtenerParticipantesActividadAmbiente", false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);

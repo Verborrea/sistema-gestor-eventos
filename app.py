@@ -1095,8 +1095,8 @@ def validarInscripcion():
         tipoUsuario = session['tipoUsuario']
     )
 
-@app.route('/asistencia', methods=['POST','GET'])
-def asistencia():
+@app.route('/registraAsistencia', methods=['POST','GET'])
+def registraAsistencia():
     return "Registra asistencia de: "
 
 @app.route('/materiales', methods=['POST','GET'])
@@ -1173,8 +1173,8 @@ def obtenerParticipantesActividadAmbiente():
 def nosotros():
     return render_template("Nosotros.html",tipoUsuario="Visitante")
 
-@app.route('/registrarAsistencia', methods=['GET','POST'])
-def registrarAsistencia():
+@app.route('/asistencia', methods=['GET','POST'])
+def asistencia():
     ambiente =[
         {"id":"AMB1", "texto":"Nombre de Ambiente"}
     ]
@@ -1200,7 +1200,7 @@ def registrarAsistencia():
         asistencia=asistencia,
     )
 
-@app.route('/obtenerParticipantesAmbienteAsistencia', methods=['GET'])
+@app.route('/obtenerParticipantesAmbienteAsistencia', methods=['GET','POST'])
 def obtenerParticipantesAmbienteAsistencia():
     #idAmb #mandamos en el request
     participante = [
@@ -1211,16 +1211,14 @@ def obtenerParticipantesAmbienteAsistencia():
     }
     return response
 
-#no usamos
-@app.route('/obtenerNombreQR', methods=['GET'])
-def obtenerNombreQR():
+@app.route('/obtenerQRAsistencia', methods=['GET'])
+def obtenerQRAsistencia():
     #idAmb #mandamos en el request
     response = {
-        "nombreQR":"qrqrqr.jpg",
-        "codigo":"codigoSesionTomadoAsistencia"
+        "imgSrc":"static\qrs\CODECODE.png",
+        "session":"codigoSesionTomadoAsistencia"
     }
     return response
-
 
 @app.route('/terminarAsistencia', methods=['GET'])
 def terminarAsistencia():
@@ -1239,9 +1237,13 @@ def reporteInscritos():
         paquete=paquete,
         len=lens
     )
-@app.route('/obtenerCodigoQRParticipante', methods=['POST','GET'])
+@app.route('/obtenerQRParticipantes', methods=['POST','GET'])
 def obtenerCodigoQRParticipante():
-    return "jiji"
+    response ={
+        "fileName":"Códigos QR.pdf",
+        "url" : "/static/pdfs/pdf.pdf"#no se olviden de generar el url
+    }
+    return response
 
 @app.route('/obtenerCategoriasPaquetesIns', methods=['POST','GET'])
 def obtenerCategoriasPaquetesIns():
@@ -1386,8 +1388,9 @@ def reporteCertificado():
         "SCV-B14GenerarCertificados.html",
     )
 
-@app.route('/obtenerReporteCertificados/', methods=['POST','GET'])
+@app.route('/obtenerReporteCertificados', methods=['POST','GET'])
 def obtenerReporteCertificados():
+    
     # No olvidar generar el pdf
     response ={
         "fileName":"Certificados.pdf",
@@ -1400,15 +1403,15 @@ def obtenerReporteCertificados():
 def obtenerParticipantesCertificados():
     participantes=[
         {
-        "id":"IDIDID",
+        "id":"IDIDID1",
         "nombre":"puesNombre",
         },
         {
-        "id":"IDIDID",
+        "id":"IDIDID2",
         "nombre":"puesNombre",
         },
         {
-        "id":"IDIDID",
+        "id":"IDIDID3",
         "nombre":"puesNombre",
         }
     ]

@@ -84,9 +84,14 @@
             const pdf = JSON.parse(request.responseText);
             document.getElementById("exportar").setAttribute('href',pdf.url)
             document.getElementById("exportar").setAttribute('download',pdf.fileName)
-            
         };
-        request.send(seleccion = seleccion, formato="pdf")
+        text = {}
+
+        var arr = document.getElementsByClassName("seleccionado")
+        for(i in arr){
+            text[arr[i].value] = arr[i].checked
+        }
+        request.send(seleccion = text, formato="pdf")
     }
 
     function seleccionarTodos(){

@@ -38,12 +38,9 @@
                     </form>
                 </td>
                 <td>
-                    <form action="{{url_for('obtenerCodigoQR')}}">
-                        <input type="text" value="{{idEvento}}" name="idEvento" style="display: none;">
-                        <button id="" class="btn btn-primary btn-sm" type="submit">
-                            <span class="fas fa-qrcode"></span>
-                        </button>
-                    </form>
+                    <a href="#" id="exportar" class="btn btn-primary btn-sm" type="button" onclick="exportar({{idEvento}})" download="pdf.pdf">
+                        <span class="fas fa-qrcode"></span>
+                    </a>
                 </td>
 
             </tr>
@@ -52,3 +49,18 @@
     </table>
 {% endblock %}
 </html>
+{% block script %}
+<script>
+function exportar(val){
+    const request = new XMLHttpRequest();
+    request.open('GET',  "/obtenerQRParticipantes", false);
+    request.onload = () => {
+        const pdf = JSON.parse(request.responseText);
+        document.getElementById("exportar").setAttribute('href',pdf.url)
+        document.getElementById("exportar").setAttribute('download',pdf.fileName)
+    };
+    request.send(id = val, formato="pdf")
+}
+
+</script>
+{% endblock %}

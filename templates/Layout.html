@@ -46,7 +46,7 @@
                         {% if tipoUsuario == 'Colaborador' %}
                         <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('colaborador')}}'">{{nombreEvento}}</h5>
                         <nav class="my-2 my-md-0 mr-md-3">
-                            <a class="p-2 text-dark" href="#" disabled>Asistencia</a>
+                            <a class="p-2 text-dark" href="{{ url_for('asistencia') }}" disabled>Asistencia</a>
                             <a class="p-2 text-dark" href="{{ url_for('materiales') }}">Materiales</a>
                         </nav>
                         {% else %}

@@ -14,7 +14,9 @@
                     </button>
                     </div>
                     <div class="modal-body">
-                        <img src="{{codigo.rutaImagen}}" alt="Generando código QR para el llenado de asistencia" id="imgQR" style="height: 100px;width: 100px;background-color: aliceblue;">
+                        <div class="text-center">
+                            <img src="#" alt="Generando código QR para el llenado de asistencia" id="imgQR" style="height: 350px;width: 350px;background-color: aliceblue;">
+                        </div>
                     </div>
                     <div class="modal-footer">
                     <form action="{{url_for('terminarAsistencia')}}">
@@ -94,7 +96,7 @@
     //Obtener Participantes
     function getParticipantes(idAmb){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia/", false);
+        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia", false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);
@@ -103,7 +105,7 @@
             for (let i in participante){
                 tableRows+=String.raw`
                 <tr>
-                    <th scope="row">${i+1}</th>
+                    <th scope="row">${parseInt(i)+1}</th>
                     <th >${participante[i].participante}</th>
                     <th >${participante[i].horaIngreso}</th>
                 </tr>
@@ -113,7 +115,16 @@
         };
         request.send(idAmb=idAmb)
     }
-
+    function obtenerQr(idAmb){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerQRAsistencia", false);
+        request.onload = () => {
+            const qr = JSON.parse(request.responseText);
+            document.getElementById("imgQR").src = qr.imgSrc
+            document.getElementById("codigoAsistencia").value = qr.session
+        };
+        request.send(idAmb=idAmb)
+    }
 
     //
     //Obtener Participantes
