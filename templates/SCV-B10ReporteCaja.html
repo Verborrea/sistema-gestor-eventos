@@ -50,6 +50,7 @@
 {% endblock %}
 {% block script %}
 <script>
+    //Funcion que permite exportar el reporte de caja en extension .pdf y .xls
     function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteCaja", false);
