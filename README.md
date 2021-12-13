@@ -59,3 +59,4 @@ Boundaries y archivos
 - Mensaje
 - Nosotros
 - PaginaColaborador
+- Reportes

@@ -1,0 +1,199 @@
+{% extends "Reportes.html" %}
+<html>
+{% block Reporte %}
+        <h1>Reporte Inscritos</h1>
+        <form method="post">
+            <div id="reporteInscritosContainer"></div>
+            
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm">
+                        <label for="inputPaquete">Paquete</label>
+                        <select id="inputPaquete" class="form-control" name="paquete" onchange="getCategorias(this.value)" required>
+                            <option value="all"> Todos </option>
+                            {% for i in range(len.Paquete)%}
+                            <option value="{{ paquete[i].id }}">{{ paquete[i].texto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-sm">
+                        <label for="inputCategoria">Categoria</label>
+                        <select id="inputCategoria" class="form-control" name="categoria" onchange="changeCategoriaSeleccionada(this.value)" required>
+                            <option value="all">Seleccione un paquete primero</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaInicio">Fecha inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" onchange="changeIdFechaInicio(this.value)">
+                        </div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="fechaFin">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" onchange="changeIdFechaFin(this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col">
+                        <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="getInscritos()">Buscar</button>
+                    </div>
+                    <div class="col ">
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Paquete</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">QR</th>
+                        <th scope="col">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    
+                </tbody>
+            </table>
+        </form>
+
+        <div id="modalQrContainer">
+            <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Codigo QR</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nobreParticipante">Nombre del participante</label>
+                                <input type="text" class="form-control" id="nombreParticipante" readonly>
+                            </div>
+                            <div class="text-center">
+                                <img id="qrParticipante" src="" alt="" width="400px" height="400px">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+{% block script %}
+<script>
+    var seleccion ={
+        "idPaquete":"All",
+        "idCategoria":"All",
+        "idFechaInicio":"All",
+        "idFechaFin":"All",
+    }
+    let idPaquete = "inputPaquete"
+    let idCategoria = "inputCategoria"
+    let idTablaBody = "tbody"
+
+    function changeCategoriaSeleccionada(val){ seleccion.idCategoria = val }
+    function changeIdFechaInicio(val){ seleccion.idFechaInicio = val }
+    function changeIdFechaFin(val){ seleccion.idFechaFin = val }
+
+    function getCategorias(idPaq){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerCategoriasPaquetesIns", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idCategoria," ")
+            // BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let categoria = data.categoria
+            let optionsHtml = String.raw`<option value="all" selected> Todos </option>`
+            for (let i in categoria){
+                optionsHtml+=String.raw`<option value="${categoria[i].id}">${categoria[i].nombre}</option>`
+            }
+            BOOSTTRAP.Utilities.onlyChild(idCategoria,optionsHtml)
+            seleccion.idPaquete = idPaq
+        };
+        request.send(idPaq=idPaq)
+    }
+
+    function updateQRParticipante(idParticipante){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerQRparticipante", false);
+        request.onload = () => {
+            
+            const participante = JSON.parse(request.responseText);
+            document.getElementById("nombreParticipante").value = participante.nombre;
+            document.getElementById("qrParticipante").setAttribute('src',participante.qr)
+            
+        };
+        request.send(idParticipante = idParticipante)
+    }
+
+    function exportar(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerReporteInscritos", false);
+        request.onload = () => {
+            const pdf = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',pdf)
+            document.getElementById("exportar").setAttribute('download',pdf)
+            
+        };
+        request.send(idParticipante = idParticipante, formato=formato)
+    }
+    //Obtener Inscritos
+    function getInscritos(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerInscritosCategoriasPaquetes", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
+            const data = JSON.parse(request.responseText);
+            let inscrito = data.inscrito
+            let tableRows = ""
+            for (let i in inscrito){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${parseInt(i)+1}</th>
+                    <th >${inscrito[i].nombre}</th>
+                    <td>${inscrito[i].paquete}</td>
+                    <td>${inscrito[i].categoria}</td>
+                    <td>
+                        <button id="" class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#qrModal" onclick="updateQRParticipante('${inscrito[i].idParticipante}')">
+                            <span class="fas fa-qrcode"></span>
+                        </button>
+                        <!--<form action="{{url_for('obtenerCodigoQRParticipante')}}">
+                            <input type="text" value="${inscrito[i].idParticipante}" name="idParticipante" style="display: none;">
+                            <button id="" class="btn btn-primary btn-sm" type="submit">
+                                <span class="fas fa-qrcode"></span>
+                            </button>
+                        </form>-->
+                    </td>
+                    <td>${inscrito[i].fecha}</td>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
+        };
+        request.send(seleccion = seleccion)
+    }
+</script>
+
+<script>
+    /*idPaquete
+    idCategoria
+    fechaDesde
+    fechaHasta
+
+    opcionesPaquetes
+    opcionesCategorias*/
+</script>
+{% endblock %}

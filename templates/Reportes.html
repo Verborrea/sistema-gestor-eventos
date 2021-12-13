@@ -1,0 +1,49 @@
+
+{% extends "Layout.html" %}
+{% block body %}
+<html>
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-home" aria-selected="true">
+                Caja
+            </a>
+            <a class="nav-link" data-toggle="tab" href="{{ url_for('reporteInscritos') }}" role="tab" aria-controls="nav-home" aria-selected="true">
+                Inscritos
+            </a>
+            <a class="nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-home" aria-selected="true">
+                Materiales
+            </a>
+            <a class="nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-home" aria-selected="true">
+                Certificados
+            </a>
+            <a class="nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-home" aria-selected="true">
+                Asistencias
+            </a>
+        </div>
+    </nav>
+    <br>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel">
+            {% block Reporte %}
+            {% endblock %}
+        </div>
+
+    </div>
+    
+    <!--
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show" id="nav-caja" role="tabpanel">
+            {% block reporteCaja %}
+            {% endblock %}
+        </div>
+        <div class="tab-pane fade show" id="nav-inscrito" role="tabpanel">
+            {% block reporteInscritos %}
+            {% endblock %}
+        </div>
+        
+    </div>
+
+    -->
+    <br>
+</html>
+{% endblock %}

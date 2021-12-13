@@ -1,3 +1,4 @@
+from flask.templating import render_template_string
 from markupsafe import escape
 from werkzeug.wrappers import response
 from models import *
@@ -1224,6 +1225,57 @@ def obtenerNombreQR():
 @app.route('/terminarAsistencia', methods=['GET'])
 def terminarAsistencia():
     return "Que los juegos del hambre comiencen"
+
+# ======== REPORTES ========
+@app.route('/reporteInscritos', methods=['POST','GET'])
+def reporteInscritos():
+    paquete = [{"id":"id","texto":"texto"}]
+    
+    lens ={
+        "Paquete":len(paquete)
+    }
+    return render_template(
+        "SCV-B16ReporteInscritos.html",
+        paquete=paquete,
+        len=lens
+    )
+@app.route('/obtenerCodigoQRParticipante', methods=['POST','GET'])
+def obtenerCodigoQRParticipante():
+    return "jiji"
+
+@app.route('/obtenerCategoriasPaquetesIns', methods=['POST','GET'])
+def obtenerCategoriasPaquetesIns():
+    categoria=[
+        {"id":"IDIDID","nombre":"puesNombre"}
+    ]
+    response={
+        "categoria":categoria
+    }
+    return response
+
+@app.route('/obtenerInscritosCategoriasPaquetes', methods=['POST','GET'])
+def obtenerInscritosCategoriasPaquetes():
+    inscrito=[
+        {"idParticipante":"IDIDID","nombre":"puesNombre","paquete":"paquete","categoria":"categoria","fecha":"ayer"},
+
+        {"idParticipante":"IDIDID","nombre":"puesNombre","paquete":"paquete","categoria":"categoria","fecha":"ayer"}
+    ]
+    response={
+        "inscrito":inscrito
+    }
+    return response
+
+@app.route('/obtenerQRparticipante', methods=['POST','GET'])
+def obtenerQRparticipante():
+    # No olvidar cambiar el qr
+    participante= {"nombre":"Dino","qr":"/static/qrs/CODECODE.png"}
+    return participante
+
+@app.route('/obtenerReporteInscritos/', methods=['POST','GET'])
+def obtenerReporteInscritos():
+    # No olvidar generar el pdf
+    fileName = "/static/pdfs/pdf.pdf"
+    return fileName
 
 
 if __name__ == '__main__':
