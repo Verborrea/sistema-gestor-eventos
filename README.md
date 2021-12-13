@@ -50,7 +50,7 @@ Boundaries y archivos
 - RegistrarAsistencia
 
 **CD-B13**    RegistrarAsistenciaMovil
-- RegistrarAsistenciaMovil*
+- RegistrarAsistenciaMovil
 
 **CD-B14**    GenerarCertificados
 - GenerarCertificados

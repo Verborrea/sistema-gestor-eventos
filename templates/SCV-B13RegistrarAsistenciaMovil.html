@@ -1,0 +1,59 @@
+{% extends "Layout.html" %}
+{% block body %}
+<html>
+    <style>
+        .aceptado{
+            filter: sepia(57%) saturate(984%) hue-rotate(40deg) brightness(97%) contrast(109%);
+        }
+    </style>
+	<h1>Toma de asistencia</h1>
+        <div class="text-center">
+            <h2 id="estado"></h2>
+            <img id="image" src="#" alt="" width="350px" height="350px">
+            <div class="form-group">
+                <input class="form-control-file" type="file" capture="camera" name="qr" onchange="readURL(this);">
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" type="button" onclick="sendBackend()">Escanear</button>
+            <a href="{{ url_for('terminarAsistencia') }}" class="btn btn-success btn-lg btn-block" type="button">Finalizar asistencia</a>
+        </div>
+</html>
+{% endblock %}
+{% block script %}
+<script>
+    imageUrl = ""
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#image')
+                .attr('src', e.target.result)
+                .width(350)
+                .height(350);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+    imageUrl = input
+}
+function sendBackend(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/qrPArticipanteAsistencia", false);
+        request.onload = () => {
+            const response = JSON.parse(request.responseText);
+            document.getElementById("estado").innerHTML=response.estado
+            if(response.estado=="Aceptado") 
+                document.getElementById("image").className="aceptado"
+                //document.getElementById("image").style="-webkit-filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);"
+            else 
+                document.getElementById("image").className="rechazado"
+                //document.getElementById("image").style="-webkit-filter: invert(-25%) sepia() saturate(50%) hue-rotate(-174deg);filter: invert(-25%) sepia() saturate(-50%) hue-rotate(-174deg);"
+
+        };
+        
+        request.send(imageUrl = imageUrl)
+    }
+
+</script>
+{% endblock %}
+-webkit-filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);

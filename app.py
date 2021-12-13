@@ -1453,5 +1453,19 @@ def obtenerReporteCaja():
     }
     return response
 
+# Asistencia movil
+@app.route('/qrPArticipanteAsistencia', methods=['POST','GET'])
+def qrPArticipanteAsistencia():
+    # No olvidar generar el pdf
+    response ={
+        "estado":"Rechazado",
+    }
+    return response
+
+@app.route('/registrarAsistenciaMovil', methods=['POST','GET'])
+def registrarAsistenciaMovil():
+    
+    return render_template("SCV-B13RegistrarAsistenciaMovil.html")
+
 if __name__ == '__main__':
     app.run()
