@@ -121,10 +121,12 @@
     let iAmbiente = "inputAmbiente"
     let idTablaBody = "tbody"
 
+    // Permite actualizar los datos seleccionados 
     function changeActividadSeleccionada(val){ seleccion.idActividad = val }
     function changeIdFechaEntrega(val){ seleccion.idFechaEntrega = val }
     function changeEstadoSeleccionado(val){ seleccion.idEstado = val }// utilizar para estado
 
+    // Obtiene y muestra las actividades propias de un ambiente
     function getActividades(idAmb){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerActividadesAmbiente", false);
@@ -143,6 +145,7 @@
         request.send(idAmb=idAmb)
     }
 
+    // Permite ver el detalle de los datos de un material
     function detallesMaterial(idMaterial){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerDetalleMaterial", false);
@@ -158,6 +161,7 @@
         request.send(idMaterial = idMaterial)
     }
 
+    // Realiza un request al servidor para obtener el nombre del archivo del reporte
     function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteMaterial", false);
@@ -168,7 +172,8 @@
         };
         request.send(seleccion = seleccion, formato=formato)
     }
-    //Obtener Materiales
+
+    // Permite obtener y mostrar los materiales segun la seleccion de ambiente y actividad
     function getMateriales(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerMaterialesActividadesAmbientes", false);
