@@ -53,7 +53,7 @@ Boundaries y archivos
 - RegistrarAsistenciaMovil*
 
 **CD-B14**    GenerarCertificados
-- GenerarCertificados*
+- GenerarCertificados
 
 **CD-B15**    Reporte
 - Reporte*

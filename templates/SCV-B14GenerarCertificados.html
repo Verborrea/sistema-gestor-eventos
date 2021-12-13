@@ -1,0 +1,97 @@
+{% extends "Reportes.html" %}
+<html>
+{% block Reporte %}
+        <h1>Generar Certificados</h1>
+        <form method="post"> 
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="form-group col-sm">
+                        <label for="inputNombre">Nombre</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="">
+                            <div class="input-group-append">
+                              <button class="btn btn-outline-secondary" type="button" id="button-addon" onclick="getParticipantes()">Buscar</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col">
+                        <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="seleccionarTodos()">Seleccionar Todos</button>
+                    </div>
+                    <div class="col ">
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="submit" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+        </form>
+
+{% endblock %}
+{% block script %}
+<script>
+    var seleccion ={
+        "idParticipante":"All",
+        
+    }
+    idParticipantes = "tbody"
+    function getParticipantes(idPar){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerParticipantesCertificados", false);
+        request.onload = () => {
+            BOOSTTRAP.Utilities.onlyChild(idParticipantes," ")
+            const data = JSON.parse(request.responseText);
+            let participantes = data.participantes
+            let tableRows =""
+            for (let i in participantes){
+                tableRows+=String.raw`
+                <tr>
+                    <th scope="row">${parseInt(i)+1}</th>
+                    <th >${participantes[i].nombre}</th>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input position-static seleccionado" type="checkbox" value="${participantes[i].id}" aria-label="..." name="ids">
+                        </div>
+                    </td>
+                </tr>
+                `
+            }
+            BOOSTTRAP.Utilities.onlyChild(idParticipantes,tableRows)
+            seleccion.idParticipante = idPar
+        };
+        request.send(idPar=idPar)
+    }
+
+    function exportar(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerReporteCertificados", false);
+        request.onload = () => {
+            const pdf = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',pdf.url)
+            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+            
+        };
+        request.send(seleccion = seleccion, formato="pdf")
+    }
+
+    function seleccionarTodos(){
+        $(".seleccionado").attr("checked",true);
+    }
+
+</script>
+{% endblock %}

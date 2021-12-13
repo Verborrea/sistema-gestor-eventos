@@ -1378,5 +1378,44 @@ def obtenerAsistenciasActividadesAmbientes():
     }
     return response
 
+# Generar Certificados
+
+@app.route('/reporteCertificado', methods=['POST','GET'])
+def reporteCertificado():
+    return render_template(
+        "SCV-B14GenerarCertificados.html",
+    )
+
+@app.route('/obtenerReporteCertificados/', methods=['POST','GET'])
+def obtenerReporteCertificados():
+    # No olvidar generar el pdf
+    response ={
+        "fileName":"Certificados.pdf",
+        "url" : "/static/pdfs/pdf.pdf"
+    }
+    return response
+
+
+@app.route('/obtenerParticipantesCertificados', methods=['POST','GET'])
+def obtenerParticipantesCertificados():
+    participantes=[
+        {
+        "id":"IDIDID",
+        "nombre":"puesNombre",
+        },
+        {
+        "id":"IDIDID",
+        "nombre":"puesNombre",
+        },
+        {
+        "id":"IDIDID",
+        "nombre":"puesNombre",
+        }
+    ]
+    response={
+        "participantes":participantes
+    }
+    return response
+
 if __name__ == '__main__':
     app.run()
