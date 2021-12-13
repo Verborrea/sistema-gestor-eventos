@@ -41,7 +41,8 @@
                 <input type="text" class="form-control" value="{{cierreEvento}}" readonly>
             </div>
             <br>
-            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('pdf')" download="pdf.pdf">Exportar PDF</a>
+            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('excel')" download="pdf.pdf">Exportar EXCEL</a>
 
         </div>
     </div>
@@ -49,15 +50,15 @@
 {% endblock %}
 {% block script %}
 <script>
-    function exportar(){
+    function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteCaja", false);
         request.onload = () => {
-            const pdf = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',pdf.url)
-            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+            const file = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',file.url)
+            document.getElementById("exportar").setAttribute('download',file.fileName)
         };
-        request.send(formato="pdf")
+        request.send(formato=formato)
     }
 </script>
 {% endblock %}

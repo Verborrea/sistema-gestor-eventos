@@ -40,12 +40,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col">
+                    <div class="col-3"></div>
+                    <div class="col-3">
                         <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="getInscritos()">Buscar</button>
                     </div>
+                    
                     <div class="col ">
-                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('pdf')" download="pdf.pdf">Exportar PDF</a>
+                    </div>
+                    <div class="col">
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('excel')" download="pdf.pdf">Exportar EXCEL</a>
                     </div>
                 </div>
             </div>
@@ -139,16 +143,16 @@
         request.send(idParticipante = idParticipante)
     }
 
-    function exportar(){
+    function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteInscritos", false);
         request.onload = () => {
-            const pdf = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',pdf.url)
-            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+            const file = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',file.url)
+            document.getElementById("exportar").setAttribute('download',file.fileName)
             
         };
-        request.send(seleccion = seleccion, formato="pdf")
+        request.send(seleccion = seleccion, formato=formato)
     }
     //Obtener Inscritos
     function getInscritos(){
