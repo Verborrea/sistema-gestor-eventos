@@ -1390,7 +1390,7 @@ def reporteCertificado():
 
 @app.route('/obtenerReporteCertificados', methods=['POST','GET'])
 def obtenerReporteCertificados():
-    
+
     # No olvidar generar el pdf
     response ={
         "fileName":"Certificados.pdf",
@@ -1417,6 +1417,39 @@ def obtenerParticipantesCertificados():
     ]
     response={
         "participantes":participantes
+    }
+    return response
+
+# Reporte Caja
+
+@app.route('/reporteCaja', methods=['POST','GET'])
+def reporteCaja():
+    #tipos son ingreso, egreso, otro son para el color de la celda
+    general =[
+        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"ingreso"},
+        {"num":"5","fecha":"nunca","cierre":"$-5000","tipo":"egreso"},
+        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"otro"},
+
+    ]
+    cierreEvento="$-3000"
+    cierreDiario="$3.5"
+    lens = {
+        "general":len(general)
+    }
+    return render_template(
+        "SCV-B10ReporteCaja.html",
+        cierreEvento=cierreEvento,
+        cierreDiario=cierreDiario,
+        general=general,
+        len = lens
+    )
+
+@app.route('/obtenerReporteCaja', methods=['POST','GET'])
+def obtenerReporteCaja():
+    # No olvidar generar el pdf
+    response ={
+        "fileName":"Reporte Caja.pdf",
+        "url" : "/static/pdfs/pdf.pdf"
     }
     return response
 

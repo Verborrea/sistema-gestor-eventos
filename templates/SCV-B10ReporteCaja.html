@@ -1,0 +1,63 @@
+{% extends "Reportes.html" %}
+<html>
+{% block Reporte %}
+<style>
+    th,td {
+        border-style: solid;
+        border-color: #ffffff !important;
+    }
+</style>
+    <h1>Reporte Caja</h1>
+    <br>
+    <div class="row">
+        <div class="col-7">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr class="table-active">
+                        <th scope="col">Num.</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Cierre</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    {% for i in range(len.general) %}
+                        <tr class=" {% if general[i].tipo == 'ingreso'%} table-success {% else %}{% if general[i].tipo == 'egreso' %} table-danger{% else %} table-info {% endif %}{% endif %}">
+                            <th scope="row">{{general[i].num}}</th>
+                            <td>{{general[i].fecha}}</td>
+                            <td>{{general[i].cierre}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-2"></div>
+        <div class="col-3">
+            <h3>Cierre Diario</h3>
+            <div class="form-group">
+                <input type="text" class="form-control" value="{{cierreDiario}}" readonly>
+            </div>
+            <h3>Cierre Evento</h3>
+            <div class="form-group">
+                <input type="text" class="form-control" value="{{cierreEvento}}" readonly>
+            </div>
+            <br>
+            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar()" download="pdf.pdf">Exportar</a>
+
+        </div>
+    </div>
+    
+{% endblock %}
+{% block script %}
+<script>
+    function exportar(){
+        const request = new XMLHttpRequest();
+        request.open('GET',  "/obtenerReporteCaja", false);
+        request.onload = () => {
+            const pdf = JSON.parse(request.responseText);
+            document.getElementById("exportar").setAttribute('href',pdf.url)
+            document.getElementById("exportar").setAttribute('download',pdf.fileName)
+        };
+        request.send(formato="pdf")
+    }
+</script>
+{% endblock %}

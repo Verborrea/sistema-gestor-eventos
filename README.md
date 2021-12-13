@@ -41,7 +41,7 @@ Boundaries y archivos
 - RegistrarMovimiento
 
 **CD-B10**    CierreCaja
-- ReportesCaja*
+- ReporteCaja
 
 **CD-B11**    RegistrarEntregaMaterial
 - EntregaMaterial
@@ -56,7 +56,7 @@ Boundaries y archivos
 - GenerarCertificados
 
 **CD-B15**    Reporte
-- Reporte*
+- Reporte
 
 **CD-B16**    ReporteInscritos
 - ReporteInscritos
