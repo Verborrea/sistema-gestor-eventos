@@ -48,6 +48,8 @@
 {% endblock %}
 {% block script %}
     <script>
+
+        //Parte del script que permite la creacion de un modal para la validacion de pago por transferencia
         let idModal = "registroTransferencia"
         let idButton = "porTransferencia"
         let transferenciaForm = [
@@ -66,6 +68,7 @@
         BOOSTTRAP.Forms.setActionMethod(idModal+"-form","{{ url_for('porTransferencia') }}")
         BOOSTTRAP.Utilities.convertToCallModal(idButton,idModal)
 
+        //Parte del script que permite la creacion de un modal para la validacion de pago por efectivo
         idModal = "registroEfectivo"
         idButton = "porEfectivo"
         let efectivoForm = [

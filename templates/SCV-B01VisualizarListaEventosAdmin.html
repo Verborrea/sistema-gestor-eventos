@@ -117,8 +117,9 @@
 {% block script %}
     <script>
         loadedButton = false
-
-        function generarButtonsAdd(){//Crea los modals y botones de crear nuevo y crear a partir de plantilla
+        //Funcion que permite crear los modals y botones para:
+        //crear nuevo evento y crear evento a partir de plantilla
+        function generarButtonsAdd(){
             if(!loadedButton){
                 let idModalNuevo = "nuevoEventoModal"
                 let idModalPlantilla = "plantillaEventoModal"
@@ -135,7 +136,7 @@
                 document.getElementById(idModalNuevo+"-form").method = "post"
 
 
-                //Aniade botones de los modals
+                //Añade botones de los modals
                 BOOSTTRAP.Utilities.onlyChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalNuevo,"Nuevo Evento"))
                 BOOSTTRAP.Utilities.addChild("BtnEventoPlantilla", BOOSTTRAP.Modals.buildButtonModal(idModalPlantilla,"Evento Plantilla"))
                 
