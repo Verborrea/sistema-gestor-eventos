@@ -51,6 +51,8 @@
 </html>
 {% block script %}
 <script>
+
+//Funcion que permite exportar un archivo .pdf con los QR de los partcipantes del evento seleccionado
 function exportar(val){
     const request = new XMLHttpRequest();
     request.open('GET',  "/obtenerQRParticipantes", false);

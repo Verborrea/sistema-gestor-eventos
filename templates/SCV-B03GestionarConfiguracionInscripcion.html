@@ -215,7 +215,7 @@
 {% block script %}
    <script>
             
-        //Nuevo paquete
+        //Funcion que genera un modal para la creación de un nuevo paquete
         let idModalPaquete = "modalPaquete"
         let datosPaquete = [{"nombre":"nombrePaquete","tipo_dato":"text","texto":"Nombre del Paquete"}]
         let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(idModalPaquete,"Nuevo Paquete",datosPaquete)
@@ -224,7 +224,7 @@
         document.getElementById(idModalPaquete+"-form").method = "post"
         BOOSTTRAP.Utilities.convertToCallModal("crearPaquete",idModalPaquete)
 
-        //Request
+        //Request a los nombres de las actividades y coloca el checkbox a cada una
         const request = new XMLHttpRequest();
         request.open('GET', "{{url_for('obtenerNombreActividades')}}", false);
         
@@ -240,16 +240,13 @@
             
             var button = document.getElementById(idModalPaquete+"-form-button").parentElement.cloneNode("true")
             document.getElementById(idModalPaquete+"-form").removeChild(document.getElementById(idModalPaquete+"-form-button").parentElement)
-            console.log(button)
-            console.log(document.getElementById(idModalPaquete+"-form"))
             document.getElementById(idModalPaquete+"-form").appendChild(button)
-            //console.log()=
         };
         request.send(null)
 
         
 
-        //Nueva Categoria
+        //Funcion que genera un modal para la creación de un nueva categoria
         let idModalCategoria = "modalCategoria"
         let datosForm = [
             {"nombre":"nombreCategoria","tipo_dato":"text","texto":"Nombre de la Categoría"},
