@@ -4,6 +4,7 @@ from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
 from datetime import datetime
+from transacciones import *
 
 import json
 
@@ -72,6 +73,7 @@ def listaEventos():
     for usr_evt in usuario_evento:
         listaIdEventos.append(usr_evt.idEvento)
     datos = []
+    plantilla = []
     # eventos = Evento.query.all()
     for idEvt in listaIdEventos:
         evento = Evento.query.get_or_404(idEvt)
@@ -82,14 +84,13 @@ def listaEventos():
             'fechaCierreInscripcion':crearFecha(evento.fechaCierreInscripcion,"%d/%m/%Y"),
             'fechaInicioEvento':crearFecha(evento.fechaInicio,"%d/%m/%Y"),
             'fechaCierreEvento':crearFecha(evento.fechaFin,"%d/%m/%Y"),
-            'estadoEvento':evento.estado
+            'estadoEvento':evento.estado,
+            'tipoEvento':evento.tipo,
         })
+        if evento.plantilla == True:
+            plantilla.append(datos[-1])
     session.pop('idEvento', None)
-    #######################
-    plantilla = [
-        {"id":"PP","nombre":"Plantilla1","fechaInicioEvento":"hoy","tipoEvento":"charlas"},
-    ]
-    #######################
+
     lens = {
         "general":len(datos),
         "plantilla":len(plantilla),
@@ -1657,6 +1658,11 @@ def qrPArticipanteAsistencia():
 def registrarAsistenciaMovil():
     
     return render_template("SCV-B13RegistrarAsistenciaMovil.html")
+
+@app.route('/cargarTransacciones', methods=['POST','GET'])
+def cargarTransacciones():
+    t = Transacciones(db)
+    return 'ok'
 
 if __name__ == '__main__':
     app.run()
