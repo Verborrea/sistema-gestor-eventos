@@ -3,6 +3,7 @@ from markupsafe import escape
 from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
+from transacciones import *
 
 import json
 
@@ -1488,6 +1489,11 @@ def qrPArticipanteAsistencia():
 def registrarAsistenciaMovil():
     
     return render_template("SCV-B13RegistrarAsistenciaMovil.html")
+
+@app.route('/cargarTransacciones', methods=['POST','GET'])
+def cargarTransacciones():
+    t = Transacciones(db)
+    return 'ok'
 
 if __name__ == '__main__':
     app.run()
