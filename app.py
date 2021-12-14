@@ -3,6 +3,7 @@ from markupsafe import escape
 from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
+from datetime import datetime
 
 import json
 
@@ -1275,19 +1276,61 @@ def obtenerParticipantesActividadAmbiente():
 def nosotros():
     return render_template("Nosotros.html",tipoUsuario="Visitante")
 
+# ================== funcionalidades para COLABORADOR ==================
 @app.route('/asistencia', methods=['GET','POST'])
 def asistencia():
-    ambiente =[
-        {"id":"AMB1", "texto":"Nombre de Ambiente"}
-    ]
+    '''Generar registro de asistencia por participante y ambiente programado para cada actividad del evento'''
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+
+    #Obtener ids de las actividades del evento
+    actividades = Actividad.query.filter_by(idEvento = id_evento)
+    listaIdActividades = []
+    for actividad in actividades:
+        listaIdActividades.append(actividad.id)
+
+    #Obtener ids de ambientes
+    listaAmbientes = []
+    ambientes = Ambiente.query.filter(Ambiente.id.in_(listaIdActividades)).all()
+    for ambiente in ambientes:
+        listaAmbientes.append({
+            "id":ambiente.id,
+            "texto":ambiente.nombre
+        })
+    
     lens={
-        "Ambiente":len(ambiente)
+        "Ambiente":len(listaAmbientes)
     }
+    #Obtener datos de la asistencia
+    ahora = datetime.now()
+    horaAhora = ahora.hour
+    diaAhora = ahora.day
+    mesAhora = ahora.strftime("%b")
+    turno = ""
+    if horaAhora < 12:
+        turno = "Mañana"
+    elif horaAhora < 18:
+        turno = "Tarde"
+    else:
+        turno = "Noche"
+    diaAhora = (mesAhora) + "  " + str(diaAhora)
+
+    listaIdsUsuarios = []
+    participantes_eventos = Usuario_Evento.query.filter_by(idEvento = id_evento)
+    for pe in participantes_eventos:
+        listaIdsUsuarios.append(pe.idUsuario)
+    
+    listaIdsParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdsUsuarios)).all()
+    for participante in participantes:
+        if participante.tipoUsuario == "Participante":
+            listaIdsParticipantes.append(participante.id)
+
     asistencia ={
-        "turno":"noche",
-        "dia":"30 de Febrero",
-        "horaInicio":"10:10",
-        "participantes":20
+        "turno":turno,
+        "dia":diaAhora,
+        "participantes":len(listaIdsParticipantes)
     }
     codigo = {
         "rutaImagen":"qr/qrqrqr.jpg",
@@ -1296,20 +1339,66 @@ def asistencia():
     return render_template(
         "SCV-B12RegistrarAsistencia.html",
         tipoUsuario="Colaborador",
-        ambiente=ambiente,
+        ambiente=listaAmbientes,
         len=lens,
         codigo = codigo,
         asistencia=asistencia,
     )
 
-@app.route('/obtenerParticipantesAmbienteAsistencia', methods=['GET','POST'])
+@app.route('/obtenerParticipantesAmbienteAsistencia/', methods=['GET','POST'])
 def obtenerParticipantesAmbienteAsistencia():
     #idAmb #mandamos en el request
-    participante = [
-        {"participante":"Dino","horaIngreso":"10:10"}
-    ]
+    listaIdUsuarios = []
+    listaHoras = []
+    '''
+    idUsuarios = Asistencia.query.filter_by(idAmbiente = idAmb)
+    for iU in idUsuarios:
+        listaIdUsuarios.append(iU.idUsuario)
+        listaHoras.append({
+            "id":iU.id,
+            "horaIng":(str(iU.fechaAsistencia.hour) + ":" + str(iU.fechaAsistenca.minute))
+        })
+    horasOrdenadas = sorted(listaHoras, key = lambda k : k["id"])
+
+    listaParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdUsuarios)).all()
+    for participante in participantes:
+        listaParticipantes.append({
+            "id": participante.id,
+            "nombre":participante.nombre
+        })
+    participantesOrdenados = sorted(listaParticipantes, key = lambda k : k["id"])
+
+    listaAsistencias = []
+    for hora, participante in horasOrdenadas, participantesOrdenados:
+        listaAsistencias.append({
+            "participante":participante.get("nombre"),
+            "horaIngreso":hora.get("horaIng")
+        })
+    
+    #prueba
+    listaPrueba = []
+    horaPrueba = [{
+        "id":"1",
+        "horaIng":"10:20"
+    }]
+    participantePrueba = [{
+        "id":"1",
+        "nombre":"Felipe"
+    }]
+    for hora, participante in horaPrueba, participantePrueba:
+        listaPrueba.append({
+            "participante":participante.get("nombre"),
+            "horaIngreso":hora.get("horaIng")
+        })
+    '''
+    listaEjemplo = [{
+        "participante":"Jose",
+        "horaIngreso":"10:50"
+    }]
+
     response = {
-        "participante":participante
+        "participante":listaEjemplo
     }
     return response
 
