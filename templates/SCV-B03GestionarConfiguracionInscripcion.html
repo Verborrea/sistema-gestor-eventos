@@ -15,7 +15,7 @@
                     {%for i in range(paquetes)%}
                     <th scope="col">
                         {{paquete[i]}}
-                        <a href="{{ url_for('eliminarPaquete',id = ids_paquete[paquete[i]]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
+                        <a href="{{ url_for('eliminarPaquete',id = ids_paquete[i]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
                     </th>
                     {%endfor%}
                     
@@ -27,7 +27,7 @@
                     <tr>
                         <td scope="row">
                             {{categoria[i]}}
-                            <a href="{{ url_for('eliminarCategoria',id = ids_categoria[categoria[i]]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
+                            <a href="{{ url_for('eliminarCategoria',id = ids_categoria[i]) }}"><i class="fas fa-trash" style="color: Tomato;"> </i></a>
 
                         </td>
                         {% for j in range(paquetes)%}
