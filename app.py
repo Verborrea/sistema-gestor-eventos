@@ -1293,13 +1293,13 @@ def materiales():
         })
     
     lens={
-        "Ambiente":len(listaAmbientes)
-        
+        "Ambiente":len(listaAmbientes) 
     }
     return render_template(
         "SCV-B11EntregaMaterial.html",
         ambiente=listaAmbientes,
-        len=lens
+        len=lens,
+        tipoUsuario=session['tipoUsuario']
     )
 
 @app.route('/obtenerCodigoQR', methods=['POST','GET'])
