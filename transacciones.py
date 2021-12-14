@@ -592,8 +592,8 @@ class Transacciones:
         nuevo_inscrito = Usuario_Evento(
             idEvento = self.eventos["libro"].id,
             idUsuario = nuevo_usuario.id,
-            estaInscrito = False,
-            idCategoria_Paquete = nuevaCategoriaPaquete.id)
+            idCategoria_Paquete = nuevaCategoriaPaquete.id,
+            estaInscrito = True)
         db.session.add(nuevo_inscrito)
         db.session.commit()
 
@@ -612,8 +612,8 @@ class Transacciones:
         nuevo_inscrito = Usuario_Evento(
             idEvento = self.eventos["libro"].id,
             idUsuario = nuevo_usuario.id,
-            estaInscrito = False,
-            idCategoria_Paquete = nuevaCategoriaPaquete.id)
+            idCategoria_Paquete = nuevaCategoriaPaquete.id,
+            estaInscrito = True)
         db.session.add(nuevo_inscrito)
         db.session.commit()
 
@@ -632,8 +632,9 @@ class Transacciones:
         nuevo_inscrito = Usuario_Evento(
             idEvento = self.eventos["libro"].id,
             idUsuario = nuevo_usuario.id,
-            estaInscrito = False,
-            idCategoria_Paquete = nuevaCategoriaPaquete.id)
+            idCategoria_Paquete = nuevaCategoriaPaquete.id,
+            estaInscrito = True
+        )
         db.session.add(nuevo_inscrito)
         db.session.commit()
         
@@ -652,8 +653,8 @@ class Transacciones:
         nuevo_inscrito = Usuario_Evento(
             idEvento = self.eventos["libro"].id,
             idUsuario = nuevo_usuario.id,
-            estaInscrito = False,
-            idCategoria_Paquete = nuevaCategoriaPaquete.id)
+            idCategoria_Paquete = nuevaCategoriaPaquete.id,
+            estaInscrito = True)
         db.session.add(nuevo_inscrito)
         db.session.commit()
 
@@ -672,8 +673,8 @@ class Transacciones:
         nuevo_inscrito = Usuario_Evento(
             idEvento = self.eventos["libro"].id,
             idUsuario = nuevo_usuario.id,
-            estaInscrito = False,
-            idCategoria_Paquete = nuevaCategoriaPaquete.id)
+            idCategoria_Paquete = nuevaCategoriaPaquete.id,
+            estaInscrito = True)
         db.session.add(nuevo_inscrito)
         db.session.commit()
 

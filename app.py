@@ -1735,20 +1735,20 @@ def obtenerReporteCertificados():
 
 @app.route('/obtenerParticipantesCertificados', methods=['POST','GET'])
 def obtenerParticipantesCertificados():
-    participantes=[
-        {
-        "id":"IDIDID1",
-        "nombre":"puesNombre",
-        },
-        {
-        "id":"IDIDID2",
-        "nombre":"puesNombre",
-        },
-        {
-        "id":"IDIDID3",
-        "nombre":"puesNombre",
-        }
-    ]
+    #Todos los particpantes de un evento
+    idid = session['idEvento']
+    participanteQuery = Usuario_Evento.query.filter_by(estaInscrito = True).filter_by(idEvento = idid)
+    pariticipantesId = []
+    for pa in participanteQuery:
+        pariticipantesId.append(pa.id)
+
+    participantes =[]
+    for pa in pariticipantesId:
+        participante = Usuario.query.get_or_404(pa)
+        participantes.append({
+            "id":participante.id,
+            "nombre":participante.nombre,
+        })
     response={
         "participantes":participantes
     }
@@ -1759,6 +1759,7 @@ def obtenerParticipantesCertificados():
 @app.route('/reporteCaja', methods=['POST','GET'])
 def reporteCaja():
     #tipos son ingreso, egreso, otro son para el color de la celda
+    idEvento = session['idEvento']
     movimientos = Movimiento.query.filter_by(idEvento = session['idEvento']).order_by(Movimiento.fechaCreacion) 
     #usuario = Usuario.query.get_or_404(session['idUsuario'])
     movimientosId = []
@@ -1797,29 +1798,6 @@ def reporteCaja():
         general=general,
         len = lens
     )
-'''
-@app.route('/excel', methods=['GET', 'POST'])
-def exportexcel():
-    data = Data.query.all()
-    data_list = [to_dict(item) for item in data]
-    df = pd.DataFrame(data_list)
-    filename = app.config['UPLOAD_FOLDER']+"/autos.xlsx"
-    print("Filename: "+filename)
-
-    writer = pd.ExcelWriter(filename)
-    df.to_excel(writer, sheet_name='Registrados')
-    writer.save()
-
-    return send_file(filename)
-'''
-@app.route('/obtenerReporteCaja', methods=['POST','GET'])
-def obtenerReporteCaja():
-    # No olvidar generar el pdf
-    response ={
-        "fileName":"Reporte Caja.pdf",
-        "url" : "/static/pdfs/pdf.pdf"
-    }
-    return response
 
 # Asistencia movil
 @app.route('/qrPArticipanteAsistencia', methods=['POST','GET'])
