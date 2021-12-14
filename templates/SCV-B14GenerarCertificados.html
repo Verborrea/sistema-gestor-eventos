@@ -24,7 +24,7 @@
                         <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="seleccionarTodos()">Seleccionar Todos</button>
                     </div>
                     <div class="col ">
-                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="submit" onclick="exportar()" download="pdf.pdf">Exportar</a>
+                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="submit" onclick="exportar()">Exportar</a>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                     <th >${participantes[i].nombre}</th>
                     <td>
                         <div class="form-check">
-                            <input class="form-check-input position-static seleccionado" type="checkbox" value="${participantes[i].id}" aria-label="..." name="ids">
+                            <input class="form-check-input position-static seleccionado" type="checkbox" value="${participantes[i].id}" aria-label="..." name="${participantes[i].nombre}" data-usuario="">
                         </div>
                     </td>
                 </tr>
@@ -80,20 +80,40 @@
 
     // Realiza un request al servidor para obtener el nombre del archivo del reporte
     function exportar(){
-        const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerReporteCertificados", false);
-        request.onload = () => {
-            const pdf = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',pdf.url)
-            document.getElementById("exportar").setAttribute('download',pdf.fileName)
-        };
+        
         text = {}
-
+        //Genera el certificado
         var arr = document.getElementsByClassName("seleccionado")
+        console.log(arr)
         for(i in arr){
-            text[arr[i].value] = arr[i].checked
+            if(arr[i].checked) {
+                text[arr[i].value] = arr[i].checked
+                var doc = new jsPDF('landscape');
+ 
+                var img1 = new Image()
+                img1.src = 'static/img/fondo-certificado.png'
+                doc.addImage(img1, 'png', 0, -5, 300, 215, "alias1", 'SLOW');
+
+                var img = new Image()
+                img.src = 'static/img/sello.png'
+                doc.addImage(img, 'png', 130, 20, 40, 40, "alias2", 'SLOW');
+
+                doc.setFontSize(50);
+                doc.setFont("times");
+                doc.setFontType("italic");  
+                doc.text( 'Certificado', 150, 80,'center');
+                doc.setFontSize(20);
+                doc.text( 'Otorgado a: ', 150, 105,'center');
+                var nombre =  arr[i].name
+                doc.setFontSize(25);
+                doc.setFont("times");
+                doc.setFontType("italic");
+                doc.setFontType("bold");  
+                doc.text('"'+nombre+'"', 150, 135,'center');
+                var docname=nombre+'.pdf'
+                doc.save(docname);
+            }
         }
-        request.send(seleccion = text, formato="pdf")
     }
 
     // Permite cambiar el estado de cada certificado de participante a seleccionado
