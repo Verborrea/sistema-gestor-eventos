@@ -13,6 +13,8 @@
         <title>Our Point</title>
     </head>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <script src="https://code.jquery.com/jquery-3.5.1.js" crossorigin="anonymous"></script>
+
         {% if tipoUsuario == 'Visitante'%}
         <h5 class="my-0 mr-md-auto font-weight-normal" style="cursor: pointer;" onclick="window.location='{{url_for('index')}}'">Our Point</h5>
         <nav class="my-2 my-md-0 mr-md-3">
@@ -57,7 +59,7 @@
                             <a class="p-2 text-dark" href="{{ url_for('gestionar_inscripcion') }}">Inscripciones</a>
                             <a class="p-2 text-dark" href="{{ url_for('movimiento') }}">Caja</a>
                             <a class="p-2 text-dark" href="{{ url_for('gestionarUsuario') }}">Gestión</a>
-                            <a class="p-2 text-dark" href="#" disabled>Reporte</a>
+                            <a class="p-2 text-dark" href="{{ url_for('reporteCaja') }}">Reporte</a>
                         </nav>
                         {% endif %}
                     {% endif %}
@@ -95,9 +97,9 @@
     <div class="fixed-bottom ">
 
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
     <script type='text/javascript' src="{{ url_for('static', filename='js/boosttrap.js') }}"></script>
+    
     {% block script %}
         
     {% endblock %}

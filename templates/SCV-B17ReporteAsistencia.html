@@ -43,15 +43,15 @@
                         <button id="buscar" class="btn btn-primary btn-block" type="button" onclick="getAsistencias()">Buscar</button>
                     </div>
                     <div class="col ">
-                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('pdf')" download="pdf.pdf">Exportar PDF</a>
+                        <button id="pdf" class="btn btn-primary btn-block" type="button">Exportar PDF</button>
                     </div>
                     <div class="col">
-                        <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('excel')" download="pdf.pdf">Exportar EXCEL</a>
+                        <button id="excel" class="btn btn-primary btn-block" type="button">Exportar EXCEL</button>
                     </div>
                 </div>
             </div>
             <br>
-            <table class="table table-striped">
+            <table class="table table-striped" id="tabla">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -105,17 +105,15 @@
         request.send(idAmb=idAmb)
     }
 
-    // Realiza un request al servidor para obtener el nombre del archivo del reporte
-    function exportar(formato){
-        const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerReporteAsistencia", false);
-        request.onload = () => {
-            const file = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',file.url)
-            document.getElementById("exportar").setAttribute('download',file.fileName)
-        };
-        request.send(seleccion = seleccion, formato=formato)
-    }
+    // Genera los archivos pdf y excel
+    window.onload = ()=> {
+        $('#pdf').on('click',function(){
+            $("#tabla").tableHTMLExport({type:'pdf',filename:'ReporteAsistencia.pdf'});
+        })
+        $('#excel').on('click',function(){
+            $("#tabla").tableHTMLExport({type:'csv',filename:'ReporteAsistencia.csv'});
+        })
+    };
 
     // Permite obtener los datos de las asistencias registradas en el evento
     function getAsistencias(){
