@@ -44,6 +44,7 @@
 {% endblock %}
 {% block script %}
     <script>
+        //El script permite generar un formulario modal para la creacion de un nuevo usuario
         idbutton = "agregarUsuario"
         idModal = "agregarUsuarioModal"
         datosForm = [
@@ -63,12 +64,13 @@
         for (i in roles){
             opciones+=String.raw`<option value="${roles[i]}">${roles[i]}</option>`
         }
+
+        //Permite coonfigurar las opciones de usuarios
         document.getElementById("agregarUsuarioModal-form-tipoUsuario").parentElement.innerHTML = String.raw`
             <select id="inputState" class="form-control" name="profesion" required>
                 ${opciones}
             </select>
         `
-
     </script>
 {% endblock %}
 </html>

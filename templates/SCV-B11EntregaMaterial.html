@@ -49,6 +49,8 @@
     let idAmbiente = "inputAmbiente"
     let idActividad = "inputActividad"
     let idTablaBody = "tbody"
+
+    // Permite obtener las actividades del ambiente seleccionado
     function getActividades(idAmb){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerActividadesAmbiente", false);
@@ -66,7 +68,8 @@
         };
         request.send(idAmb=idAmb)
     }
-    //
+
+    // Genera un modal que permite confirmar si se desea registrar la entrega de material
     idModal = "ConfirmarEntregaMaterial"
     function generarModalConfirmacion(participante,material,idParticipante){
             //id,titulo, datosForm
@@ -101,7 +104,7 @@
             BOOSTTRAP.Utilities.onlyChild("registrarEntregaMaterialContainer",formModal)//Agrega el modal al doc
     }
 
-    //Obtener Participantes
+    // Permite obtener y mostrar los participantes de una actividad junto al material asignado y un boton de confirmacion
     function getParticipantes(idAct){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerParticipantesActividadAmbiente", false);

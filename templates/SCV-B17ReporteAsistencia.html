@@ -82,16 +82,17 @@
     let iAmbiente = "inputAmbiente"
     let idTablaBody = "tbody"
 
+    // Permite actualizar los datos seleccionados 
     function changeActividadSeleccionada(val){ seleccion.idActividad = val }
     function changeIdFechaInicio(val){ seleccion.idFechaInicio = val }
     function changeIdFechaFin(val){ seleccion.idFechaFin = val }
 
+    // Obtiene las actividades realizadas en un ambiente
     function getActividades(idAmb){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerActividadesAmbiente", false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idActividad," ")
-            // BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);
             let actividad = data.actividad
             let optionsHtml = String.raw`<option value="all" selected> Todos </option>`
@@ -104,7 +105,7 @@
         request.send(idAmb=idAmb)
     }
 
-
+    // Realiza un request al servidor para obtener el nombre del archivo del reporte
     function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteAsistencia", false);
@@ -115,7 +116,8 @@
         };
         request.send(seleccion = seleccion, formato=formato)
     }
-    //Obtener Asistencias
+
+    // Permite obtener los datos de las asistencias registradas en el evento
     function getAsistencias(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerAsistenciasActividadesAmbientes", false);

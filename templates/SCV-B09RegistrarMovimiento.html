@@ -108,6 +108,8 @@
 {% endblock %}
 {% block script %}
     <script>
+
+        //Funcion que genera el modal con los botones de ingreso y egreso, estos botones llevan a cada modal (Ingreso y Egreso)
         function cargarBotonesModal(){
             idModal = "modalEleccion"
             modalIngreso = "RegistrarMovimientoIngresoModal"
@@ -122,6 +124,8 @@
             BOOSTTRAP.Utilities.onlyChild("modalEleccionContainer",modalEleccion)
             BOOSTTRAP.Utilities.convertToCallModal("registrarMovimiento",idModal)
         }
+
+        //Funcion que genera dos modals, uno para el registro de ingresos y el otro para el registro de egresos
         function formularioMovimiento(){
             let idModalEgreso = "RegistrarMovimientoEgresoModal"
             let idModalIngreso = "RegistrarMovimientoIngresoModal"

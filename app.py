@@ -912,13 +912,13 @@ def gestionar_inscripcion():
             categoria_paquete_mtrx[cat].append(5)
 
     #  Ids categoria paquete #
-    ids_categoria ={
-        "Adulto":"PAQ-C51",
-        "Niño":"PAQ-12H",
-    }
-    ids_paquete={
-        "Básico":"CAT-B05",
-    }
+    ids_categoria = []
+    ids_paquete= []
+    for categoria in misCategorias:
+        ids_categoria.append(categoria.id)
+    misPaquetes = miEvento.paquetes
+    for paquete in misPaquetes:
+        ids_paquete.append(paquete.id)
 
     #  Usuarios en el Evento #
     idUsuariosG = []
@@ -990,13 +990,41 @@ def gestionar_inscripcion():
     )
 
 @app.route('/eliminarCategoria/<id>', methods=['POST','GET'])
-def eliminarCategoria(id):
-    return "."
+def eliminarCategoria(id): 
+    #Eliminar Categoria en Categoria-Paquete
+    CategoriaPaquete = Categoria_Paquete.query.filter_by(idCategoria=id).first()
+    
+    if CategoriaPaquete != None:
+        db.session.delete(paquete)
+        db.session.commit()
+    
+    #Eliminar Categoria
+    categoria = Categoria.query.filter_by(id=id).one()
+    if categoria != None:
+        db.session.delete(categoria)
+        db.session.commit()
+    
+    return redirect(url_for('gestionar_inscripcion'))
+                                       
 @app.route('/eliminarPaquete/<id>', methods=['POST','GET'])
 def eliminarPaquete(id):
-    return "."
+    #Eliminar Paquete en Categoria-Paquete#
+    CategoriaPaquete = Categoria_Paquete.query.filter_by(idPaquete=id).first()
+    
+    if CategoriaPaquete != None:
+        db.session.delete(CategoriaPaquete)
+        db.session.commit()
+    
+    #Eliminar Paquete#
+    paquete = Paquete.query.filter_by(id=id).one()
+    if paquete != None:
+        db.session.delete(paquete)
+        db.session.commit()
+    
+    return redirect(url_for('gestionar_inscripcion'))
 
 # ================== gestion administrativa ==================
+
 @app.route('/gestionarUsuario', methods=['POST','GET'])
 def gestionarUsuario():
     if request.method == 'POST':

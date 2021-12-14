@@ -108,10 +108,12 @@
     let idCategoria = "inputCategoria"
     let idTablaBody = "tbody"
 
+    // Permite actualizar los datos seleccionados 
     function changeCategoriaSeleccionada(val){ seleccion.idCategoria = val }
     function changeIdFechaInicio(val){ seleccion.idFechaInicio = val }
     function changeIdFechaFin(val){ seleccion.idFechaFin = val }
 
+    // Obtiene los paquetes propios de una categoria
     function getCategorias(idPaq){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerCategoriasPaquetesIns", false);
@@ -130,6 +132,7 @@
         request.send(idPaq=idPaq)
     }
 
+    // Obtiene el codigo QR del Participante seleccionado
     function updateQRParticipante(idParticipante){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerQRparticipante", false);
@@ -143,6 +146,7 @@
         request.send(idParticipante = idParticipante)
     }
 
+    // Realiza un request al servidor para obtener el nombre del archivo del reporte
     function exportar(formato){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteInscritos", false);
@@ -154,7 +158,8 @@
         };
         request.send(seleccion = seleccion, formato=formato)
     }
-    //Obtener Inscritos
+
+    // Permite obtener los datos de los participantes registradas en el evento
     function getInscritos(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerInscritosCategoriasPaquetes", false);

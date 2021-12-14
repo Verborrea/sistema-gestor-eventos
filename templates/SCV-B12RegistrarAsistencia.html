@@ -93,7 +93,7 @@
 <script>
     let idTablaBody = "tbody"
 
-    //Obtener Participantes
+    // Permite Obtener los participantes segun el ambiente seleccionado
     function getParticipantes(idAmb){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerParticipantesAmbienteAsistencia", false);
@@ -115,6 +115,8 @@
         };
         request.send(idAmb=idAmb)
     }
+
+    // Permite obtener la direccion del codigo qr para la toma de asistencia
     function obtenerQr(idAmb){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerQRAsistencia", false);
@@ -125,20 +127,5 @@
         };
         request.send(idAmb=idAmb)
     }
-
-    //
-    //Obtener Participantes
-    /*function obtenerQr(idAmb){
-        const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerNombreQR/", false);
-        request.onload = () => {
-            const data = JSON.parse(request.responseText);
-            let imgSrc = String.raw` url_for('static', filename='qr/'+data.nombreQR) }}`
-            document.getElementById("imgQR").src = imgSrc
-            document.getElementById("codigoAsistencia").value = "data.codigo"
-        };
-        request.send(idAmb=idAmb)
-    }*/
-
 </script>
 {% endblock %}

@@ -47,10 +47,11 @@
 <script>
     var seleccion ={
         "idParticipante":"All",
-        
     }
     idParticipantes = "tbody"
-    function getParticipantes(idPar){
+
+    // Permite obtener la lista de participantes en el evento
+    function getParticipantes(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerParticipantesCertificados", false);
         request.onload = () => {
@@ -77,6 +78,7 @@
         request.send(idPar=idPar)
     }
 
+    // Realiza un request al servidor para obtener el nombre del archivo del reporte
     function exportar(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/obtenerReporteCertificados", false);
@@ -94,6 +96,7 @@
         request.send(seleccion = text, formato="pdf")
     }
 
+    // Permite cambiar el estado de cada certificado de participante a seleccionado
     function seleccionarTodos(){
         $(".seleccionado").attr("checked",true);
     }

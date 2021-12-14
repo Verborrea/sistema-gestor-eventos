@@ -21,22 +21,25 @@
 {% block script %}
 <script>
     imageUrl = ""
-function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
 
-        reader.onload = function (e) {
-            $('#image')
-                .attr('src', e.target.result)
-                .width(350)
-                .height(350);
-        };
+    // Permite mostrar la imagen obtenida
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#image')
+                    .attr('src', e.target.result)
+                    .width(350)
+                    .height(350);
+            };
 
-        reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(input.files[0]);
+        }
+        imageUrl = input
     }
-    imageUrl = input
-}
-function sendBackend(){
+
+    // Envia la imagen al servidor y espera una respuesta del estado del participante (puede ser aceptado o rechazado)
+    function sendBackend(){
         const request = new XMLHttpRequest();
         request.open('GET',  "/qrPArticipanteAsistencia", false);
         request.onload = () => {
@@ -44,16 +47,10 @@ function sendBackend(){
             document.getElementById("estado").innerHTML=response.estado
             if(response.estado=="Aceptado") 
                 document.getElementById("image").className="aceptado"
-                //document.getElementById("image").style="-webkit-filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);"
             else 
                 document.getElementById("image").className="rechazado"
-                //document.getElementById("image").style="-webkit-filter: invert(-25%) sepia() saturate(50%) hue-rotate(-174deg);filter: invert(-25%) sepia() saturate(-50%) hue-rotate(-174deg);"
-
         };
-        
         request.send(imageUrl = imageUrl)
     }
-
 </script>
 {% endblock %}
--webkit-filter: invert(25%) sepia() saturate(50%) hue-rotate(174deg);
