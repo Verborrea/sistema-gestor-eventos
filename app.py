@@ -1239,7 +1239,11 @@ def porEfectivo():
 def validarInscripcion():
     '''Devuelve la lista de aquellos movimientos correspondientes al tipo de validaciones de inscripciones
         realizadas por los participantes.'''
-    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento'])
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+    
+    movimientos = Movimiento.query.filter_by(idEvento = id_evento)
     listaMovimientos = []
     for movimiento in movimientos:
         if movimiento.nombre == "Validacion de inscripcion":
@@ -1541,7 +1545,7 @@ def obtenerParticipantesAmbienteAsistencia(idAmb):
 def obtenerQRAsistencia():
     #idAmb #mandamos en el request
     response = {
-        "imgSrc":"static\qrs\CODECODE.png",
+        "imgSrc":"static\qrs\QRappMovil.jpeg",
         "session":"codigoSesionTomadoAsistencia"
     }
     return response
