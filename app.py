@@ -1591,9 +1591,8 @@ def obtenerCategoriasPaquetesIns():
 @app.route('/obtenerInscritosCategoriasPaquetes', methods=['POST','GET'])
 def obtenerInscritosCategoriasPaquetes():
     inscrito=[
-        {"idParticipante":"IDIDID","nombre":"puesNombre","paquete":"paquete","categoria":"categoria","fecha":"ayer"},
-
-        {"idParticipante":"IDIDID","nombre":"puesNombre","paquete":"paquete","categoria":"categoria","fecha":"ayer"}
+        {"idParticipante":"is1","nombre":"Daniel Rojas","paquete":"Basico","categoria":"Estudiante","fecha":"01/09/2021"},
+        {"idParticipante":"is2","nombre":"Luisa Vizcarra","paquete":"Basico","categoria":"Profesor","fecha":"08/09/2021"}
     ]
     response={
         "inscrito":inscrito
