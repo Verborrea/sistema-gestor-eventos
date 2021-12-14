@@ -24,6 +24,7 @@ class Usuario(db.Model):
 
     usuarios_eventos = db.relationship('Usuario_Evento', backref='usuario', lazy=True)
     asistencias = db.relationship('Asistencia', backref='usuario', lazy=True)
+    materiales = db.relationship('Material_Usuario', backref='usuario', lazy=True)
 
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,6 +84,7 @@ class Material(db.Model):
     costoUnitario = db.Column(db.Float, nullable = False)
 
     idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
+    material_usuarios = db.relationship('Material_Usuario', backref='material', lazy = True)
     
 class Movimiento(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -132,3 +134,10 @@ class Asistencia(db.Model):
     turno = db.Column(db.String(30), nullable=False)
     fechaAsistencia = db.Column(db.DateTime)
     asistio = db.Column(db.Boolean, default=False)
+
+class Material_Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    idMaterial = db.Column(db.Integer, db.ForeignKey('material.id'), nullable=False)
+    estado = db.Column(db.String(30), nullable=True)    
+    fecha = db.Column(db.DateTime, nullable=True)

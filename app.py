@@ -6,6 +6,7 @@ from sendEmail import *
 from datetime import datetime
 from transacciones import *
 from datetime import date
+from sendEmailwithQR import *
 
 import json
 
