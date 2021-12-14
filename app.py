@@ -731,7 +731,10 @@ def index():
     info = Evento.query.all()
     nom_usuario = 'no existe'
     if 'idUsuario' in session:
-        usuario = Usuario.query.get_or_404(session['idUsuario'])
+        usuario = Usuario.query.get(session['idUsuario'])
+        if usuario == None:
+            session.clear()
+            return redirect(url_for('index'))
         nom_usuario = usuario.nombre
     for evento in info:
         if evento.estado == 'Inscripciones':
