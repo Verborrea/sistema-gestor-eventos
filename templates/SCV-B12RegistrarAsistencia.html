@@ -92,7 +92,7 @@
     // Permite Obtener los participantes segun el ambiente seleccionado
     function getParticipantes(idAmb){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia", false);
+        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia/"+idAmb, false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);

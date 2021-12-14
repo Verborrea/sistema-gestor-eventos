@@ -53,7 +53,7 @@
     // Permite obtener las actividades del ambiente seleccionado
     function getActividades(idAmb){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerActividadesAmbiente", false);
+        request.open('GET',  "/obtenerActividadesAmbiente/"+idAmb, false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idActividad," ")
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
@@ -107,7 +107,7 @@
     // Permite obtener y mostrar los participantes de una actividad junto al material asignado y un boton de confirmacion
     function getParticipantes(idAct){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerParticipantesActividadAmbiente", false);
+        request.open('GET',  "/obtenerParticipantesActividadAmbiente/"+idAct, false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);
@@ -127,7 +127,7 @@
             }
             BOOSTTRAP.Utilities.onlyChild(idTablaBody,tableRows)
         };
-        request.send(idAmbiente=idAmbienteSeleccionado,idAct=idAct)
+        request.send(idAct=idAct)
     }
 </script>
 {% endblock %}

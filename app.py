@@ -1194,16 +1194,32 @@ def registraAsistencia():
 @app.route('/materiales', methods=['POST','GET'])
 def materiales():
 
-    ambiente = [
-        {"id":"AMBAMB","texto":"Ambientito"}
-    ]
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+
+    #Obtener ids de las actividades del evento
+    actividades = Actividad.query.filter_by(idEvento = id_evento)
+    listaIdActividades = []
+    for actividad in actividades:
+        listaIdActividades.append(actividad.id)
+
+    #Obtener ids de ambientes
+    listaAmbientes = []
+    ambientes = Ambiente.query.filter(Ambiente.id.in_(listaIdActividades)).all()
+    for ambiente in ambientes:
+        listaAmbientes.append({
+            "id":ambiente.id,
+            "texto":ambiente.nombre
+        })
+    
     lens={
-        "Ambiente":len(ambiente)
+        "Ambiente":len(listaAmbientes)
         
     }
     return render_template(
         "SCV-B11EntregaMaterial.html",
-        ambiente=ambiente,
+        ambiente=listaAmbientes,
         len=lens
     )
 
@@ -1228,13 +1244,24 @@ def colaborador():
         tipoUsuario = "Colaborador"
     )
 
-@app.route('/obtenerActividadesAmbiente', methods=['POST','GET'])
-def obtenerActividadesAmbiente():
-    actividad = [
-        {"id":"ACAC","nombre":"Actividad 1"}
-    ]
+@app.route('/obtenerActividadesAmbiente/<idAmb>', methods=['POST','GET'])
+def obtenerActividadesAmbiente(idAmb):
+    
+    listaIdsActividades = []
+    ambientes = Ambiente.query.filter_by(id = idAmb)
+    for ambiente in ambientes:
+        listaIdsActividades.append(ambiente.idActividad)
+    
+    listaActividades = []
+    actividades = Actividad.query.filter(Actividad.id.in_(listaIdsActividades))
+    for actividad in actividades:
+        listaActividades.append({
+            "id":actividad.id,
+            "nombre":actividad.nombre
+        })
+    
     response ={
-        "actividad":actividad
+        "actividad":listaActividades
     }
     
     return response
@@ -1262,13 +1289,48 @@ def obtenerCategoriasPaquete(idCat):
     return response
 
 
-@app.route('/obtenerParticipantesActividadAmbiente', methods=['POST','GET'])
-def obtenerParticipantesActividadAmbiente():
+@app.route('/obtenerParticipantesActividadAmbiente/<idAct>', methods=['POST','GET'])
+def obtenerParticipantesActividadAmbiente(idAct):
+    ''' Devuelve la relacion de participantes inscritos y que hayan registrado su asistencia para un ambiente
+        acompaniado del material que se le debe entregar dependiendo de la actividad elegida'''
+    idAmbiente = ""
+    ambientes = Ambiente.query.filter_by(idActividad = idAct)
+    for ambiente in ambientes:
+        idAmbiente = ambiente.id
+    
+    listaIdUsuarios = []
+    idUsuarios = Asistencia.query.filter_by(idAmbiente = idAmbiente)
+    for iU in idUsuarios:
+        listaIdUsuarios.append(iU.idUsuario)
+
+    listaParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdUsuarios)).all()
+    for participante in participantes:
+        if participante.tipoUsuario == "Participante":
+            listaParticipantes.append({
+                "id": participante.id,
+                "nombre":participante.nombre
+            })
+    
+    materialesEntregar = ""
+    materiales = Material.query.filter_by(idActividad = idAct)
+    for material in materiales:
+        if material.tipo == "Material participantes":
+            materialesEntregar = material.nombre
+
+    listaParticipantesMaterial = []
+    for i in range(len(listaParticipantes)):
+        listaParticipantesMaterial.append({
+            "participante":listaParticipantes[i].get("nombre"),
+            "materialAsignado":materialesEntregar,
+            "idParticipante":listaParticipantes[i].get("id")
+        })
+    
     participante = [
-        {"participante":"Pepe","materialAsignado":"PC","idParticipante":"1"}
+        {"participante":"Pepe","materialAsignado":materialesEntregar,"idParticipante":"1"}
     ]
     response ={
-        "participante":participante
+        "participante":participante #listaParticipantesMaterial
     }
     
     return response
@@ -1346,12 +1408,12 @@ def asistencia():
         asistencia=asistencia,
     )
 
-@app.route('/obtenerParticipantesAmbienteAsistencia/', methods=['GET','POST'])
-def obtenerParticipantesAmbienteAsistencia():
+@app.route('/obtenerParticipantesAmbienteAsistencia/<idAmb>', methods=['GET','POST'])
+def obtenerParticipantesAmbienteAsistencia(idAmb):
     #idAmb #mandamos en el request
     listaIdUsuarios = []
     listaHoras = []
-    '''
+    
     idUsuarios = Asistencia.query.filter_by(idAmbiente = idAmb)
     for iU in idUsuarios:
         listaIdUsuarios.append(iU.idUsuario)
@@ -1364,19 +1426,20 @@ def obtenerParticipantesAmbienteAsistencia():
     listaParticipantes = []
     participantes = Usuario.query.filter(Usuario.id.in_(listaIdUsuarios)).all()
     for participante in participantes:
-        listaParticipantes.append({
-            "id": participante.id,
-            "nombre":participante.nombre
-        })
+        if participante.tipoUsuario == "Participante":
+            listaParticipantes.append({
+                "id": participante.id,
+                "nombre":participante.nombre
+            })
     participantesOrdenados = sorted(listaParticipantes, key = lambda k : k["id"])
 
     listaAsistencias = []
-    for hora, participante in horasOrdenadas, participantesOrdenados:
+    for i in range(len(horasOrdenadas)):
         listaAsistencias.append({
-            "participante":participante.get("nombre"),
-            "horaIngreso":hora.get("horaIng")
+            "participante":participantesOrdenados[i].get("nombre"),
+            "horaIngreso":horasOrdenadas[i].get("horaIng")
         })
-    
+    '''
     #prueba
     listaPrueba = []
     horaPrueba = [{
@@ -1387,19 +1450,19 @@ def obtenerParticipantesAmbienteAsistencia():
         "id":"1",
         "nombre":"Felipe"
     }]
-    for hora, participante in horaPrueba, participantePrueba:
+    for i in range(len(horaPrueba)):
         listaPrueba.append({
-            "participante":participante.get("nombre"),
-            "horaIngreso":hora.get("horaIng")
+            "participante":participantePrueba[i].get("nombre"),
+            "horaIngreso":horaPrueba[i].get("horaIng")
         })
-    '''
+    
     listaEjemplo = [{
-        "participante":"Jose",
+        "participante":idAmb,
         "horaIngreso":"10:50"
     }]
-
+    '''
     response = {
-        "participante":listaEjemplo
+        "participante":listaAsistencias
     }
     return response
 
