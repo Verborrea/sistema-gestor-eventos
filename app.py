@@ -781,7 +781,7 @@ def verEvento(id):
             "duracion": duracion,
             "ponente": actividad.ponente
         })
-    #.
+    #. 
     paquete=["Paquete 1","Paquete 2","Paquete 3"]
     categoria=["Categoria 1","Categoria 2"]
     categoria_paquete = {
@@ -1001,7 +1001,7 @@ def eliminarPaquete(id):
 def gestionarUsuario():
     if request.method == 'POST':
         nuevoUsuario = Usuario(
-            tipoUsuario = request.form.get('tipoUsuario'),
+            tipoUsuario = request.form.get('profesion'),
             username = request.form.get('nombreUsuario'),
             password = request.form.get('contrasenia'),
             nombre = request.form.get('nombreCompleto'),
@@ -1083,24 +1083,76 @@ def listaEventosParticipante():
         tipoUsuario = session['tipoUsuario']
     )
 
+# ================== validacion de inscripcion de participante ==================
 @app.route('/porTransferencia', methods=['POST','GET'])
 def porTransferencia():
-    return "dinero dinero"
+    '''Agrega un nuevo movimiento del tipo transferencia para la validacion de la inscripcion
+        y actualiza el estado del participante en el evento como INSCRITO'''
+    #Agregar nuevo movimiento del tipo validacion de inscripcion - transferencia
+    nuevoMovimiento = Movimiento(
+        tipo = "Transferencia",
+        nombre = "Validacion de inscripcion",
+        factura = request.form.get('numeroOperacion'),
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
+    db.session.add(nuevoMovimiento)
+    db.session.commit()
+    #Actualizar estado de participante
+    usuarioParticipante = request.form.get('usuarioParticipante')
+    miParticipante = Usuario.query.filter_by(username = usuarioParticipante, tipoUsuario = "Participante").first()
+    idParticipante = miParticipante.id
+
+    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = session['idEvento']).first()
+    miUsuarioEvento.estaInscrito = True
+    db.session.commit()
+
+    return redirect(url_for('validarInscripcion'), code=302)
 
 @app.route('/porEfectivo', methods=['POST','GET'])
 def porEfectivo():
-    return "viva el dinero"
+    '''Agrega un nuevo movimiento del tipo efectivo para la validacion de la inscripcion
+        y actualiza el estado del participante en el evento como INSCRITO'''
+    #Agregar nuevo movimiento del tipo validacion de inscripcion - transferencia
+    nuevoMovimiento = Movimiento(
+        tipo = "Efectivo",
+        nombre = "Validacion de inscripcion",
+        factura = "EF",
+        monto = request.form.get('monto'),
+        idEvento = session['idEvento']
+    )
+    db.session.add(nuevoMovimiento)
+    db.session.commit()
+    #Actualizar estado de participante
+    usuarioParticipante = request.form.get('usuarioParticipante')
+    miParticipante = Usuario.query.filter_by(username = usuarioParticipante, tipoUsuario = "Participante").first()
+    idParticipante = miParticipante.id
+
+    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = session['idEvento']).first()
+    miUsuarioEvento.estaInscrito = True
+    db.session.commit()
+
+    return redirect(url_for('validarInscripcion'), code=302)
 
 @app.route('/validarInscripcion', methods=['POST','GET'])
 def validarInscripcion():
+    '''Devuelve la lista de aquellos movimientos correspondientes al tipo de validaciones de inscripciones
+        realizadas por los participantes.'''
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento'])
+    listaMovimientos = []
+    for movimiento in movimientos:
+        if movimiento.nombre == "Validacion de inscripcion":
+            listaMovimientos.append({
+                "codigoPago":movimiento.factura,
+                "categoria":movimiento.tipo,
+                "monto":movimiento.monto
+            })
     lens={
-        "general":1
+        "general":len(listaMovimientos)
     }
     return render_template(
         "SCV-B08ValidarInscripcion.html",
-        general = [
-            {"codigoPago":"EST", "categoria":"Estudiante", "paquete":"Estudiante Starter Pack", "monto":70}
-        ],#codigoPago, categoria, presupuesto, monto
+        general = listaMovimientos,
         lens = lens,
         tipoUsuario = session['tipoUsuario']
     )

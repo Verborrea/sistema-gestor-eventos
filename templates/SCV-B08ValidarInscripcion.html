@@ -24,8 +24,7 @@
             <thead>
                 <tr>
                     <th scope="col">Código de pago</th>
-                    <th scope="col">Categoría</th>
-                    <th scope="col">Paquete</th>
+                    <th scope="col">Tipo de pago</th>
                     <th scope="col">Monto</th>
                 </tr>
             </thead>
@@ -34,7 +33,6 @@
                 <tr>
                     <th scope="row">{{general[i].codigoPago}}</th>
                     <td>{{general[i].categoria}}</td>
-                    <td>{{general[i].paquete}}</td>
                     <td>{{general[i].monto}}</td>
                 </tr>
                 {% endfor %}
@@ -53,7 +51,6 @@
         let transferenciaForm = [
             {"nombre":"usuarioParticipante","tipo_dato":"text","texto":"Usuario del Participante"},
             {"nombre":"numeroOperacion","tipo_dato":"text","texto":"Número de operación"},
-            {"nombre":"paquete","tipo_dato":"text","texto":"Paquete"},
             {"nombre":"monto","tipo_dato":"number","texto":"Confirmar Monto","extra":String.raw`step='.01'`},
         ]
         let formModal = BOOSTTRAP.GenerateComplex.buildFormModal(
@@ -70,7 +67,6 @@
         idButton = "porEfectivo"
         let efectivoForm = [
             {"nombre":"usuarioParticipante","tipo_dato":"text","texto":"Usuario del Participante"},
-            {"nombre":"paquete","tipo_dato":"text","texto":"Paquete"},
             {"nombre":"monto","tipo_dato":"number","texto":"Confirmar Monto","extra":String.raw`step='.01'`},
         ]
         formModal = BOOSTTRAP.GenerateComplex.buildFormModal(
