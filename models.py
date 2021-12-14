@@ -23,6 +23,7 @@ class Usuario(db.Model):
     profesion = db.Column(db.String(30), nullable=True)
 
     usuarios_eventos = db.relationship('Usuario_Evento', backref='usuario', lazy=True)
+    asistencias = db.relationship('Asistencia', backref='usuario', lazy=True)
 
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +72,7 @@ class Ambiente(db.Model):
     aforo = db.Column(db.Integer, nullable = False)
 
     idActividad = db.Column(db.Integer, db.ForeignKey('actividad.id'), nullable=False)
+    asistencias = db.relationship('Asistencia', backref='ambiente', lazy = True)
 
 class Material(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -90,7 +92,8 @@ class Movimiento(db.Model):
     detalle = db.Column(db.String(90))
     cantidad = db.Column(db.Integer)
     monto = db.Column(db.Float, nullable = False)
-    
+    fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
+
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
 class Categoria(db.Model):
@@ -121,3 +124,11 @@ class Usuario_Evento(db.Model):
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     idCategoria_Paquete = db.Column(db.Integer, db.ForeignKey('categoria_paquete.id'))
     estaInscrito = db.Column(db.Boolean, nullable=True)
+
+class Asistencia(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    idAmbiente = db.Column(db.Integer, db.ForeignKey('ambiente.id'), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    turno = db.Column(db.String(30), nullable=False)
+    fechaAsistencia = db.Column(db.DateTime)
+    asistio = db.Column(db.Boolean, default=False)

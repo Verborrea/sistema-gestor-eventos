@@ -3,6 +3,9 @@ from markupsafe import escape
 from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
+from datetime import datetime
+from transacciones import *
+from datetime import date
 
 import json
 
@@ -39,6 +42,14 @@ def breakArr(array,division):
                 sizes[i//division]=sizes[i//division]+1
     return arr,sizes, len(sizes)
 
+def to_dict(row):
+    if row is None: return None
+    rtn_dict = dict()
+    keys = row.__table__.columns.keys()
+    for key in keys:
+        rtn_dict[key] = getattr(row, key)
+    return rtn_dict
+
 # =============== creacion de un administrador primigenio =============== #
 
 usuario_admin = Usuario.query.filter_by(
@@ -71,6 +82,7 @@ def listaEventos():
     for usr_evt in usuario_evento:
         listaIdEventos.append(usr_evt.idEvento)
     datos = []
+    plantilla = []
     # eventos = Evento.query.all()
     for idEvt in listaIdEventos:
         evento = Evento.query.get_or_404(idEvt)
@@ -81,14 +93,13 @@ def listaEventos():
             'fechaCierreInscripcion':crearFecha(evento.fechaCierreInscripcion,"%d/%m/%Y"),
             'fechaInicioEvento':crearFecha(evento.fechaInicio,"%d/%m/%Y"),
             'fechaCierreEvento':crearFecha(evento.fechaFin,"%d/%m/%Y"),
-            'estadoEvento':evento.estado
+            'estadoEvento':evento.estado,
+            'tipoEvento':evento.tipo,
         })
+        if evento.plantilla == True:
+            plantilla.append(datos[-1])
     session.pop('idEvento', None)
-    #######################
-    plantilla = [
-        {"id":"PP","nombre":"Plantilla1","fechaInicioEvento":"hoy","tipoEvento":"charlas"},
-    ]
-    #######################
+
     lens = {
         "general":len(datos),
         "plantilla":len(plantilla),
@@ -606,9 +617,14 @@ def login():
         if user:
             session['tipoUsuario'] = user.tipoUsuario
             session['idUsuario'] = user.id
-            if 'eventoReg' in session:
-                registrarUsuario(user.id)
-                return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
+            if ('eventoReg' in session) and user.tipoUsuario == 'Participante':
+                usuario_evento = Usuario_Evento.query.filter_by(
+                    idUsuario = user.id,
+                    idEvento = session['eventoReg']
+                ).first()
+                if usuario_evento == None:
+                    nom_Evento = registrarUsuario(session['idUsuario'],session['cat_pqt'])
+                    return render_template("Mensaje.html",tipoUsuario = 'Participante',Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento "+nom_Evento)
             if session['tipoUsuario'] == 'Admin':
                 return redirect(url_for('listaEventos'))
             return redirect(url_for('index'))
@@ -623,19 +639,24 @@ def login():
     else:
         return render_template('SCV-B04Login.html',tipoUsuario='Visitante')
 
-def registrarUsuario(id,idCategoria_Paquete):
+def registrarUsuario(id,idCat_Paq):
     nuevo_inscrito = Usuario_Evento(
         idEvento = session['eventoReg'],
         idUsuario = id,
         estaInscrito = False,
-        idCategoria_Paquete = idCategoria_Paquete
+        idCategoria_Paquete = idCat_Paq
     )
+
+    monEvent = Evento.query.get(session['eventoReg'])
     
     session.pop('eventoReg', None)
+    session.pop('cat_pqt', None)
     session['idUsuario'] = id # login automatico
     session['tipoUsuario'] = 'Participante'
     db.session.add(nuevo_inscrito)
     db.session.commit()
+
+    return monEvent.nombre
 
 @app.route('/signup')
 def register():
@@ -692,8 +713,8 @@ def create_user():
     
     # registro en el evento
     if 'eventoReg' in session:
-        registrarUsuario(nuevo_usuario.id)
-        return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
+        nom_Evento = registrarUsuario(nuevo_usuario.id,session['cat_pqt'])
+        return render_template("Mensaje.html",tipoUsuario = 'Participante',Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento "+nom_Evento)
     return redirect(url_for('login'))
 
 @app.route('/')#para probar la vista de participante
@@ -742,9 +763,11 @@ def registrarse(id):
         ).first()
         if usuario_evento == None:
             session['eventoReg'] = id
-            registrarUsuario(session['idUsuario'],categoria_paquete.id)
-        return render_template("Mensaje.html",Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento<a href='/'>Regresar</a>")
+            session['cat_pqt'] = categoria_paquete.id
+            nom_Evento = registrarUsuario(session['idUsuario'],categoria_paquete.id)
+            return render_template("Mensaje.html",tipoUsuario = 'Participante',Titulo = "Registro Exitoso",Mensaje="Ya estas registrado en el evento "+nom_Evento)
     session['eventoReg'] = id
+    session['cat_pqt'] = categoria_paquete.id
     return redirect(url_for('login'))
 
 @app.route('/visualizarEvento/<id>')
@@ -781,27 +804,37 @@ def verEvento(id):
             "duracion": duracion,
             "ponente": actividad.ponente
         })
-    #. 
-    paquete=["Paquete 1","Paquete 2","Paquete 3"]
-    categoria=["Categoria 1","Categoria 2"]
-    categoria_paquete = {
-        "Categoria 1":{
-            "Paquete 1":5,
-            "Paquete 2":10,
-            "Paquete 3":7,
-        },
-        "Categoria 2":{
-            "Paquete 1":6,
-            "Paquete 2":11,
-            "Paquete 3":6,
-        }
-    }
-    categorias = 2
-    paquetes = 3
-    cat = [
-        {"id":"CAT","texto":"Estudiante"},
-        {"id":"CAT2","texto":"Profesor"},
-    ]
+
+    paquete = []
+    categoria = []
+    categoria_paquete_mtrx = []
+    cat_dict = []
+
+
+    misPaquetes = miEvento.paquetes
+    misCategorias = miEvento.categorias
+
+    for pqt_reg in misPaquetes:
+        paquete.append(pqt_reg.nombre)
+    
+    for cat_reg in misCategorias:
+        categoria.append(cat_reg.nombre)
+        cat_dict.append({
+            "id":cat_reg.id,
+            "texto":cat_reg.nombre
+        })
+
+    cat_number = 0
+    for cat in misCategorias:
+        categoria_paquete_mtrx.append([])
+        for pqt in misPaquetes:
+            misCat_Paq = Categoria_Paquete.query.filter_by(
+                idPaquete = pqt.id,
+                idCategoria = cat.id
+            ).first()
+            categoria_paquete_mtrx[cat_number].append(misCat_Paq.monto)
+        cat_number += 1
+
     lens ={
         "Categoria":len(categoria),
     }
@@ -810,12 +843,12 @@ def verEvento(id):
         evento=evento,
         actividad=actividades,
         lenActividad=len(actividades),
-        categoria_paquete=categoria_paquete,
-        categorias=categorias,
-        paquetes=paquetes,
+        categoria_paquete=categoria_paquete_mtrx,
+        categorias=len(categoria),
+        paquetes=len(paquete),
         paquete=paquete,
         categoria=categoria,
-        cat=cat,
+        cat=cat_dict,
         disponible=mePuedoInscribir,
         len=lens,
         tipoUsuario = session['tipoUsuario']
@@ -853,8 +886,17 @@ def crearCategoria():
             idEvento = session['idEvento'],
             nombre = request.form.get('nombreCategoria')
         )
-
         db.session.add(nuevaCategoria)
+
+        paquetes = Paquete.query.filter_by(idEvento=session['idEvento'])
+        for paq in  paquetes:
+            nuevo_cat_paq = Categoria_Paquete(
+                idCategoria = nuevaCategoria.id,
+                idPaquete = paq.id,
+                monto = 0
+            )
+            db.session.add(nuevo_cat_paq)
+
         db.session.commit()
 
     return redirect(url_for('gestionar_inscripcion'))
@@ -869,10 +911,36 @@ def crearPaquete():
             idEvento = session['idEvento'],
             nombre = request.form.get('nombrePaquete')
         )
-
         db.session.add(nuevoPaquete)
+
+        categorias = Categoria.query.filter_by(idEvento=session['idEvento'])
+        for cat in  categorias:
+            nuevo_cat_paq = Categoria_Paquete(
+                idPaquete = nuevoPaquete.id,
+                idCategoria = cat.id,
+                monto = 0
+            )
+            db.session.add(nuevo_cat_paq)
+
         db.session.commit()
 
+    return redirect(url_for('gestionar_inscripcion'))
+
+@app.route('/guardar-precios', methods=['POST'])
+def guardar_precios():
+    miEvento = Evento.query.get_or_404(session['idEvento'])
+    misCategorias = miEvento.categorias
+    misPaquetes = miEvento.paquetes
+    
+    for cat in misCategorias:
+        for pqt in misPaquetes:
+            cat_pqt = Categoria_Paquete.query.filter_by(
+                idPaquete = pqt.id,
+                idCategoria = cat.id
+            ).first()
+            cat_pqt.monto = request.form.get(str(cat.id) + '&' + str(pqt.id))
+
+    db.session.commit()
     return redirect(url_for('gestionar_inscripcion'))
 
 @app.route('/gestionar_inscripcion', methods=['GET','POST'])
@@ -897,28 +965,33 @@ def gestionar_inscripcion():
     
     #categoriaPaquete
     misCategorias = miEvento.categorias
+    misPaquetes = miEvento.paquetes
     listCategorias = []
     listPaquetes = []
-    for categoria in misCategorias:
-        listCategorias.append(categoria.nombre)
-    misPaquetes = miEvento.paquetes
-    for paquete in misPaquetes:
-        listPaquetes.append(paquete.nombre)
-
-    categoria_paquete_mtrx = []
-    for cat in range(len(listCategorias)):
-        categoria_paquete_mtrx.append([])
-        for pqt in range(len(listPaquetes)):
-            categoria_paquete_mtrx[cat].append(5)
 
     #  Ids categoria paquete #
     ids_categoria = []
     ids_paquete= []
+
     for categoria in misCategorias:
         ids_categoria.append(categoria.id)
-    misPaquetes = miEvento.paquetes
+        listCategorias.append(categoria.nombre)
+
     for paquete in misPaquetes:
         ids_paquete.append(paquete.id)
+        listPaquetes.append(paquete.nombre)
+
+    categoria_paquete_mtrx = []
+    cat_number = 0
+    for cat in misCategorias:
+        categoria_paquete_mtrx.append([])
+        for pqt in misPaquetes:
+            misCat_Paq = Categoria_Paquete.query.filter_by(
+                idPaquete = pqt.id,
+                idCategoria = cat.id
+            ).first()
+            categoria_paquete_mtrx[cat_number].append(misCat_Paq.monto)
+        cat_number += 1
 
     #  Usuarios en el Evento #
     idUsuariosG = []
@@ -937,23 +1010,25 @@ def gestionar_inscripcion():
     general = []
     usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosG)).all()
     for usuario in usuarios:
-        general.append({
-            "numero":usuario.id,
-            "nombre":usuario.nombre,
-            "documento":usuario.doc,
-            "tipoDocumento":usuario.tipodoc
-        })
+        if usuario.tipoUsuario == 'Participante':
+            general.append({
+                "numero":usuario.id,
+                "nombre":usuario.nombre,
+                "documento":usuario.doc,
+                "tipoDocumento":usuario.tipodoc
+            })
 
     #  Listado de Usuarios PreInscritos #
     preinscritos = []
     usuarios = Usuario.query.filter(Usuario.id.in_(idUsuariosPre)).all()
     for usuario in usuarios:
-        preinscritos.append({
-            "numero":usuario.id,
-            "nombre":usuario.nombre,
-            "documento":usuario.doc,
-            "tipoDocumento":usuario.tipodoc
-        })
+        if usuario.tipoUsuario == 'Participante':
+            preinscritos.append({
+                "numero":usuario.id,
+                "nombre":usuario.nombre,
+                "documento":usuario.doc,
+                "tipoDocumento":usuario.tipodoc
+            })
     
     #  Listado de Usuarios Inscritos #
     inscritos = []
@@ -986,40 +1061,38 @@ def gestionar_inscripcion():
         fecha = fecha,
         descuento = descuento,
         ids_categoria=ids_categoria,
-        ids_paquete=ids_paquete,
+        ids_paquete=ids_paquete
     )
 
 @app.route('/eliminarCategoria/<id>', methods=['POST','GET'])
 def eliminarCategoria(id): 
     #Eliminar Categoria en Categoria-Paquete
-    CategoriaPaquete = Categoria_Paquete.query.filter_by(idCategoria=id).first()
+    CategoriaPaquete = Categoria_Paquete.query.filter_by(idCategoria=id)
     
-    if CategoriaPaquete != None:
-        db.session.delete(paquete)
-        db.session.commit()
+    for cat_pqt in CategoriaPaquete:
+        db.session.delete(cat_pqt)
     
     #Eliminar Categoria
-    categoria = Categoria.query.filter_by(id=id).one()
-    if categoria != None:
-        db.session.delete(categoria)
-        db.session.commit()
+    categoria = Categoria.query.get(id)
+    db.session.delete(categoria)
+    
+    db.session.commit()
     
     return redirect(url_for('gestionar_inscripcion'))
                                        
 @app.route('/eliminarPaquete/<id>', methods=['POST','GET'])
 def eliminarPaquete(id):
     #Eliminar Paquete en Categoria-Paquete#
-    CategoriaPaquete = Categoria_Paquete.query.filter_by(idPaquete=id).first()
+    CategoriaPaquete = Categoria_Paquete.query.filter_by(idPaquete=id)
     
-    if CategoriaPaquete != None:
-        db.session.delete(CategoriaPaquete)
-        db.session.commit()
+    for cat_pqt in CategoriaPaquete:
+        db.session.delete(cat_pqt)
     
-    #Eliminar Paquete#
-    paquete = Paquete.query.filter_by(id=id).one()
-    if paquete != None:
-        db.session.delete(paquete)
-        db.session.commit()
+    #Eliminar Paquete
+    paquete = Paquete.query.get(id)
+    db.session.delete(paquete)
+
+    db.session.commit()
     
     return redirect(url_for('gestionar_inscripcion'))
 
@@ -1192,16 +1265,32 @@ def registraAsistencia():
 @app.route('/materiales', methods=['POST','GET'])
 def materiales():
 
-    ambiente = [
-        {"id":"AMBAMB","texto":"Ambientito"}
-    ]
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+
+    #Obtener ids de las actividades del evento
+    actividades = Actividad.query.filter_by(idEvento = id_evento)
+    listaIdActividades = []
+    for actividad in actividades:
+        listaIdActividades.append(actividad.id)
+
+    #Obtener ids de ambientes
+    listaAmbientes = []
+    ambientes = Ambiente.query.filter(Ambiente.id.in_(listaIdActividades)).all()
+    for ambiente in ambientes:
+        listaAmbientes.append({
+            "id":ambiente.id,
+            "texto":ambiente.nombre
+        })
+    
     lens={
-        "Ambiente":len(ambiente)
+        "Ambiente":len(listaAmbientes)
         
     }
     return render_template(
         "SCV-B11EntregaMaterial.html",
-        ambiente=ambiente,
+        ambiente=listaAmbientes,
         len=lens
     )
 
@@ -1226,13 +1315,24 @@ def colaborador():
         tipoUsuario = "Colaborador"
     )
 
-@app.route('/obtenerActividadesAmbiente', methods=['POST','GET'])
-def obtenerActividadesAmbiente():
-    actividad = [
-        {"id":"ACAC","nombre":"Actividad 1"}
-    ]
+@app.route('/obtenerActividadesAmbiente/<idAmb>', methods=['POST','GET'])
+def obtenerActividadesAmbiente(idAmb):
+    
+    listaIdsActividades = []
+    ambientes = Ambiente.query.filter_by(id = idAmb)
+    for ambiente in ambientes:
+        listaIdsActividades.append(ambiente.idActividad)
+    
+    listaActividades = []
+    actividades = Actividad.query.filter(Actividad.id.in_(listaIdsActividades))
+    for actividad in actividades:
+        listaActividades.append({
+            "id":actividad.id,
+            "nombre":actividad.nombre
+        })
+    
     response ={
-        "actividad":actividad
+        "actividad":listaActividades
     }
     
     return response
@@ -1260,13 +1360,48 @@ def obtenerCategoriasPaquete(idCat):
     return response
 
 
-@app.route('/obtenerParticipantesActividadAmbiente', methods=['POST','GET'])
-def obtenerParticipantesActividadAmbiente():
+@app.route('/obtenerParticipantesActividadAmbiente/<idAct>', methods=['POST','GET'])
+def obtenerParticipantesActividadAmbiente(idAct):
+    ''' Devuelve la relacion de participantes inscritos y que hayan registrado su asistencia para un ambiente
+        acompaniado del material que se le debe entregar dependiendo de la actividad elegida'''
+    idAmbiente = ""
+    ambientes = Ambiente.query.filter_by(idActividad = idAct)
+    for ambiente in ambientes:
+        idAmbiente = ambiente.id
+    
+    listaIdUsuarios = []
+    idUsuarios = Asistencia.query.filter_by(idAmbiente = idAmbiente)
+    for iU in idUsuarios:
+        listaIdUsuarios.append(iU.idUsuario)
+
+    listaParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdUsuarios)).all()
+    for participante in participantes:
+        if participante.tipoUsuario == "Participante":
+            listaParticipantes.append({
+                "id": participante.id,
+                "nombre":participante.nombre
+            })
+    
+    materialesEntregar = ""
+    materiales = Material.query.filter_by(idActividad = idAct)
+    for material in materiales:
+        if material.tipo == "Material participantes":
+            materialesEntregar = material.nombre
+
+    listaParticipantesMaterial = []
+    for i in range(len(listaParticipantes)):
+        listaParticipantesMaterial.append({
+            "participante":listaParticipantes[i].get("nombre"),
+            "materialAsignado":materialesEntregar,
+            "idParticipante":listaParticipantes[i].get("id")
+        })
+    
     participante = [
-        {"participante":"Pepe","materialAsignado":"PC","idParticipante":"1"}
+        {"participante":"Pepe","materialAsignado":materialesEntregar,"idParticipante":"1"}
     ]
     response ={
-        "participante":participante
+        "participante":participante #listaParticipantesMaterial
     }
     
     return response
@@ -1275,19 +1410,61 @@ def obtenerParticipantesActividadAmbiente():
 def nosotros():
     return render_template("Nosotros.html",tipoUsuario="Visitante")
 
+# ================== funcionalidades para COLABORADOR ==================
 @app.route('/asistencia', methods=['GET','POST'])
 def asistencia():
-    ambiente =[
-        {"id":"AMB1", "texto":"Nombre de Ambiente"}
-    ]
+    '''Generar registro de asistencia por participante y ambiente programado para cada actividad del evento'''
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+
+    #Obtener ids de las actividades del evento
+    actividades = Actividad.query.filter_by(idEvento = id_evento)
+    listaIdActividades = []
+    for actividad in actividades:
+        listaIdActividades.append(actividad.id)
+
+    #Obtener ids de ambientes
+    listaAmbientes = []
+    ambientes = Ambiente.query.filter(Ambiente.id.in_(listaIdActividades)).all()
+    for ambiente in ambientes:
+        listaAmbientes.append({
+            "id":ambiente.id,
+            "texto":ambiente.nombre
+        })
+    
     lens={
-        "Ambiente":len(ambiente)
+        "Ambiente":len(listaAmbientes)
     }
+    #Obtener datos de la asistencia
+    ahora = datetime.now()
+    horaAhora = ahora.hour
+    diaAhora = ahora.day
+    mesAhora = ahora.strftime("%b")
+    turno = ""
+    if horaAhora < 12:
+        turno = "Mañana"
+    elif horaAhora < 18:
+        turno = "Tarde"
+    else:
+        turno = "Noche"
+    diaAhora = (mesAhora) + "  " + str(diaAhora)
+
+    listaIdsUsuarios = []
+    participantes_eventos = Usuario_Evento.query.filter_by(idEvento = id_evento)
+    for pe in participantes_eventos:
+        listaIdsUsuarios.append(pe.idUsuario)
+    
+    listaIdsParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdsUsuarios)).all()
+    for participante in participantes:
+        if participante.tipoUsuario == "Participante":
+            listaIdsParticipantes.append(participante.id)
+
     asistencia ={
-        "turno":"noche",
-        "dia":"30 de Febrero",
-        "horaInicio":"10:10",
-        "participantes":20
+        "turno":turno,
+        "dia":diaAhora,
+        "participantes":len(listaIdsParticipantes)
     }
     codigo = {
         "rutaImagen":"qr/qrqrqr.jpg",
@@ -1296,20 +1473,67 @@ def asistencia():
     return render_template(
         "SCV-B12RegistrarAsistencia.html",
         tipoUsuario="Colaborador",
-        ambiente=ambiente,
+        ambiente=listaAmbientes,
         len=lens,
         codigo = codigo,
         asistencia=asistencia,
     )
 
-@app.route('/obtenerParticipantesAmbienteAsistencia', methods=['GET','POST'])
-def obtenerParticipantesAmbienteAsistencia():
+@app.route('/obtenerParticipantesAmbienteAsistencia/<idAmb>', methods=['GET','POST'])
+def obtenerParticipantesAmbienteAsistencia(idAmb):
     #idAmb #mandamos en el request
-    participante = [
-        {"participante":"Dino","horaIngreso":"10:10"}
-    ]
+    listaIdUsuarios = []
+    listaHoras = []
+    
+    idUsuarios = Asistencia.query.filter_by(idAmbiente = idAmb)
+    for iU in idUsuarios:
+        listaIdUsuarios.append(iU.idUsuario)
+        listaHoras.append({
+            "id":iU.id,
+            "horaIng":(str(iU.fechaAsistencia.hour) + ":" + str(iU.fechaAsistenca.minute))
+        })
+    horasOrdenadas = sorted(listaHoras, key = lambda k : k["id"])
+
+    listaParticipantes = []
+    participantes = Usuario.query.filter(Usuario.id.in_(listaIdUsuarios)).all()
+    for participante in participantes:
+        if participante.tipoUsuario == "Participante":
+            listaParticipantes.append({
+                "id": participante.id,
+                "nombre":participante.nombre
+            })
+    participantesOrdenados = sorted(listaParticipantes, key = lambda k : k["id"])
+
+    listaAsistencias = []
+    for i in range(len(horasOrdenadas)):
+        listaAsistencias.append({
+            "participante":participantesOrdenados[i].get("nombre"),
+            "horaIngreso":horasOrdenadas[i].get("horaIng")
+        })
+    '''
+    #prueba
+    listaPrueba = []
+    horaPrueba = [{
+        "id":"1",
+        "horaIng":"10:20"
+    }]
+    participantePrueba = [{
+        "id":"1",
+        "nombre":"Felipe"
+    }]
+    for i in range(len(horaPrueba)):
+        listaPrueba.append({
+            "participante":participantePrueba[i].get("nombre"),
+            "horaIngreso":horaPrueba[i].get("horaIng")
+        })
+    
+    listaEjemplo = [{
+        "participante":idAmb,
+        "horaIngreso":"10:50"
+    }]
+    '''
     response = {
-        "participante":participante
+        "participante":listaAsistencias
     }
     return response
 
@@ -1527,14 +1751,34 @@ def obtenerParticipantesCertificados():
 @app.route('/reporteCaja', methods=['POST','GET'])
 def reporteCaja():
     #tipos son ingreso, egreso, otro son para el color de la celda
-    general =[
-        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"ingreso"},
-        {"num":"5","fecha":"nunca","cierre":"$-5000","tipo":"egreso"},
-        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"otro"},
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento']).order_by(Movimiento.fechaCreacion) 
+    #usuario = Usuario.query.get_or_404(session['idUsuario'])
+    movimientosId = []
+    for mov in movimientos:
+        movimientosId.append(mov.id)
+    cierreEvento = 0
+    general = []
+    for idMov in movimientosId:
+        movimiento = Movimiento.query.get_or_404(idMov)
+        tipo =""
+        if movimiento.tipo == 'Ingreso': cierreEvento+=movimiento.monto
+        else: cierreEvento -= movimiento.monto
+        if cierreEvento<0: tipo = "egreso"
+        else: tipo = "ingreso"
+        general.append({
+            'num':movimiento.id,
+            'fecha':movimiento.fechaCreacion.strftime("%d/%m/%Y"),
+            'cierre':cierreEvento,#dinero de la caja
+            'tipo':tipo
+        })
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento']).filter_by(fechaCreacion = date.today())
+    movimientosId = []
+    for mov in movimientos: movimientosId.append(mov.id)
+    cierreDiario = 0
+    for idMov in movimientosId:
+        movimiento = Movimiento.query.get_or_404(idMov)
+        cierreDiario+=movimiento.monto
 
-    ]
-    cierreEvento="$-3000"
-    cierreDiario="$3.5"
     lens = {
         "general":len(general)
     }
@@ -1545,7 +1789,21 @@ def reporteCaja():
         general=general,
         len = lens
     )
+'''
+@app.route('/excel', methods=['GET', 'POST'])
+def exportexcel():
+    data = Data.query.all()
+    data_list = [to_dict(item) for item in data]
+    df = pd.DataFrame(data_list)
+    filename = app.config['UPLOAD_FOLDER']+"/autos.xlsx"
+    print("Filename: "+filename)
 
+    writer = pd.ExcelWriter(filename)
+    df.to_excel(writer, sheet_name='Registrados')
+    writer.save()
+
+    return send_file(filename)
+'''
 @app.route('/obtenerReporteCaja', methods=['POST','GET'])
 def obtenerReporteCaja():
     # No olvidar generar el pdf
@@ -1568,6 +1826,11 @@ def qrPArticipanteAsistencia():
 def registrarAsistenciaMovil():
     
     return render_template("SCV-B13RegistrarAsistenciaMovil.html")
+
+@app.route('/cargarTransacciones', methods=['POST','GET'])
+def cargarTransacciones():
+    t = Transacciones(db)
+    return 'ok'
 
 if __name__ == '__main__':
     app.run()

@@ -63,10 +63,6 @@
                     <small id="asistenciaDia" class="form-text text-muted">Día</small>
                 </div>
                 <div class="col-sm">
-                    <h5>{{asistencia.horaInicio}}</h5>
-                    <small id="asistenciaHoraInicio" class="form-text text-muted">Hora de Inicio</small>
-                </div>
-                <div class="col-sm">
                     <h5>{{asistencia.participantes}}</h5>
                     <small id="asistenciaParticipantes" class="form-text text-muted">Participantes</small>
                 </div>
@@ -96,7 +92,7 @@
     // Permite Obtener los participantes segun el ambiente seleccionado
     function getParticipantes(idAmb){
         const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia", false);
+        request.open('GET',  "/obtenerParticipantesAmbienteAsistencia/"+idAmb, false);
         request.onload = () => {
             BOOSTTRAP.Utilities.onlyChild(idTablaBody," ")
             const data = JSON.parse(request.responseText);
