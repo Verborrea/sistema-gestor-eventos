@@ -90,7 +90,8 @@ class Movimiento(db.Model):
     detalle = db.Column(db.String(90))
     cantidad = db.Column(db.Integer)
     monto = db.Column(db.Float, nullable = False)
-    
+    fechaCreacion = db.Column(db.Date, default=datetime.utcnow)
+
     idEvento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
 
 class Categoria(db.Model):

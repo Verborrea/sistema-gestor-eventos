@@ -4,6 +4,7 @@ from werkzeug.wrappers import response
 from models import *
 from sendEmail import *
 from transacciones import *
+from datetime import date
 
 import json
 
@@ -39,6 +40,14 @@ def breakArr(array,division):
                 arr[i//division].append(array[j])
                 sizes[i//division]=sizes[i//division]+1
     return arr,sizes, len(sizes)
+
+def to_dict(row):
+    if row is None: return None
+    rtn_dict = dict()
+    keys = row.__table__.columns.keys()
+    for key in keys:
+        rtn_dict[key] = getattr(row, key)
+    return rtn_dict
 
 # =============== creacion de un administrador primigenio =============== #
 
@@ -1528,14 +1537,34 @@ def obtenerParticipantesCertificados():
 @app.route('/reporteCaja', methods=['POST','GET'])
 def reporteCaja():
     #tipos son ingreso, egreso, otro son para el color de la celda
-    general =[
-        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"ingreso"},
-        {"num":"5","fecha":"nunca","cierre":"$-5000","tipo":"egreso"},
-        {"num":"5","fecha":"nunca","cierre":"$-3000","tipo":"otro"},
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento']).order_by(Movimiento.fechaCreacion) 
+    #usuario = Usuario.query.get_or_404(session['idUsuario'])
+    movimientosId = []
+    for mov in movimientos:
+        movimientosId.append(mov.id)
+    cierreEvento = 0
+    general = []
+    for idMov in movimientosId:
+        movimiento = Movimiento.query.get_or_404(idMov)
+        tipo =""
+        if movimiento.tipo == 'Ingreso': cierreEvento+=movimiento.monto
+        else: cierreEvento -= movimiento.monto
+        if cierreEvento<0: tipo = "egreso"
+        else: tipo = "ingreso"
+        general.append({
+            'num':movimiento.id,
+            'fecha':movimiento.fechaCreacion.strftime("%d/%m/%Y"),
+            'cierre':cierreEvento,#dinero de la caja
+            'tipo':tipo
+        })
+    movimientos = Movimiento.query.filter_by(idEvento = session['idEvento']).filter_by(fechaCreacion = date.today())
+    movimientosId = []
+    for mov in movimientos: movimientosId.append(mov.id)
+    cierreDiario = 0
+    for idMov in movimientosId:
+        movimiento = Movimiento.query.get_or_404(idMov)
+        cierreDiario+=movimiento.monto
 
-    ]
-    cierreEvento="$-3000"
-    cierreDiario="$3.5"
     lens = {
         "general":len(general)
     }
@@ -1546,7 +1575,21 @@ def reporteCaja():
         general=general,
         len = lens
     )
+'''
+@app.route('/excel', methods=['GET', 'POST'])
+def exportexcel():
+    data = Data.query.all()
+    data_list = [to_dict(item) for item in data]
+    df = pd.DataFrame(data_list)
+    filename = app.config['UPLOAD_FOLDER']+"/autos.xlsx"
+    print("Filename: "+filename)
 
+    writer = pd.ExcelWriter(filename)
+    df.to_excel(writer, sheet_name='Registrados')
+    writer.save()
+
+    return send_file(filename)
+'''
 @app.route('/obtenerReporteCaja', methods=['POST','GET'])
 def obtenerReporteCaja():
     # No olvidar generar el pdf

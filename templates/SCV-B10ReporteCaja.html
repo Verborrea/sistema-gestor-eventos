@@ -11,7 +11,7 @@
     <br>
     <div class="row">
         <div class="col-7">
-            <table class="table table-hover table-sm">
+            <table class="table table-hover table-sm" id="tabla">
                 <thead>
                     <tr class="table-active">
                         <th scope="col">Num.</th>
@@ -41,8 +41,8 @@
                 <input type="text" class="form-control" value="{{cierreEvento}}" readonly>
             </div>
             <br>
-            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('pdf')" download="pdf.pdf">Exportar PDF</a>
-            <a href="#" id="exportar" class="btn btn-primary btn-block" type="button" onclick="exportar('excel')" download="pdf.pdf">Exportar EXCEL</a>
+            <button id="pdf" class="btn btn-primary btn-block" type="button">Exportar PDF</button>
+            <button id="excel" class="btn btn-primary btn-block" type="button">Exportar EXCEL</button>
 
         </div>
     </div>
@@ -50,16 +50,14 @@
 {% endblock %}
 {% block script %}
 <script>
-    //Funcion que permite exportar el reporte de caja en extension .pdf y .xls
-    function exportar(formato){
-        const request = new XMLHttpRequest();
-        request.open('GET',  "/obtenerReporteCaja", false);
-        request.onload = () => {
-            const file = JSON.parse(request.responseText);
-            document.getElementById("exportar").setAttribute('href',file.url)
-            document.getElementById("exportar").setAttribute('download',file.fileName)
-        };
-        request.send(formato=formato)
-    }
+    window.onload = ()=> {
+        $('#pdf').on('click',function(){
+            $("#tabla").tableHTMLExport({type:'pdf',filename:'ReporteCaja.pdf'});
+        })
+        $('#excel').on('click',function(){
+            $("#tabla").tableHTMLExport({type:'csv',filename:'ReporteCaja.csv'});
+        })
+    };
+    
 </script>
 {% endblock %}

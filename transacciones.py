@@ -168,6 +168,7 @@ class Transacciones:
             stockInicial = 500,
             costoUnitario = 1.5,
             idActividad = 5
+
         )
         db.session.add(nuevoMaterial)
         db.session.commit()
@@ -322,7 +323,8 @@ class Transacciones:
             factura = "F123654564",
             detalle = "Adquisicion de Lapiceros",
             monto = 300,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-14","00:00")
         )
         db.session.add(movimiento)
 
@@ -332,7 +334,8 @@ class Transacciones:
             factura = "C12367904812",
             detalle = "Donación anónima",
             monto = 2000,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-13","00:00")
         )
         db.session.add(movimiento)
 
@@ -342,7 +345,8 @@ class Transacciones:
             factura = "C1236532",
             detalle = "Inscripcion aporte voluntario",
             monto = 120,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -352,7 +356,8 @@ class Transacciones:
             factura = "C12352532",
             detalle = "Inscripcion aporte voluntario",
             monto = 80,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-13","00:00")
         )
         db.session.add(movimiento)
 
@@ -362,7 +367,8 @@ class Transacciones:
             factura = "C8756532",
             detalle = "Inscripcion aporte voluntario",
             monto = 80,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-13","00:00")
         )
         db.session.add(movimiento)
 
@@ -372,7 +378,8 @@ class Transacciones:
             factura = "F352054564",
             detalle = "Instalación de Equipo de Luces en el Escenario Principal",
             monto = 450,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -382,7 +389,8 @@ class Transacciones:
             factura = "F352054564",
             detalle = "Instalación de Equipo de Sonido en el Escenario Principal",
             monto = 350,
-            idEvento = self.eventos["libro"].id
+            idEvento = self.eventos["libro"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -395,7 +403,8 @@ class Transacciones:
             factura = "F16980119",
             detalle = "adquisicion de USBs para entregar a los ponentes",
             monto = 2000,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-14","00:00")
         )
         db.session.add(movimiento)
 
@@ -405,7 +414,8 @@ class Transacciones:
             factura = "C12367904812",
             detalle = "Donación anónima para el Coffee Break",
             monto = 2750,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -415,7 +425,8 @@ class Transacciones:
             factura = "C98021819",
             detalle = "Inscripcion paquete Basico",
             monto = 150,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-11","00:00")
         )
         db.session.add(movimiento)
 
@@ -425,7 +436,8 @@ class Transacciones:
             factura = "C17961819",
             detalle = "Inscripcion paquete Estudiante",
             monto = 80,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -435,7 +447,8 @@ class Transacciones:
             factura = "C13953012",
             detalle = "Inscripcion paquete Estudiante",
             monto = 80,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-10","00:00")
         )
         db.session.add(movimiento)
 
@@ -445,7 +458,8 @@ class Transacciones:
             factura = "F09049519",
             detalle = "Reservación del Restaurante Chicha",
             monto = 1500,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
@@ -455,7 +469,8 @@ class Transacciones:
             factura = "F06159619",
             detalle = "Polos para el STAFF",
             monto = 350,
-            idEvento = self.eventos["Game"].id
+            idEvento = self.eventos["Game"].id,
+            fechaCreacion=crearFechaHora("2021-12-10","00:00")
         )
         db.session.add(movimiento)
         db.session.commit()
@@ -467,7 +482,8 @@ class Transacciones:
             factura = "F97071119",
             detalle = "Adquisicion de Manual de Reglas para los participantes",
             monto = 750,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-11","00:00")
         )
         db.session.add(movimiento)
 
@@ -477,7 +493,8 @@ class Transacciones:
             factura = "C541656513565451",
             detalle = "Donación para dar un presente a los participantes",
             monto = 2550,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-15","00:00")
         )
         db.session.add(movimiento)
 
@@ -487,7 +504,8 @@ class Transacciones:
             factura = "C95081908",
             detalle = "Inscripcion Estudiante",
             monto = 90,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-14","00:00")
         )
         db.session.add(movimiento)
 
@@ -497,7 +515,8 @@ class Transacciones:
             factura = "C17961819",
             detalle = "Inscripcion paquete Profesional",
             monto = 160,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-10","00:00")
         )
         db.session.add(movimiento)
 
@@ -507,7 +526,8 @@ class Transacciones:
             factura = "C1653215316",
             detalle = "Inscripcion paquete Profesional",
             monto = 160,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-11","00:00")
         )
         db.session.add(movimiento)
 
@@ -517,7 +537,8 @@ class Transacciones:
             factura = "F09049519",
             detalle = "Contrato para la preparación de lunchs para los participantes",
             monto = 2700,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-14","00:00")
         )
         db.session.add(movimiento)
 
@@ -527,7 +548,8 @@ class Transacciones:
             factura = "F97041219",
             detalle = "Polos para participantes",
             monto = 350,
-            idEvento = self.eventos["gameJam"].id
+            idEvento = self.eventos["gameJam"].id,
+            fechaCreacion=crearFechaHora("2021-12-12","00:00")
         )
         db.session.add(movimiento)
 
