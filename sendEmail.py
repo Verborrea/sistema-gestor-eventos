@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 
 def sedEmail(correo):
     
-    mail_content = '''Se registro Exitosamente'''
+    mail_content = '''Se registro Exitosamente. Realizar el pago en efectivo o por transacción a la cuenta 056-153895-5623, y responder al presente correo.'''
 
     #The mail addresses and password
     sender_address = 'groupis.ucsp@gmail.com'

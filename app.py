@@ -1193,13 +1193,17 @@ def listaEventosParticipante():
 def porTransferencia():
     '''Agrega un nuevo movimiento del tipo transferencia para la validacion de la inscripcion
         y actualiza el estado del participante en el evento como INSCRITO'''
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+
     #Agregar nuevo movimiento del tipo validacion de inscripcion - transferencia
     nuevoMovimiento = Movimiento(
         tipo = "Transferencia",
         nombre = "Validacion de inscripcion",
         factura = request.form.get('numeroOperacion'),
         monto = request.form.get('monto'),
-        idEvento = session['idEvento']
+        idEvento = id_evento
     )
     db.session.add(nuevoMovimiento)
     db.session.commit()
@@ -1208,7 +1212,7 @@ def porTransferencia():
     miParticipante = Usuario.query.filter_by(username = usuarioParticipante, tipoUsuario = "Participante").first()
     idParticipante = miParticipante.id
 
-    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = session['idEvento']).first()
+    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = id_evento).first()
     miUsuarioEvento.estaInscrito = True
     db.session.commit()
 
@@ -1218,13 +1222,17 @@ def porTransferencia():
 def porEfectivo():
     '''Agrega un nuevo movimiento del tipo efectivo para la validacion de la inscripcion
         y actualiza el estado del participante en el evento como INSCRITO'''
+    #Obtener id del evento
+    usuarios_eventos = Usuario_Evento.query.filter_by(idUsuario = session['idUsuario']).first()
+    id_evento = usuarios_eventos.idEvento
+    
     #Agregar nuevo movimiento del tipo validacion de inscripcion - transferencia
     nuevoMovimiento = Movimiento(
         tipo = "Efectivo",
         nombre = "Validacion de inscripcion",
         factura = "EF",
         monto = request.form.get('monto'),
-        idEvento = session['idEvento']
+        idEvento = id_evento
     )
     db.session.add(nuevoMovimiento)
     db.session.commit()
@@ -1233,7 +1241,7 @@ def porEfectivo():
     miParticipante = Usuario.query.filter_by(username = usuarioParticipante, tipoUsuario = "Participante").first()
     idParticipante = miParticipante.id
 
-    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = session['idEvento']).first()
+    miUsuarioEvento = Usuario_Evento.query.filter_by(idUsuario = idParticipante, idEvento = id_evento).first()
     miUsuarioEvento.estaInscrito = True
     db.session.commit()
 
